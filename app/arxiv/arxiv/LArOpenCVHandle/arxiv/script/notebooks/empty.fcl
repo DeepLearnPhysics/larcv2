@@ -1,0 +1,38 @@
+      Verbosity: 0
+      Profile: true
+      TrackImageProducer: "tpc_hires_crop"
+      Debug: true
+
+      Q2Gray: 2
+      QMin: 0.1
+      QMax: 500
+
+      MatchPlaneWeights: [1.,1.,1.]
+
+      ImageClusterManager: {
+        StoreAlgoData: false  
+        Verbosity: 0
+        Profile:   true
+
+        ClusterAlgoType: []
+        ClusterAlgoName: []
+        EnableWireCheck: false
+          
+        ShowImage: false
+
+        MatchAlgoType: ""
+        MatchAlgoName: ""
+
+        ReClusterAlgoType: ""
+        ReClusterAlgoName: ""
+
+        UseOnlyTwoPlanes: false
+        RequirePlane: 2
+
+        ImageClusterViewer: {
+          Verbosity: 2
+          Width:  800
+          Height: 800
+          MinContourArea: 0
+        }
+      }

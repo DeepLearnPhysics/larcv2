@@ -1,0 +1,13 @@
+CXX		= xlC
+LD              = xlC
+CXXFLAGS        += -std=c++0x -qarch=pwr3 -qmaxmem=-1 -q${OBJECT_MODE} -D_CORE_$(shell uname -s)_
+LDFLAGS       	+= -Wl,-bhalt:5 
+FFLAGS          += -qrealsize=8
+FLDFLAGS        += -lC
+ARFLAGS		= -X${OBJECT_MODE}
+SOMAKER         = g++
+SOFLAGS         = -shared -Wl -g
+
+ifeq ($(LARCV_OPENCV),1)
+CXXFLAGS += -DUSE_OPENCV
+endif

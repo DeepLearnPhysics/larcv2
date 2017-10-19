@@ -1,0 +1,11 @@
+*.sh
+*.txt
+*.pkl
+cosmic_in
+cosmic_out
+ncpizero_in
+ncpizero_out
+nue_in
+nue_out
+numu_in
+numu_out

@@ -1,0 +1,78 @@
+File=Table 
+Product=larcv
+ 
+Group:
+
+Flavor     = ANY
+Qualifiers = "e14:prof"
+
+  Action = GetProducts
+    setupRequired( root v6_08_06g -q +e14:+nu:+prof )
+
+Flavor     = ANY
+Qualifiers = "e14:debug"
+
+  Action = GetProducts
+    setupRequired( root v6_08_06g -q +e14:+nu:+debug )
+
+Flavor     = ANY
+Qualifiers = "e14:opt"
+
+  Action = GetProducts
+    setupRequired( root v6_08_06g -q +e14:+nu:+opt )
+
+Flavor     = ANY
+Qualifiers = "e10:prof"
+
+  Action = GetProducts
+    setupRequired( root v6_06_08 -q +e10:+nu:+prof )
+
+Flavor     = ANY
+Qualifiers = "e10:debug"
+
+  Action = GetProducts
+    setupRequired( root v6_06_08 -q +e10:+nu:+debug )
+
+Flavor     = ANY
+Qualifiers = "e10:opt"
+
+  Action = GetProducts
+    setupRequired( root v6_06_08 -q +e10:+nu:+opt )
+
+Common:
+  Action = setup
+    prodDir()
+    setupEnv()
+    envSet(${UPS_PROD_NAME_UC}_VERSION, ${UPS_PROD_VERSION})
+
+    # Set up required products, which is root
+    exeActionRequired(GetProducts)
+
+    envSet(LARCV_BASEDIR,${UPS_PROD_DIR}/${UPS_PROD_FLAVOR})
+    envSet(LARCV_COREDIR,${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/core)
+    envSet(LARCV_APPDIR,${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/app)
+    envSet(LARCV_ROOT6,0)
+    envSet(LARCV_INCDIR,${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/build/include)
+    envSet(LARCV_LIBDIR,${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/build/lib)
+
+    if ( test `uname` = "Darwin" )
+      envSet(LARCV_CXX,clang++)
+      pathPrepend(DYLD_LIBRARY_PATH, ${LARCV_LIBDIR})
+    else()
+      envSet(LARCV_CXX,g++)
+      pathPrepend(LD_LIBRARY_PATH, ${LARCV_LIBDIR})
+    endif ( test `uname` = "Darwin" )
+
+    # add the bin directory to the path
+    pathPrepend(PATH, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/bin )
+    # add the python area to the pythonpath
+    pathPrepend(PYTHONPATH, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/python )
+
+End:
+# End Group definition
+#*************************************************
+#
+# ups declare command that works on gpvm:
+# ups declare larcv v06_36_00 -r larcv/v06_36_00 -f Linux64bit+2.6-2.12 -m larcv.table -q e14:prof -U ups/
+#
+#

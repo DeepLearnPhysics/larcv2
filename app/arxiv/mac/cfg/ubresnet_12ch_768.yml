@@ -1,0 +1,51 @@
+# Where is your caffe?
+cafferoot: /home/taritree/working/larbys/caffe_larbys/python
+
+# CPU or GPU?
+usecpu : True
+
+# GPU number
+gpuid : 0
+
+# Deploy version of the model, please remove ROOTDataLayer or whatever
+modelfile: /home/taritree/working/larbys/resnet-18/training_attempts/ubtri/001/ub_trimese_resnet_headlessdeploy.prototxt
+
+# Pretrained caffe model
+pretrainedmodel: /home/taritree/working/larbys/resnet-18/training_attempts/ubtri/001/snapshot_rmsprop_iter_stage3.caffemodel
+
+# The mean file location on disk
+meanfile: /home/taritree/working/larbys/lmdb2image2d/mean.root
+
+# Producer for the mean file
+meanproducer: tpc_12ch_mean
+
+# Wrapper layer will make a copy of model file (has to sit somewhere on disk...)
+# the will all it's own input layer on top so make sure the first
+# real layer has input "data", we will try to guess the dimensions
+# based on image in the pgplot window
+model: /tmp/test.prototxt
+
+# Number of channels
+channels: 12
+
+# Thresholding parameter iMin and iMax
+imin : 0
+imax : 255
+
+# Can be per plane (per channel...) but is currently unused
+imin_plane0: 0
+imin_plane1: 0
+imin_plane2: 0
+
+imax_plane0: 255
+imax_plane1: 255
+imax_plane2: 255
+
+# This is the name of the last FC layer which computer the score
+lastfc: probt
+
+# This layer doesn't have to be here but that's OK, what is the name of the loss layer
+loss: loss
+
+# For Debug: save the data given to the network in a numpy binary file
+save_datablob: True

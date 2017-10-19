@@ -1,0 +1,8 @@
+{
+  "larcv_process_cfg": "default_larcv.cfg", 
+  "larlite_process_cfg": "default_larlite.cfg", 
+  "larlite_filelist": "", 
+  "larcv_filelist": "ana_dbscan_out.txt",
+  "load_files_on_start":"yes",
+  "default_filetype_driver":"LARCV"
+}

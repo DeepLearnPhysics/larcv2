@@ -1,0 +1,88 @@
+#!/usr/bin/env python
+import sys,commands,os,argparse
+try:
+    import proddb
+except ImportError,NameError:
+    print 'Cannot use this script w/o proddb!'
+    sys.exit(1)
+from proddb.table import table
+from proddb.dbenv import *
+from subprocess import Popen, PIPE
+
+parser = argparse.ArgumentParser(description='LArCV ProcessDriver execution script (use proddb)')
+
+parser.add_argument('-c','--config',  
+                    type=str, dest='cfg',
+                    help='string, Config file',required=True)
+
+parser.add_argument('-nevents','--num-events',
+                    type=int, dest='nevents', default=0,
+                    help='integer, Number of events to process')
+
+parser.add_argument('-nskip','--num-skip',
+                    type=int, dest='nskip', default=0,
+                    help='integer, Number of events to skip')
+
+parser.add_argument('-ip','--input-project', 
+                    type=str, dest='inputproject',required=True,
+                    help='string,  Input project name')
+
+parser.add_argument('-isession','--input-sessionid',
+                    type=int, dest='inputsession',default=None,
+                    help='integer, Input session id (optional)')
+
+parser.add_argument('-istatus','--input-status',
+                    type=int, dest='inputstatus',default=None,
+                    help='integer, Input status (optional)')
+
+parser.add_argument('-ol','--output-larcv',default='',
+                    type=str, dest='larcv_fout',
+                    help='string,  Output larcv file name (optional)')
+
+parser.add_argument('-oa','--output-ana',default='',
+                    type=str, dest='ana_fout',
+                    help='string,  Output analysis file name (optional)')
+
+args = parser.parse_args()
+
+in_project=args.inputproject
+in_session=args.inputsession
+in_status =args.inputstatus
+t=table(args.inputproject)
+if not t.exist():
+    print 'Project does not exist:',args.inputproject
+    sys.exit(1)
+
+files = t.list(session_id=in_session,status=in_status)
+t.close()
+if len(files) == 0:
+    msg = 'No input files found ... project: ' + in_project
+    if in_session:
+        msg += ' session: ' + in_session
+    if in_status:
+        msg += ' status: ' + in_status
+    print msg
+    sys.exit(1)
+
+from ROOT import std
+from larcv import larcv
+
+proc = larcv.ProcessDriver('ProcessDriver')
+
+proc.configure(args.cfg)
+
+proc.override_output_file(args.larcv_fout)
+
+proc.override_ana_file(args.ana_fout)
+
+flist = std.vector('string')()
+for f in files:
+    flist.push_back(f[4])
+   
+proc.override_input_file(flist)
+
+proc.initialize()
+
+proc.batch_process(args.nskip,args.nevents)
+
+proc.finalize()

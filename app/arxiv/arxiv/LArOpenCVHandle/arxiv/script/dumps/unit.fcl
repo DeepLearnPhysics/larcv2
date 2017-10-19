@@ -1,0 +1,81 @@
+      Verbosity: 0
+      Profile: true
+      ImageProducer: "tpc_hires_crop"#"tpc"#"tpc_hires_crop"
+      Debug: true
+
+      Q2Gray: 2	
+      QMin: 0.1
+      QMax: 500
+
+      MatchPlaneWeights: [1.,1.,1.]
+
+      ImageClusterManager: {
+        StoreAlgoData: false  
+        Verbosity: 0
+        Profile:   true
+
+        ClusterAlgoType: ["HIPCluster","DefectCluster","PCACandidates","Refine2DVertex","VertexTrackCluster"]
+        ClusterAlgoName: ["hipctor","defbreak1","pca1","refine_vtx","vtxctor"]
+        EnableWireCheck: false
+          
+        ShowImage: false
+
+        MatchAlgoType: ""
+        MatchAlgoName: ""
+
+        ReClusterAlgoType: ""
+        ReClusterAlgoName: ""
+
+        UseOnlyTwoPlanes: false
+        RequirePlane: 2
+
+        ImageClusterViewer: {
+          Verbosity: 2
+          Width:  800
+          Height: 800
+          MinContourArea: 0
+        }
+
+        hipctor : { 
+            #MinHIPClusterSize : 4
+        }
+        defbreak1 : {}
+        pca1 : {
+            DefectClusterAlgo: "defbreak1"
+            BreakPerVertex: false
+        }
+        rough_vtx : {}
+        refine_vtx : { PCACandidatesAlgo : "pca1" DefectClusterAlgo : "defbreak1" }
+        vtxctor : {
+            #Verbosity : 0
+                DilationSize : 10
+                DilationIterations : 2
+                BlurSizeR : 25
+                BlurSizeT : 5
+                Thresh : 1
+                ThreshMaxVal : 255
+                Refine2DVertexAlgo : refine_vtx
+        }
+        defbreak2 : {}
+        pca2 : {
+            DefectClusterAlgo: "defbreak2"
+            BreakPerVertex: true
+        }
+        atrack : {
+            2ndPCACandidatesName : "pca2"
+            2ndDefectClusterName : "defbreak2"		       
+	    Refine2DVertexName   : "refine_vtx" 
+	    }
+        dqdx : {
+            PCACandidatesName    : "pca2"
+    	    AtomicTrackAnaName   : "atrack"
+	    2ndDefectClusterName : "defbreak2"		       
+	    Refine2DVertexName   : "refine_vtx"
+	    }
+        proj : {
+            Refine2DVertexName :     "refine_vtx"
+	    PCACandidatesName  :     "pca2"
+    	    VertexTrackClusterName : "vtxctor"
+            AtomicTrackAnaName :     "atrack"
+     	    }
+      }

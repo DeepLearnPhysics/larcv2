@@ -1,0 +1,70 @@
+#!/usr/bin/env python
+import sys, os
+if len(sys.argv)<2:
+   sys.stderr.write('Usage: %s CLASS_NAME\n\n' % sys.argv[0])
+   sys.exit(1)
+if not 'LARCV_BASEDIR' in os.environ.keys():
+   sys.stderr.write('$LARCV_BASEDIR not defined!\n\n')
+   sys.exit(1)
+for f in ['GNUmakefile','LinkDef.h']:
+   if not f in os.listdir(os.getcwd()):
+      sys.stderr.write('Current directory does not appear to be a package (missing %s).\n\n' % f)
+      sys.exit(1)
+
+target_dir = os.getcwd()
+working_package = target_dir.replace(target_dir[0:target_dir.rfind('/')+1],'')
+name=sys.argv[1]
+source_dir='%s/bin/templates' % os.environ['LARCV_BASEDIR']
+
+in_source='%s/process.cxx' % source_dir
+in_header='%s/process.h' % source_dir
+
+src_list = { in_source   : '%s/%s.cxx' % (target_dir,name),
+             in_header   : '%s/%s.h'   % (target_dir,name) }
+
+for src in src_list.keys():
+   if os.path.isfile(src_list[src]):
+      sys.stderr.write('File already exists: %s\n\n' % src_list[src])
+      sys.exit(1)
+      
+for src in src_list.keys():
+   contents=open(src,'r').read()
+   contents=contents.replace('EMPTY_CLASS_NAME',name.upper())
+   contents=contents.replace('empty_class_name',name.lower())
+   contents=contents.replace('Empty_Class_Name',name)
+   contents=contents.replace('Shell_User_Name',os.environ['USER'])
+   contents=contents.replace('Working_Package',working_package)
+   fout=open(src_list[src],'w')
+   fout.write(contents)
+   fout.close()
+
+# modify LinkDef
+contents=open('%s/LinkDef.h' % target_dir, 'r').read().split('\n')
+fout=open('%s/LinkDef.h' % target_dir,'w')
+for line in contents:
+   line=line + '\n'
+   if line.find('ADD_NEW_CLASS')>=0:
+      line='#pragma link C++ class larcv::%s+;\n%s' % (name,line)
+   fout.write(line)
+
+print
+print 'Generated the followings under %s.' % target_dir
+for key in src_list.keys():
+   print '    %s' % src_list[key]
+print
+print 'To compile your program, try:'
+print '    > make --directory=%s' % target_dir
+print ' OR'
+print '    > cd %s; make;' % target_dir
+print
+print 'To remove your empty class code, you should remove:'
+print '%s/%s.h' % (target_dir,name)
+print '%s/%s.cxx' % (target_dir,name)
+print
+print 'Finally remove #pragma statement for your class from'
+print '%s/LinkDef.h' % target_dir
+print
+print 'I let you go now :)'
+print
+print
+sys.exit(0)

@@ -1,0 +1,96 @@
+#COMPILER:
+CC              = gcc
+CXX             = $(LARCV_CXX)
+#LINKER          = libtool
+#SOMAKER         = libtool 
+LINKER          = $(LARCV_CXX)
+SOMAKER         = $(LARCV_CXX)
+
+#######"-O" FLAG: (not always ideal with debugging info)
+CFLAGS          += -O3
+CXXFLAGS        += -O3 
+#SOFLAGS         += -O
+#AFLAGS          += -O
+#DLLFLAGS        += -O
+
+#######DEBUG FLAG:  BOTH COMPILER & LINKER
+CFLAGS          += -ggdb
+CXXFLAGS        += -ggdb
+#AFLAGS          += -ggdb
+#SOFLAGS         += -ggdb
+DLLFLAGS        += -ggdb
+
+#######PROFILING FLAG: gprof
+#CFLAGS          += -pg
+#CXXFLAGS        += -pg
+#SOFLAGS         += -pg
+
+#######PROFILING FLAG (II): gprof line execution counter (NOT WORKING)
+#CFLAGS          += -a
+#CXXFLAGS        += -a
+#SOFLAGS         += -a
+
+#######"-Wl" FLAG: BOTH COMPILER & LINKER
+CFLAGS          += -Wall
+#CXXFLAGS        += -Wall -std=c++11 -Wc++11-extensions
+#SOFLAGS         += -Wl #-Wall g++
+#AFLAGS          += -Wall
+DLLFLAGS        += -Wall
+
+#######PENDANTIC FLAG: BOTH COMPILER & LINKER
+#CFLAGS          += -pedantic
+#CXXFLAGS        += -pedantic
+#SOFLAGS         += -pedantic 
+#DLLFLAGS        += -pedantic
+
+#######"-Wl" FLAG: BOTH COMPILER & LINKER
+CFLAGS          += -fPIC
+CXXFLAGS        += -fPIC
+#AFLAGS          += -fPIC
+SOFLAGS         += -fPIC # g++
+DLLFLAGS        += -fPIC
+
+
+##########
+#COMPILER FLAGS
+##########
+CFLAGS          += -fsigned-char -pipe -DHAVE_LONG_LONG  
+CFLAGS          += -fno-common -O3 -D_CORE_$(shell uname -s)_
+CXXFLAGS        += -fsigned-char -pipe -DHAVE_LONG_LONG  
+CXXFLAGS        += -fno-common -O3 -Wno-deprecated -D_CORE_$(shell uname -s)_
+
+
+##########
+#LINKER FLAGS
+##########
+#DYNAMIC LIBRARY
+DLLFLAGS        += -dynamiclib -single_module -undefined dynamic_lookup 
+#STATIC LIBRARY
+AFLAGS          += -static 
+#LOADABLE LIBRARY
+#SOFLAGS         += -dynamic # for libtool
+#ALTERNATIVE: checks symbols at run-time only -> disable for debugging
+#SOFLAGS         += -undefined dynamic_lookup # for libtool
+
+SOFLAGS += -g -shared 
+
+#######FLAT NAMESPACE:
+#SOFLAGS         += -flat_namespace 
+#DLLFLAGS        += -flat_namespace 
+
+
+#FORTRAN FLAGS:
+FFLAGS          += -Wall
+FLDFLAGS        += -lstdc++ -bundle -undefined dynamic_lookup -O2 -bind_at_load  -L. 
+
+################
+#NOT USED -> OLD VERSION: DEPRECATED???
+################
+#CXXFLAGS        += -O -W -Wall -Wno-deprecated
+#LD              = MACOSX_DEPLOYMENT_TARGET=10.4 g++
+#MACOSX_DEPLOYMENT_TARGET=10.4 
+#-install_name (MACH-O) = -soname (EFL)
+
+ifeq ($(LARCV_OPENCV),1)
+CXXFLAGS += -DUSE_OPENCV
+endif

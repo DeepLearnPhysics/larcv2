@@ -1,0 +1,45 @@
+# Where is your caffe?
+cafferoot: /Users/vgenty/git/caffe/python
+
+# CPU or GPU?
+usecpu : True
+
+# GPU number
+gpuid : 0
+
+# Deploy version of the model, please remove ROOTDataLayer or whatever
+modelfile: /Users/vgenty/Desktop/trial_fake/2_class_deploy.prototxt
+
+# Pretrained caffe model
+pretrainedmodel: /Users/vgenty/Desktop/snapshot_rmsprop_nu_alex_fake_iter_3100.caffemodel.h5
+
+# The mean file location on disk
+meanfile: /Users/vgenty/Desktop/trial_fake/mean_valid.root
+
+# Producer for the mean file
+meanproducer: fake_color
+
+# Wrapper layer will make a copy of model file (has to sit somewhere on disk...)
+# then we put our own input layer on top so make sure the first
+# real layer has input "data", we will try to guess the dimensions
+# based on image in the pgplot window
+model: /tmp/test.prototxt
+
+# Thresholding parameter iMin and iMax -- user is going to do this now
+imin : 0
+imax : 255
+
+# Can be per plane (per channel...) but is currently unused
+imin_plane0: 0
+imin_plane1: 0
+imin_plane2: 0
+
+imax_plane0: 255
+imax_plane1: 255
+imax_plane2: 255
+
+# This is the name of the last FC layer which computer the score
+lastfc: fc8
+
+# This layer doesn't have to be here but that's OK, what is the name of the loss layer
+loss: loss

@@ -1,0 +1,76 @@
+ProcessDriver: {
+  Verbosity: 2
+  EnableFilter: true
+  RandomAccess: false
+  ProcessType: ["ChannelMax","ChannelMax","ChannelMax","CombineImages","SegmentMask","SegmentMask","MaskImage","MaskImage"]
+  ProcessName: ["ChannelMaxPlane0","ChannelMaxPlane1","ChannelMaxPlane2","CombineImages","ShowerSegment","TrackSegment","ShowerImage","TrackImage"]
+  AnaFile: "ana.root"
+  IOManager: {
+    Verbosity: 2
+    Name: "IOManager"
+    IOMode: 2
+    OutFileName: "out.root"
+    InputFiles: []
+    InputDirs: []
+    StoreOnlyType: [0,0,0,0,0,0,1,2,0]
+    StoreOnlyName: ["uburn","tpc_hires_crop","track_segment","shower_segment","shower_hires_crop","track_hires_crop","tpc_hires_crop","tpc_hires_crop","weight_hires_crop"]
+  }
+  ProcessList: {
+  ChannelMaxPlane0: {
+    InProducer: "uburn_plane0"
+    NPlanes: 3
+    OutputProducer: "uburn_max_plane0"
+  }
+  ChannelMaxPlane1: {
+    InProducer: "uburn_plane1"
+    NPlanes: 3
+    OutputProducer: "uburn_max_plane1"
+  }
+  ChannelMaxPlane2: {
+    InProducer: "uburn_plane2"
+    NPlanes: 3
+    OutputProducer: "uburn_max_plane2"
+  }
+  CombineImages: {
+    Verbosity: 0
+    ImageProducers: ["uburn_max_plane0","uburn_max_plane1","uburn_max_plane2"]
+    NPlanes: 1
+    OutputProducer: "uburn"
+   }
+    ShowerSegment: {
+      Verbosity: 2
+      ROIProducer: ""
+      ImageProducer:  "uburn"
+      OutputProducer: "shower_segment"
+      ValidROI: ["Cosmic"]
+      MaskValue: 0
+      PlaneID: [0,1,2]
+    }
+    TrackSegment: {
+      Verbosity: 2
+      ROIProducer: ""
+      ImageProducer:  "uburn"
+      OutputProducer: "track_segment"
+      ValidROI: ["BNB"]
+      MaskValue: 0
+      PlaneID: [0,1,2]
+    }
+    ShowerImage: {
+      Verbosity: 2
+      MinPIThreshold: 1
+      MaskValue: 0
+      OutputProducer: "shower_hires_crop"
+      ReferenceProducer: "shower_segment"
+      TargetProducer: "tpc_hires_crop"
+    }
+    TrackImage: {
+      Verbosity: 2
+      MinPIThreshold: 1
+      MaskValue: 0
+      OutputProducer: "track_hires_crop"
+      ReferenceProducer: "track_segment"
+      TargetProducer: "tpc_hires_crop"
+    }
+  }
+}
+
