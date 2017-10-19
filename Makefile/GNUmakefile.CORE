@@ -7,15 +7,15 @@ LARCV_BASIC_ROOTLIBS = $(shell root-config --libs) -lPhysics
 LARCV_BASIC_ROOTINC  = $(shell root-config --cflags)
 
 PACKAGE_BUILDDIR = $(LARCV_BUILDDIR)/$(PACKAGE_NAME)
-PACKAGE_INCDIR   = $(LARCV_INCDIR)/$(PACKAGE_NAME)
+PACKAGE_INCDIR   = $(LARCV_INCDIR)/$(HEADERS_DEST)
 $(shell mkdir -p $(LARCV_BUILDDIR))
 $(shell mkdir -p $(LARCV_LIBDIR))
-ifdef LARCV_PREFIX_INCDIR
-$(shell mkdir -p $(LARCV_INCDIR)/larcv/$(PACKAGE_NAME))
-endif
 $(shell mkdir -p $(LARCV_BINDIR))
 $(shell mkdir -p $(PACKAGE_BUILDDIR))
+
+ifdef HEADERS_DEST
 $(shell mkdir -p $(PACKAGE_INCDIR))
+endif
 
 DICT    = $(PACKAGE_BUILDDIR)/$(PACKAGE_NAME)Dict
 OBJECTS = $(addprefix $(PACKAGE_BUILDDIR)/, $(SOURCES:.cxx=.o))
@@ -29,12 +29,10 @@ main_build: .depend pre_build $(DICT).o $(OBJECTS) $(LARCV_LIBDIR)/$(ROOTMAP) in
 # default rule for making .o files from .cxx files
 $(PACKAGE_BUILDDIR)/%.o: %.cxx %.h
 	@echo '<< compiling' $< '>>'
-#	@echo $(CXX) $(CXXFLAGS) $(LARCV_BASIC_ROOTINC) $(INCFLAGS) -c $< -o $@
 	@$(CXX) $(CXXFLAGS) $(LARCV_BASIC_ROOTINC) $(INCFLAGS) -c $< -o $@
 
 $(DICT).o: $(DICT).cxx
 	@echo '<< compiling' $(PACKAGE_NAME)Dict.cxx '>>'
-#	@echo $(CXX) $(CXXFLAGS) $(LARCV_BASIC_ROOTINC) $(INCFLAGS) -c $< -o $@
 	@$(CXX) $(CXXFLAGS) $(LARCV_BASIC_ROOTINC) $(INCFLAGS) -c $< -o $@
 
 ifdef LARCV_ROOT6
@@ -42,16 +40,13 @@ ifdef LARCV_ROOT6
 # root class dictionary
 $(DICT).cxx: $(HEADERS) LinkDef.h
 	@echo '<< generating dict >>'
-#	@echo rootcling -f $(DICT).cxx -s $(LARCV_LIBDIR)/$(SHLIB) -rml $(SHLIB) -rmf $(LARCV_LIBDIR)/$(ROOTMAP) $(CINTFLAGS) -c $(INCFLAGS) $(HEADERS) LinkDef.h	
 	@rootcling -f $(DICT).cxx -s $(LARCV_LIBDIR)/$(SHLIB) -rml liblarcv.so -rmf $(LARCV_LIBDIR)/$(ROOTMAP) $(CINTFLAGS) -c $(INCFLAGS) $(HEADERS) LinkDef.h
 
 # install headers
 install_header: $(OBJECTS) $(DICT).o
+ifdef HEADERS_DEST
 	@echo '<< installing headers >>'
 	@$(foreach f, $(HEADERS),$(shell cp $(f) $(PACKAGE_INCDIR)/))
-ifdef LARCV_PREFIX_INCDIR
-	@echo '<< install prefix headers >>'
-	@$(foreach f, $(HEADERS),$(shell cp $(f) $(LARCV_INCDIR)/larcv/$(PACKAGE_NAME)/$(f)) )
 endif
 
 $(LARCV_LIBDIR)/$(ROOTMAP):
@@ -61,7 +56,6 @@ else
 # root class dictionary
 $(DICT).cxx: $(HEADERS) LinkDef.h
 	@echo '<< generating dict >>'
-#	@echo rootcint -f $(DICT).cxx -c $(CINTFLAGS) $(INCFLAGS) $(HEADERS) LinkDef.h
 	@rootcint -f $(DICT).cxx -c $(CINTFLAGS) $(INCFLAGS) $(HEADERS) LinkDef.h
 
 # if ROOTMAP defined, define rule for making it
@@ -71,9 +65,10 @@ $(LARCV_LIBDIR)/$(ROOTMAP): $(OBJECTS) $(DICT).o
 
 # install headers
 install_header: .depend #$(OBJECTS) $(DICT).o
+ifdef HEADERS_DEST
 	@echo '<< installing headers >>'
 	@$(foreach f, $(HEADERS),$(shell cp $(f) $(PACKAGE_INCDIR)/))
-
+endif
 endif
 
 ###################################################

@@ -14,8 +14,8 @@
 #ifndef EMPTY_CLASS_NAME_H
 #define EMPTY_CLASS_NAME_H
 
-#include "EventBase.h"
-#include "DataProductFactory.h"
+#include "larcv/core/DataFormat/EventBase.h"
+#include "larcv/core/DataFormat/DataProductFactory.h"
 
 namespace larcv {
   /**
