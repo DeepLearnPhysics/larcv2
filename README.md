@@ -1,4 +1,5 @@
 # LArCV: Liquid Argon Computer Vision
+***Note*** This repository is re-created from LArbys/LArCV repository, referred to as larbys version. The larbys version is still under active development for analysis purpose in MicroBooNE experiment. This DeepLearnPhysics/larcv is split for more generic technical R&D work in October 2017.
 
 Data format and image processing tools, routines, and framework for LAr TPC-derived images. Developing as bridge between LArSoft and Caffe/Tensorflow.
 
