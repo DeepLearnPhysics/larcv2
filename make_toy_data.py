@@ -131,6 +131,7 @@ while ctr<NUM_EVENT:
     event_vox3d = o.get_data("voxel3d","fake")
     fill_vox(event_vox3d, vtx, end0)
     fill_vox(event_vox3d, vtx, end1)
+    event_vox3d.Meta(VOX_DEF)
 
     # fill projection image2d
     event_image2d = o.get_data("image2d","fake_plane")
