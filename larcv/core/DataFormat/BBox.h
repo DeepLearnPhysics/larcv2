@@ -15,7 +15,7 @@
 #define __BBOX_H__
 
 #include <iostream>
-
+#include "DataFormatTypes.h"
 namespace larcv {
 
   /**
@@ -27,7 +27,8 @@ namespace larcv {
   public:
     
     /// Default constructor
-    BBox2D(double xmin=-1, double ymin=-1, double xmax=-1, double ymax=-1)
+    BBox2D(double xmin=kINVALID_DOUBLE, double ymin=kINVALID_DOUBLE,
+	   double xmax=kINVALID_DOUBLE, double ymax=kINVALID_DOUBLE)
       : x1(xmin), y1(ymin), x2(xmax), y2(ymax)
     {}
     
@@ -35,7 +36,13 @@ namespace larcv {
     ~BBox2D(){}
 
     std::string dump() const;
-    
+
+    inline bool valid() const
+    {
+      return (x1 != kINVALID_DOUBLE && x2 != kINVALID_DOUBLE &&
+	      y1 != kINVALID_DOUBLE && y2 != kINVALID_DOUBLE);
+    }
+
     double x1; ///< minimum x in absolute coordinate [cm]
     double y1; ///< minimum y in absolute coordinate [cm]
     double x2; ///< maximum x in absolute coordinate [cm]
@@ -52,8 +59,8 @@ namespace larcv {
   public:
     
     /// Default constructor
-    BBox3D(double xmin=-1, double ymin=-1, double zmin=-1,
-	   double xmax=-1, double ymax=-1, double zmax=-1)
+    BBox3D(double xmin=kINVALID_DOUBLE, double ymin=kINVALID_DOUBLE, double zmin=kINVALID_DOUBLE,
+	   double xmax=kINVALID_DOUBLE, double ymax=kINVALID_DOUBLE, double zmax=kINVALID_DOUBLE)
       : x1(xmin), y1(ymin), z1(zmin), x2(xmax), y2(ymax), z2(zmax)
     {}
     
@@ -61,6 +68,13 @@ namespace larcv {
     ~BBox3D(){}
 
     std::string dump() const;
+
+    inline bool valid() const
+    {
+      return (x1 != kINVALID_DOUBLE && x2 != kINVALID_DOUBLE &&
+	      y1 != kINVALID_DOUBLE && y2 != kINVALID_DOUBLE &&
+	      z1 != kINVALID_DOUBLE && z2 != kINVALID_DOUBLE);
+    }
     
     double x1; ///< minimum x in absolute coordinate [cm]
     double y1; ///< minimum y in absolute coordinate [cm]
