@@ -76,15 +76,15 @@ namespace larcv {
     template <class T> T& get_data(const ProducerID_t id)
     {
       if(id >= _product_type_v.size()) {
-	LARCV_CRITICAL() << "Invalid producer id: " << id << " requested " << std::endl;
-	throw larbys();
+        LARCV_CRITICAL() << "Invalid producer id: " << id << " requested " << std::endl;
+        throw larbys();
       }
       auto ptr = this->get_data(id); 
       if(product_unique_name<T>() != _product_type_v[id]) {
-	LARCV_CRITICAL() << "Unmatched type (in memory type = " << _product_type_v[id]
-			 << " while specialization type = " << product_unique_name<T>()
-			 << std::endl;
-	throw larbys();
+        LARCV_CRITICAL() << "Unmatched type (in memory type = " << _product_type_v[id]
+                         << " while specialization type = " << product_unique_name<T>()
+                         << std::endl;
+        throw larbys();
       }
       return *((T*)(ptr));
     }
@@ -97,8 +97,17 @@ namespace larcv {
     {
       std::vector<std::string> res;
       for(auto const& key_value : _key_list) {
-	if(key_value.first.first != type) continue;
-	res.push_back(key_value.first.second);
+        if(key_value.first.first != type) continue;
+        res.push_back(key_value.first.second);
+      }
+      return res;
+    }
+
+    const std::vector<std::string> product_list() const
+    {
+      std::vector<std::string> res;
+      for(auto const& key_value : _key_list) {
+        res.push_back(key_value.first.first);
       }
       return res;
     }
