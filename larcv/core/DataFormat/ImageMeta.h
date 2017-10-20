@@ -96,7 +96,7 @@ namespace larcv {
     /// Change # of vertical/horizontal pixels in meta data
     inline void update(size_t row_count, size_t col_count){_row_count = row_count;_col_count = col_count;}
     /// Reset origin coordinate
-    inline void   reset_origin(double x, double y) { BBox2D::update(x,y,max_x(),max_y()); }
+    inline void reset_origin(double x, double y) { BBox2D::update(x,y,max_x(),max_y()); }
     /// Check if there's an overlap. If so return overlapping bounding box
     ImageMeta overlap(const ImageMeta& meta) const;
     /// Construct a union bounding box

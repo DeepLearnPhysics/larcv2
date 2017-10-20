@@ -24,6 +24,7 @@
 #pragma link C++ class larcv::EventBase+;
 #pragma link C++ class larcv::Vertex+;
 #pragma link C++ class larcv::Point2D+;
+#pragma link C++ class larcv::Point3D+;
 
 #pragma link C++ class larcv::Image2D+;
 #pragma link C++ class std::vector<larcv::Image2D>+;

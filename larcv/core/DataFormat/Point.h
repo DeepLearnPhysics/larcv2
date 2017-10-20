@@ -15,7 +15,7 @@
 #define LARCV_POINT_H
 
 #include <iostream>
-
+#include <cmath>
 namespace larcv {
 
   /**
@@ -36,6 +36,8 @@ namespace larcv {
 
     inline Point2D& operator*= (const double rhs)
     { x *= rhs; y *= rhs; return (*this); }
+    inline Point2D& operator/= (const double rhs)
+    { x /= rhs; y /= rhs; return (*this); }
     inline Point2D& operator+= (const Point2D& rhs)
     { x += rhs.x; y += rhs.y; return (*this); }
     inline Point2D& operator-= (const Point2D& rhs)
@@ -43,10 +45,18 @@ namespace larcv {
 
     inline Point2D operator* (const double rhs) const
     { return Point2D(x*rhs,y*rhs); }
+    inline Point2D operator/ (const double rhs) const
+    { return Point2D(x/rhs,y/rhs); }
     inline Point2D operator+ (const Point2D& rhs) const
     { return Point2D(x+rhs.x,y+rhs.y); }
     inline Point2D operator- (const Point2D& rhs) const
     { return Point2D(x-rhs.x,y-rhs.y); }
+
+    inline double distance(const Point2D& pt) const
+    { return sqrt(pow(x-pt.x,2)+pow(y-pt.y,2)); }
+    inline Point2D direction(const Point2D& pt) const
+    { Point2D res(pt.x - x, pt.y - y); res /= distance(pt); return res; }
+
   };
 
   /**
@@ -65,6 +75,8 @@ namespace larcv {
     inline bool operator!= (const Point3D& rhs) const
     { return !(rhs == (*this)); }
 
+    inline Point3D& operator/= (const double rhs)
+    { x /= rhs; y /= rhs; z /= rhs; return (*this); }
     inline Point3D& operator*= (const double rhs)
     { x *= rhs; y *= rhs; z *= rhs; return (*this); }
     inline Point3D& operator+= (const Point3D& rhs)
@@ -72,12 +84,20 @@ namespace larcv {
     inline Point3D& operator-= (const Point3D& rhs)
     { x -= rhs.x; y -= rhs.y; z -= rhs.z; return (*this); }
 
+    inline Point3D operator/ (const double rhs) const
+    { return Point3D(x/rhs,y/rhs,z/rhs); }
     inline Point3D operator* (const double rhs) const
     { return Point3D(x*rhs,y*rhs,z*rhs); }
     inline Point3D operator+ (const Point3D& rhs) const
     { return Point3D(x+rhs.x,y+rhs.y,z+rhs.z); }
     inline Point3D operator- (const Point3D& rhs) const
     { return Point3D(x-rhs.x,y-rhs.y,z-rhs.z); }
+
+    inline double distance(const Point3D& pt) const
+    { return sqrt(pow(x-pt.x,2)+pow(y-pt.y,2)+pow(z-pt.z,2)); }
+    inline Point3D direction(const Point3D& pt) const
+    { Point3D res(pt.x - x, pt.y - y, pt.z - z); res /= distance(pt); return res; }
+
   };
 
 }

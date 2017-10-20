@@ -49,7 +49,7 @@ namespace larcv {
   /// Coordinate unit type
   enum DistanceUnit_t {
     kUnitCM,      ///< cm scale
-    kUnitWireTime ///< x=wire, y=time-tick scale
+    kUnitWireTime ///< wire/time in 2D image
   };
 
   /// Pooling type

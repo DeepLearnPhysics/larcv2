@@ -47,7 +47,6 @@ namespace larcv {
       (*iter) += vox.Value();
       return;
     }
-
     // Else insert @ appropriate place
     else {
       size_t target_loc = iter - _voxel_v.begin();
