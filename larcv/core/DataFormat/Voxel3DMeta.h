@@ -15,6 +15,7 @@
 #define VOXEL3DMETA_H
 
 #include "DataFormatTypes.h"
+#include "BBox.h"
 #include <array>
 
 namespace larcv {
@@ -23,78 +24,58 @@ namespace larcv {
      \class Voxel3DMeta
      @brief Meta data for defining voxels (ID, size, position) and voxelized volume (coordinate, size)
   */
-  class Voxel3DMeta {
+  class Voxel3DMeta : public BBox3D{
   public:
     /// Default ctor
     Voxel3DMeta();
     /// Default dtor
     ~Voxel3DMeta(){}
-
+    /// Update voxel count
+    void update(size_t xnum,size_t ynum,size_t znum);
     /// Define dimensions
-    void Set(double xmin, double xmax,
-	     double ymin, double ymax,
-	     double zmin, double zmax,
-	     size_t xnum,
-	     size_t ynum,
-	     size_t znum);
+    inline void set(double xmin, double ymin, double zmin,
+		    double xmax, double ymax, double zmax,
+		    size_t xnum,size_t ynum,size_t znum)
+    { BBox3D::update(xmin,ymin,zmin,xmax,ymax,zmax);
+      Voxel3DMeta::update(xnum,ynum,znum); }
     /// Clear method
-    void Clear();
+    void clear();
     /// Checker if the meta parameters are set properly or not
-    inline bool Valid() const { return _valid; }
+    inline bool valid() const { return _valid; }
     /// Returns size
-    inline VoxelID_t Size() const { return _num_element; }
+    inline VoxelID_t size() const { return _num_element; }
     /// Given a position, returns voxel ID
-    VoxelID_t ID(double x, double y, double z) const;
+    VoxelID_t index(double x, double y, double z) const;
     /// Given a valid voxel ID, returns a position array
-    const std::array<double,3> Position(VoxelID_t id) const;
+    Point3D position(VoxelID_t id) const;
     /// Given a valid voxel ID, returns X position
-    double X(VoxelID_t id) const;
+    double pos_x(VoxelID_t id) const;
     /// Given a valid voxel ID, returns Y position
-    double Y(VoxelID_t id) const;
+    double pos_y(VoxelID_t id) const;
     /// Given a valid voxel ID, returns Z position
-    double Z(VoxelID_t id) const;
+    double pos_z(VoxelID_t id) const;
     /// Returns voxel count along x-axis
-    inline size_t NumVoxelX()  const { return _xnum; }
+    inline size_t num_voxel_x()  const { return _xnum; }
     /// Returns voxel count along y-axis
-    inline size_t NumVoxelY()  const { return _ynum; }
+    inline size_t num_voxel_y()  const { return _ynum; }
     /// Returns voxel count along z-axis
-    inline size_t NumVoxelZ()  const { return _znum; }
+    inline size_t num_voxel_z()  const { return _znum; }
     /// Returns voxel size along x-axis;
-    inline double SizeVoxelX() const { return _xlen; }
+    inline double size_voxel_x() const { return _xlen; }
     /// Returns voxel size along y-axis;
-    inline double SizeVoxelY() const { return _ylen; }
+    inline double size_voxel_y() const { return _ylen; }
     /// Returns voxel size along z-axis;
-    inline double SizeVoxelZ() const { return _zlen; }
-    /// Returns voxel definition maximum x value
-    inline double MaxX() const { return _xmax; }
-    /// Returns voxel definition maximum y value
-    inline double MaxY() const { return _ymax; }
-    /// Returns voxel definition maximum z value
-    inline double MaxZ() const { return _zmax; }
-    /// Returns voxel definition minimum x value
-    inline double MinX() const { return _xmin; }
-    /// Returns voxel definition minimum y value
-    inline double MinY() const { return _ymin; }
-    /// Returns voxel definition minimum z value
-    inline double MinZ() const { return _zmin; }
+    inline double size_voxel_z() const { return _zlen; }
     /// text dumper
-    std::string  Dump() const;
+    std::string  dump() const;
     
   private:
 
     bool   _valid; ///< Boolean set to true only if voxel parameters are properly set
     size_t _num_element; ///< Total number of voxel elements
     
-    double _xmin; ///< X min value in voxel definition in [cm]
-    double _xmax; ///< X max value in voxel definition in [cm]
     double _xlen; ///< X voxel size in [cm]
-    
-    double _ymin; ///< Y min value in voxel definition in [cm]
-    double _ymax; ///< Y min value in voxel definition in [cm]
     double _ylen; ///< Y voxel size in [cm]
-    
-    double _zmin; ///< Z min value in voxel definition in [cm]
-    double _zmax; ///< Z min value in voxel definition in [cm]
     double _zlen; ///< Z voxel size in [cm]
     
     size_t _xnum; ///< Number of voxels along X

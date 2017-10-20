@@ -8,39 +8,19 @@
 namespace larcv {
 
   Voxel3DMeta::Voxel3DMeta()
-  { Clear(); }
+  { clear(); }
 
-  void Voxel3DMeta::Clear()
+  void Voxel3DMeta::clear()
   {
-    _xmin = _xmax = _xlen = kINVALID_DOUBLE;
-    _ymin = _ymax = _ylen = kINVALID_DOUBLE;
-    _zmin = _zmax = _zlen = kINVALID_DOUBLE;
-    _xnum = _ynum = _znum = kINVALID_SIZE;
+    (BBox3D)(*this) = BBox3D();
     _valid = false;
   }
   
-  void Voxel3DMeta::Set(double xmin, double xmax,
-			double ymin, double ymax,
-			double zmin, double zmax,
-			size_t xnum,
-			size_t ynum,
-			size_t znum)
-  {
-    if(xmin == kINVALID_DOUBLE || xmax == kINVALID_DOUBLE)
-      throw larbys("Voxel3DMeta::Set x boundary not set!");
-    if(xmin >= xmax)
-      throw larbys("Voxel3DMeta::Set xmin >= xmax!");
+  void Voxel3DMeta::update(size_t xnum, size_t ynum, size_t znum) {
 
-    if(ymin == kINVALID_DOUBLE || ymax == kINVALID_DOUBLE)
-      throw larbys("Voxel3DMeta::Set y boundary not set!");
-    if(ymin >= ymax)
-      throw larbys("Voxel3DMeta::Set ymin >= ymax!");
-
-    if(zmin == kINVALID_DOUBLE || zmax == kINVALID_DOUBLE)
-      throw larbys("Voxel3DMeta::Set z boundary not set!");
-    if(zmin >= zmax)
-      throw larbys("Voxel3DMeta::Set zmin >= zmax!");
-
+    if(empty())
+      throw larbys("Empty voxel volume definition cannot be updated with new voxel counts!");
+    
     if(xnum == kINVALID_SIZE || xnum == 0)
       throw larbys("Voxel3DMeta::Set x voxel count not set!");
     
@@ -50,44 +30,29 @@ namespace larcv {
     if(znum == kINVALID_SIZE || znum == 0)
       throw larbys("Voxel3DMeta::Set z voxel count not set!");
 
-    _xmin = xmin;
-    _xmax = xmax;
-    _xlen = (xmax - xmin) / ((double)xnum);
+    _xlen = (max_x() - min_x()) / ((double)xnum);
     _xnum = xnum;
 
-    _ymin = ymin;
-    _ymax = ymax;
-    _ylen = (ymax - ymin) / ((double)ynum);
+    _ylen = (max_y() - min_y()) / ((double)ynum);
     _ynum = ynum;
 
-    _zmin = zmin;
-    _zmax = zmax;
-    _zlen = (zmax - zmin) / ((double)znum);
+    _zlen = (max_z() - min_z()) / ((double)znum);
     _znum = znum;
     
-    if( (_xmin + _xlen * _xnum) != _xmax )
-      throw larbys("Voxel3DMeta::Set (xmax - xmin) not divisible by xnum!");
-    
-    if( (_ymin + _ylen * _ynum) != _ymax )
-      throw larbys("Voxel3DMeta::Set (ymax - ymin) not divisible by ynum!");
-
-    if( (_zmin + _zlen * _znum) != _zmax )
-      throw larbys("Voxel3DMeta::Set (zmax - zmin) not divisible by znum!");
-
     _num_element = _xnum * _ynum * _znum;
     _valid = true;
   }
 
-  VoxelID_t Voxel3DMeta::ID(double x, double y, double z) const
+  VoxelID_t Voxel3DMeta::index(double x, double y, double z) const
   {
     if(!_valid) throw larbys("Voxel3DMeta::ID cannot be called on invalid meta!");
-    if(x > _xmax || x < _xmin) return kINVALID_VOXELID;
-    if(y > _ymax || y < _ymin) return kINVALID_VOXELID;
-    if(z > _zmax || z < _zmin) return kINVALID_VOXELID;
+    if(x > max_x() || x < min_x()) return kINVALID_VOXELID;
+    if(y > max_y() || y < min_y()) return kINVALID_VOXELID;
+    if(z > max_z() || z < min_z()) return kINVALID_VOXELID;
 
-    VoxelID_t xindex = (x - _xmin) / _xlen;
-    VoxelID_t yindex = (y - _ymin) / _ylen;
-    VoxelID_t zindex = (z - _zmin) / _zlen;
+    VoxelID_t xindex = (x - min_x()) / _xlen;
+    VoxelID_t yindex = (y - min_y()) / _ylen;
+    VoxelID_t zindex = (z - min_z()) / _zlen;
 
     if(xindex == _xnum) xindex -= 1;
     if(yindex == _ynum) yindex -= 1;
@@ -96,62 +61,60 @@ namespace larcv {
     return (zindex * (_xnum * _ynum) + yindex * _xnum + xindex);
   }
 
-  const std::array<double,3> Voxel3DMeta::Position(VoxelID_t id) const
+  Point3D Voxel3DMeta::position(VoxelID_t id) const
   {
-    if(!_valid) throw larbys("Voxel3DMeta::Position cannot be called on invalid meta!");
-    if(id >= _num_element) throw larbys("Voxel3DMeta::Position invalid VoxelID_t!");
+    if(!_valid) throw larbys("Voxel3DMeta::pos cannot be called on invalid meta!");
+    if(id >= _num_element) throw larbys("Voxel3DMeta::pos invalid VoxelID_t!");
     
     VoxelID_t zid = id / (_xnum * _ynum);
     id -= zid * (_xnum * _ynum);
     VoxelID_t yid = id / _xnum;
     VoxelID_t xid = (id - yid * _xnum);
 
-    std::array<double,3> pos;
-    pos[0] = _xmin + ((double)xid + 0.5) * _xlen;
-    pos[1] = _ymin + ((double)yid + 0.5) * _ylen;
-    pos[2] = _zmin + ((double)zid + 0.5) * _zlen;
-    return pos;
+    return Point3D(min_x() + ((double)xid + 0.5) * _xlen,
+		   min_y() + ((double)yid + 0.5) * _ylen,
+		   min_z() + ((double)zid + 0.5) * _zlen);
   }
   
-  double Voxel3DMeta::X(VoxelID_t id) const
+  double Voxel3DMeta::pos_x(VoxelID_t id) const
   {
-    if(!_valid) throw larbys("Voxel3DMeta::X cannot be called on invalid meta!");
-    if(id >= _num_element) throw larbys("Voxel3DMeta::X invalid VoxelID_t!");
+    if(!_valid) throw larbys("Voxel3DMeta::pos_x cannot be called on invalid meta!");
+    if(id >= _num_element) throw larbys("Voxel3DMeta::pos_x invalid VoxelID_t!");
     
     VoxelID_t zid = id / (_xnum * _ynum);
     id -= zid * (_xnum * _ynum);
     VoxelID_t yid = id / _xnum;
     VoxelID_t xid = (id - yid * _xnum);
 
-    return _xmin + ((double)xid + 0.5) * _xlen;
+    return min_x() + ((double)xid + 0.5) * _xlen;
   }
   
-  double Voxel3DMeta::Y(VoxelID_t id) const
+  double Voxel3DMeta::pos_y(VoxelID_t id) const
   {
-    if(!_valid) throw larbys("Voxel3DMeta::Y cannot be called on invalid meta!");
-    if(id >= _num_element) throw larbys("Voxel3DMeta::Y invalid VoxelID_t!");
+    if(!_valid) throw larbys("Voxel3DMeta::pos_y cannot be called on invalid meta!");
+    if(id >= _num_element) throw larbys("Voxel3DMeta::pos_y invalid VoxelID_t!");
     
     VoxelID_t zid = id / (_xnum * _ynum);
     id -= zid * (_xnum * _ynum);
     VoxelID_t yid = id / _xnum;
-    return _ymin + ((double)yid + 0.5) * _ylen;
+    return min_y() + ((double)yid + 0.5) * _ylen;
   }
   
-  double Voxel3DMeta::Z(VoxelID_t id) const
+  double Voxel3DMeta::pos_z(VoxelID_t id) const
   {
-    if(!_valid) throw larbys("Voxel3DMeta::Z cannot be called on invalid meta!");
-    if(id >= _num_element) throw larbys("Voxel3DMeta::Z invalid VoxelID_t!");
+    if(!_valid) throw larbys("Voxel3DMeta::pos_z cannot be called on invalid meta!");
+    if(id >= _num_element) throw larbys("Voxel3DMeta::pos_z invalid VoxelID_t!");
 	
     VoxelID_t zid = id / (_xnum * _ynum);
-    return _zmin + ((double)zid + 0.5) * _zlen;
+    return min_z() + ((double)zid + 0.5) * _zlen;
   }
 
-  std::string  Voxel3DMeta::Dump() const
+  std::string  Voxel3DMeta::dump() const
   {
     std::stringstream ss;
-    ss << "X range: " << _xmin << " => " << _xmax << " ... " << _xnum << " bins" << std::endl
-       << "Y range: " << _ymin << " => " << _ymax << " ... " << _ynum << " bins" << std::endl
-       << "Z range: " << _zmin << " => " << _zmax << " ... " << _znum << " bins" << std::endl;
+    ss << "X range: " << min_x() << " => " << max_x() << " ... " << _xnum << " bins" << std::endl
+       << "Y range: " << min_y() << " => " << max_y() << " ... " << _ynum << " bins" << std::endl
+       << "Z range: " << min_z() << " => " << max_z() << " ... " << _znum << " bins" << std::endl;
     return std::string(ss.str());
   }
 

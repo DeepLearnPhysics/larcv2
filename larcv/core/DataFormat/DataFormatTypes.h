@@ -6,15 +6,6 @@
 #include <set>
 namespace larcv {
 
-  /**
-     \struct Point2D
-     Simple 2D point struct (unit of "x" and "y" are not defined here and app specific)
-  */
-  struct Point2D {
-    double x, y;
-    Point2D(double xv=0, double yv=0) : x(xv), y(yv) {}
-  };
-
   /// Invalid rep for vector index
   static const unsigned short kINVALID_INDEX = kINVALID_USHORT;
   /// Image index type for Image2D within EventImage2D  
@@ -57,8 +48,8 @@ namespace larcv {
 
   /// Coordinate unit type
   enum DistanceUnit_t {
-    kCM,      ///< cm scale
-    kWireTime ///< x=wire, y=time-tick scale
+    kUnitCM,      ///< cm scale
+    kUnitWireTime ///< x=wire, y=time-tick scale
   };
 
   /// Pooling type

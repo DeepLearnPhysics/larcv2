@@ -11,11 +11,11 @@
 /** \addtogroup core_DataFormat
 
     @{*/
-#ifndef __BBOX_H__
-#define __BBOX_H__
+#ifndef __LARCV_BBOX_H__
+#define __LARCV_BBOX_H__
 
 #include <iostream>
-#include "DataFormatTypes.h"
+#include "Point.h"
 namespace larcv {
 
   /**
@@ -27,27 +27,42 @@ namespace larcv {
   public:
     
     /// Default constructor
-    BBox2D(double xmin=kINVALID_DOUBLE, double ymin=kINVALID_DOUBLE,
-	   double xmax=kINVALID_DOUBLE, double ymax=kINVALID_DOUBLE)
-      : x1(xmin), y1(ymin), x2(xmax), y2(ymax)
-    {}
+    BBox2D(double xmin=0, double ymin=0,
+	   double xmax=0, double ymax=0);
     
     /// Default destructor
     ~BBox2D(){}
 
+    inline bool operator== (const BBox2D& rhs) const
+    { return (_p1 == rhs._p1 && _p2 == rhs._p2); }
+
+    void update(double xmin, double ymin, double xmax, double ymax);
+    void update(const Point2D& pt1, const Point2D& pt2);
+    inline bool empty() const { return (_p1 == _p2); }
+    inline const Point2D& origin      () const { return _p1; }
+    inline const Point2D& bottom_left () const { return _p1; }
+    inline const Point2D& top_right   () const { return _p2; }
+    inline Point2D center  () const { return Point2D(center_x(),center_y()); }
+    inline double center_x () const { return _p1.x + (_p2.x - _p1.x); }
+    inline double center_y () const { return _p1.y + (_p2.y - _p1.y); }
+    inline double min_x  () const { return _p1.x; }
+    inline double min_y  () const { return _p1.y; }
+    inline double max_x  () const { return _p2.x; }
+    inline double max_y  () const { return _p2.y; }
+    inline double width  () const { return _p2.x - _p1.x; }
+    inline double height () const { return _p2.y - _p1.y; }
+    inline double area   () const { return (_p2.y - _p1.y) * (_p2.x - _p1.x); }
+    
     std::string dump() const;
 
-    inline bool valid() const
-    {
-      return (x1 != kINVALID_DOUBLE && x2 != kINVALID_DOUBLE &&
-	      y1 != kINVALID_DOUBLE && y2 != kINVALID_DOUBLE);
-    }
+    BBox2D overlap(const BBox2D& box) const;
 
-    double x1; ///< minimum x in absolute coordinate [cm]
-    double y1; ///< minimum y in absolute coordinate [cm]
-    double x2; ///< maximum x in absolute coordinate [cm]
-    double y2; ///< maximum y in absolute coordinate [cm]
-    
+    BBox2D inclusive(const BBox2D& box) const;
+
+  private:
+
+    Point2D _p1; ///< bottom-left point coordinate (x1,y1) where x1<x2 and y1<y2
+    Point2D _p2; ///< top-right point coordinate (x2,y2) where x1<x2 and y1<y2
   };
 
   /**
@@ -59,29 +74,47 @@ namespace larcv {
   public:
     
     /// Default constructor
-    BBox3D(double xmin=kINVALID_DOUBLE, double ymin=kINVALID_DOUBLE, double zmin=kINVALID_DOUBLE,
-	   double xmax=kINVALID_DOUBLE, double ymax=kINVALID_DOUBLE, double zmax=kINVALID_DOUBLE)
-      : x1(xmin), y1(ymin), z1(zmin), x2(xmax), y2(ymax), z2(zmax)
-    {}
+    BBox3D(double xmin=0, double ymin=0, double zmin=0,
+	   double xmax=0, double ymax=0, double zmax=0);
     
     /// Default destructor
     ~BBox3D(){}
 
+    inline bool operator== (const BBox3D& rhs) const
+    { return (_p1 == rhs._p1 && _p2 == rhs._p2); }
+
+    void update(double xmin, double ymin, double zmin,
+		double xmax, double ymax, double zmax);
+    
+    void update(const Point3D& pt1, const Point3D& pt2);
+    inline bool empty() const { return (_p1 == _p2); }
+    inline const Point3D& origin      () const { return _p1; }
+    inline const Point3D& bottom_left () const { return _p1; }
+    inline const Point3D& top_right   () const { return _p2; }
+    inline Point3D center  () const { return Point3D(center_x(),center_y(),center_z()); }
+    inline double center_x () const { return _p1.x + (_p2.x - _p1.x); }
+    inline double center_y () const { return _p1.y + (_p2.y - _p1.y); }
+    inline double center_z () const { return _p1.z + (_p2.z - _p1.z); }
+    inline double min_x  () const { return _p1.x; }
+    inline double min_y  () const { return _p1.y; }
+    inline double min_z  () const { return _p1.z; }
+    inline double max_x  () const { return _p2.x; }
+    inline double max_y  () const { return _p2.y; }
+    inline double max_z  () const { return _p2.z; }
+    inline double width  () const { return _p2.x - _p1.x; }
+    inline double height () const { return _p2.y - _p1.y; }
+    inline double depth  () const { return _p2.z - _p1.z; }
+    inline double volume () const { return (_p2.x - _p1.x) * (_p2.y - _p1.y) * (_p2.z - _p1.z); }
+    double area(int axis) const;
+    BBox3D overlap(const BBox3D& box) const;
+    BBox3D inclusive(const BBox3D& box) const;
+
     std::string dump() const;
 
-    inline bool valid() const
-    {
-      return (x1 != kINVALID_DOUBLE && x2 != kINVALID_DOUBLE &&
-	      y1 != kINVALID_DOUBLE && y2 != kINVALID_DOUBLE &&
-	      z1 != kINVALID_DOUBLE && z2 != kINVALID_DOUBLE);
-    }
-    
-    double x1; ///< minimum x in absolute coordinate [cm]
-    double y1; ///< minimum y in absolute coordinate [cm]
-    double z1; ///< minimum z in absolute coordinate [cm]
-    double x2; ///< maximum x in absolute coordinate [cm]
-    double y2; ///< maximum y in absolute coordinate [cm]
-    double z2; ///< maximum z in absolute coordinate [cm]
+  private:
+
+    Point3D _p1; ///< bottom-left point coordinate (x1,y1,z1) where x1<x2 and y1<y2 and z1<z2
+    Point3D _p2; ///< top-right point coordinate (x2,y2,z2) where x1<x2 and y1<y2 and z1<z2
   };
 }
 #endif

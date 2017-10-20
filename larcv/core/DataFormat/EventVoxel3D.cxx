@@ -9,7 +9,7 @@ namespace larcv {
   static EventVoxel3DFactory __global_EventVoxel3DFactory__;
 
   void EventVoxel3D::clear()
-  { EventBase::clear(); VoxelSet::Clear(); _meta.Clear(); }
+  { EventBase::clear(); VoxelSet::Clear(); _meta.clear(); }
 
 }
 
