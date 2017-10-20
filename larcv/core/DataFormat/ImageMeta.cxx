@@ -27,12 +27,12 @@ namespace larcv {
 
   size_t ImageMeta::row(double y) const
   {
-    if(y <= (_origin.y - _height) || y > _origin.y) {
+    if(y < _origin.y || y >= (_origin.y + _height)) {
       std::stringstream ss;
-      ss << "Requested col for y=" << y << " ... but the y (cols) spans only " << _origin.y - _height << " => " << _origin.y << "!" << std::endl;
+      ss << "Requested col for y=" << y << " ... but the y (cols) spans only " << _origin.y << " => " << _origin.y + _height << "!" << std::endl;
       throw larbys(ss.str());
     }
-    return (size_t)((_origin.y - y) / pixel_height());
+    return (size_t)((y - _origin.y) / pixel_height());
   }
 
   ImageMeta ImageMeta::overlap(const ImageMeta& meta) const
@@ -52,7 +52,7 @@ namespace larcv {
     return ImageMeta(maxx - minx, maxy - miny,
 		     (maxy - miny) / pixel_height(),
 		     (maxx - minx) / pixel_width(),
-		     minx, maxy, _plane);
+		     minx, miny, _plane);
   }
 
   ImageMeta ImageMeta::inclusive(const ImageMeta& meta) const
@@ -66,15 +66,15 @@ namespace larcv {
     return ImageMeta(max_x - min_x, max_y - min_y,
 		     (max_y - min_y) / pixel_height(),
 		     (max_x - min_x) / pixel_width(),
-		     min_x, max_y, _plane);
+		     min_x, min_y, _plane);
   }
 
   std::string ImageMeta::dump() const
   {
     std::stringstream ss;
     ss << "Plane " << plane() << " (rows,cols) = (" << _row_count << "," << _col_count
-       << ") ... Left Top (" << min_x() << "," << max_y()
-       << ") ... Right Bottom (" << max_x() << "," << min_y()
+       << ") ... Left Bottom (" << min_x() << "," << min_y()
+       << ") ... Right Top (" << max_x() << "," << max_y()
        << ")" << std::endl;
     return ss.str();
   }

@@ -27,7 +27,9 @@ namespace larcv {
   public:
     
     /// Default constructor
-    BBox2D() {}
+    BBox2D(double xmin=-1, double ymin=-1, double xmax=-1, double ymax=-1)
+      : x1(xmin), y1(ymin), x2(xmax), y2(ymax)
+    {}
     
     /// Default destructor
     ~BBox2D(){}
@@ -50,7 +52,10 @@ namespace larcv {
   public:
     
     /// Default constructor
-    BBox3D() {}
+    BBox3D(double xmin=-1, double ymin=-1, double zmin=-1,
+	   double xmax=-1, double ymax=-1, double zmax=-1)
+      : x1(xmin), y1(ymin), z1(zmin), x2(xmax), y2(ymax), z2(zmax)
+    {}
     
     /// Default destructor
     ~BBox3D(){}

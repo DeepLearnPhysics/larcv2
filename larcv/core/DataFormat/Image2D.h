@@ -95,9 +95,9 @@ namespace larcv {
     /// Paint a column of pixels with a specified value
     void paint_col( int col, float value );
     /// Apply threshold: pixels lower than "thres" are all overwritten by lower_overwrite value
-    void threshold(float thres, float lower_overwrite);
+    void threshold(float thresh, bool lower);
     /// Apply threshold: make all pixels to take only 2 values, lower_overwrite or upper_overwrite 
-    void binary_threshold(float thres, float lower_overwrite, float upper_overwrite);
+    void binarize(float thresh, float lower_overwrite, float upper_overwrite);
     /// Clear data contents
     void clear_data();
     /// Call copy_compress internally and set itself to the result

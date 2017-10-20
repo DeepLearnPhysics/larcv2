@@ -52,7 +52,7 @@ namespace larcv {
 
     _meta = ImageMeta(cols * _meta.pixel_width(), rows * _meta.pixel_height(),
 		      rows, cols,
-		      _meta.min_x(), _meta.max_y(),
+		      _meta.min_x(), _meta.min_y(),
 		      _meta.plane());
     _img = std::move(img);
   }
@@ -92,11 +92,11 @@ namespace larcv {
       set_pixel( row, col, value );
   }
 
-  void Image2D::threshold(float thres, float lower_overwrite)
-  { for(auto& v : _img) if( v <= thres ) v = lower_overwrite; }
+  void Image2D::threshold(float thresh, bool lower)
+  { for(auto& v : _img) if( (lower && v < thresh) || (!lower && v > thresh ) ) v = thresh; }
 
-  void Image2D::binary_threshold(float thres, float lower_overwrite, float upper_overwrite)
-  { for(auto& v : _img) v = (v <= thres ? lower_overwrite : upper_overwrite); }
+  void Image2D::binarize(float thresh, float lower_overwrite, float upper_overwrite)
+  { for(auto& v : _img) v = (v <= thresh ? lower_overwrite : upper_overwrite); }
 
   float Image2D::pixel( size_t row, size_t col ) const 
   { return _img[_meta.index(row,col)]; }
@@ -214,7 +214,7 @@ namespace larcv {
   void Image2D::compress(size_t rows, size_t cols, CompressionModes_t mode)
   {
     _img = copy_compress(rows,cols,mode);
-    _meta = ImageMeta(_meta.width(),_meta.height(),rows,cols,_meta.min_x(),_meta.max_y(),_meta.plane());
+    _meta = ImageMeta(_meta.width(),_meta.height(),rows,cols,_meta.min_x(),_meta.min_y(),_meta.plane());
   }
 
   Image2D Image2D::crop(const ImageMeta& crop_meta) const
@@ -242,7 +242,7 @@ namespace larcv {
 			(max_row - min_row + 1),
 			(max_col - min_col + 1),
 			_meta.min_x() + min_col * _meta.pixel_width(),
-			_meta.max_y() - min_row * _meta.pixel_height(),
+			_meta.min_y() + min_row * _meta.pixel_height(),
 			_meta.plane());
     
     std::vector<float> img;
@@ -286,7 +286,7 @@ namespace larcv {
 			(max_row - min_row + 1),
 			(max_col - min_col + 1),
 			_meta.min_x() + min_col * _meta.pixel_width(),
-			_meta.max_y() - min_row * _meta.pixel_height(),
+			_meta.min_y() + min_row * _meta.pixel_height(),
 			_meta.plane());
     
     std::vector<float> img;
