@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 from larcv import larcv
-from colored_msg import colored_msg as cmsg
 import os, sys
 import numpy as np
 import numpy.random as npr
@@ -134,8 +133,8 @@ while ctr<NUM_EVENT:
     fill_vox(event_vox3d, vtx, end1)
 
     # fill projection image2d
+    event_image2d = o.get_data("image2d","fake_plane")
     for plane in xrange(3):
-        event_image2d = o.get_data("image2d","fake_plane%d" % plane)
         meta = make_meta(plane)
         img2d = larcv.Image2D(meta)
         fill_image(img2d, vtx, end0, axis=plane)
