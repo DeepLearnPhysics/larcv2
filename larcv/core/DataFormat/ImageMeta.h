@@ -43,7 +43,7 @@ namespace larcv {
               const size_t row_count = 0., const size_t col_count = 0,
               const double origin_x = 0.,  const double origin_y = 0.,
               const ProjectionID_t id =::larcv::kINVALID_PROJECTIONID,
-              const DistanceUnit_t unit = kUnitWireTime)
+              const DistanceUnit_t unit = kUnitUnknown)
       : BBox2D(origin_x, origin_y, origin_x + width, origin_y + height, id)
     {
       if ( width  < 0. ) throw larbys("Width must be a positive floating point!");

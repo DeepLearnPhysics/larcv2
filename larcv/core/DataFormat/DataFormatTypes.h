@@ -47,6 +47,7 @@ namespace larcv {
 
   /// Coordinate unit type
   enum DistanceUnit_t {
+    kUnitUnknown, ///< undefined scale (bad!)
     kUnitCM,      ///< cm scale
     kUnitWireTime ///< wire/time in 2D image
   };
