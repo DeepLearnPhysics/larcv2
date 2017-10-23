@@ -2,7 +2,7 @@
  * \file ADCScaleAna.h
  *
  * \ingroup Package_Name
- * 
+ *
  * \brief Class def header for a class ADCScaleAna
  *
  * @author kazuhiro
@@ -27,12 +27,12 @@ namespace larcv {
   class ADCScaleAna : public ProcessBase {
 
   public:
-    
+
     /// Default constructor
-    ADCScaleAna(const std::string name="ADCScaleAna");
-    
+    ADCScaleAna(const std::string name = "ADCScaleAna");
+
     /// Default destructor
-    ~ADCScaleAna(){}
+    ~ADCScaleAna() {}
 
     void configure(const PSet&);
 
@@ -56,7 +56,7 @@ namespace larcv {
   class ADCScaleAnaProcessFactory : public ProcessFactoryBase {
   public:
     /// ctor
-    ADCScaleAnaProcessFactory() { ProcessFactory::get().add_factory("ADCScaleAna",this); }
+    ADCScaleAnaProcessFactory() { ProcessFactory::get().add_factory("ADCScaleAna", this); }
     /// dtor
     ~ADCScaleAnaProcessFactory() {}
     /// creation method
@@ -66,5 +66,5 @@ namespace larcv {
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

@@ -12,19 +12,18 @@ namespace larcv {
   typedef unsigned short ImageIndex_t;
   /// ROI index type for Particle within EventROI
   typedef unsigned short ParticleIndex_t;
-
+  /// Projection ID to distinguish different 2D projections
+  typedef unsigned short ProjectionID_t;
   /// "ID" of MCShower/MCTrack in terms of its index number in the collection std::vector
   typedef unsigned short MCSTIndex_t;
   /// "ID" of MCTruth in terms of its index number in the collection std::vector
   typedef unsigned short MCTIndex_t;
-  /// "ID" for wire planes
-  typedef unsigned short PlaneID_t;
   /// "ID" for a set of voxels
   typedef unsigned short InstanceID_t;
   /// Invalid rep for InstanceID_t
   static const unsigned short kINVALID_INSTANCEID = kINVALID_USHORT;
-  /// Invalid plane definition
-  static const PlaneID_t kINVALID_PLANE = kINVALID_USHORT;
+  /// Invalid projection id
+  static const ProjectionID_t kINVALID_PROJECTIONID = kINVALID_USHORT;
 
   /// "ID" for Voxel3D
   typedef unsigned long long VoxelID_t;

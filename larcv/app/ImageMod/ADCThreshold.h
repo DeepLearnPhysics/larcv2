@@ -2,7 +2,7 @@
  * \file ADCThreshold.h
  *
  * \ingroup Package_Name
- * 
+ *
  * \brief Class def header for a class ADCThreshold
  *
  * @author kazuhiro
@@ -26,12 +26,12 @@ namespace larcv {
   class ADCThreshold : public ProcessBase {
 
   public:
-    
+
     /// Default constructor
-    ADCThreshold(const std::string name="ADCThreshold");
-    
+    ADCThreshold(const std::string name = "ADCThreshold");
+
     /// Default destructor
-    ~ADCThreshold(){}
+    ~ADCThreshold() {}
 
     void configure(const PSet&);
 
@@ -57,7 +57,7 @@ namespace larcv {
   class ADCThresholdProcessFactory : public ProcessFactoryBase {
   public:
     /// ctor
-    ADCThresholdProcessFactory() { ProcessFactory::get().add_factory("ADCThreshold",this); }
+    ADCThresholdProcessFactory() { ProcessFactory::get().add_factory("ADCThreshold", this); }
     /// dtor
     ~ADCThresholdProcessFactory() {}
     /// creation method
@@ -67,5 +67,5 @@ namespace larcv {
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

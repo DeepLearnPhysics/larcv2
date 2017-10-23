@@ -30,26 +30,26 @@ namespace larcv {
 
 #ifndef __CINT__
     /// Status vector move ctor
-    ChStatus(PlaneID_t plane, std::vector<short>&& data)
+    ChStatus(ProjectionID_t id, std::vector<short>&& data)
       : _status_v(std::move(data))
-      , _plane(plane)
+      , _id(id)
     {}
 #endif    
     /// Default destructor
     ~ChStatus(){}
 
     /// Initialize instance (nullify status + set dimension)
-    void  Initialize(size_t nwires, short status = chstatus::kUNKNOWN);
+    void initialize(size_t nwires, short status = chstatus::kUNKNOWN);
     /// Set all channels' status to what's specified
-    void  Reset(short status = chstatus::kUNKNOWN);
-    /// Set plane id
-    void Plane(PlaneID_t p) { _plane = p; }
+    void reset(short status = chstatus::kUNKNOWN);
+    /// Set Projection id
+    void id(ProjectionID_t p) { _id = p; }
     /// Set wire status
-    void Status(size_t wire, short status);
-    /// Plane getter
-    PlaneID_t Plane() const { return _plane; }
+    void status(size_t wire, short status);
+    /// ProjectionID_t getter
+    ProjectionID_t id() const { return _id; }
     /// Status getter
-    short Status(size_t wire) const;
+    short status(size_t wire) const;
     /// Status vector const reference getter
     const std::vector<short>& as_vector() const { return _status_v; }
     /// Status vector dumper
@@ -57,7 +57,7 @@ namespace larcv {
 
   private:
     std::vector<short> _status_v;
-    larcv::PlaneID_t _plane;
+    larcv::ProjectionID_t _id;
   };
 }
 

@@ -28,27 +28,27 @@ namespace larcv {
     size_t part_ctr = 0;
     for(auto const& part : ev_part) {
       
-      if(part.MCSTIndex() == kINVALID_USHORT) continue;
+      if(part.mcst_index() == kINVALID_USHORT) continue;
 
-      if( (part.PdgCode() == 11 || part.PdgCode() == -11 || part.PdgCode() == 22 || part.PdgCode() == 111) && 
-	  part.EnergyDeposit() < _shower_min_energy) {
-	LARCV_INFO() << "Ignoring Shower (PdgCode=" << part.PdgCode() << ") with energy " << part.EnergyDeposit() << std::endl;
+      if( (part.pdg_code() == 11 || part.pdg_code() == -11 || part.pdg_code() == 22 || part.pdg_code() == 111) && 
+	  part.energy_deposit() < _shower_min_energy) {
+	LARCV_INFO() << "Ignoring Shower (pdg_code=" << part.pdg_code() << ") with energy " << part.energy_deposit() << std::endl;
 	continue;
       }
 
-      if(part.PdgCode() == 2212 && part.EnergyDeposit() < _proton_min_energy) {
+      if(part.pdg_code() == 2212 && part.energy_deposit() < _proton_min_energy) {
 
-	LARCV_INFO() << "Ignoring Proton with energy " << part.EnergyDeposit() << std::endl;
+	LARCV_INFO() << "Ignoring Proton with energy " << part.energy_deposit() << std::endl;
 	continue;
 
-      }else if(part.Shape() == kShapeTrack && part.EnergyDeposit() < _track_min_energy) {
+      }else if(part.shape() == kShapeTrack && part.energy_deposit() < _track_min_energy) {
 
-	LARCV_INFO() << "Ignoring TRACK (PdgCode=" << part.PdgCode() << ") with energy " << part.EnergyDeposit() << std::endl;
+	LARCV_INFO() << "Ignoring TRACK (pdg_code=" << part.pdg_code() << ") with energy " << part.energy_deposit() << std::endl;
 	continue;
 
       }
 
-      LARCV_INFO() << "Counting particle (PdgCode=" << part.PdgCode() << ") with energy " << part.EnergyDeposit() << std::endl;
+      LARCV_INFO() << "Counting particle (pdg_code=" << part.pdg_code() << ") with energy " << part.energy_deposit() << std::endl;
 
       ++part_ctr;
 

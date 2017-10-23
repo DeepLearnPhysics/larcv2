@@ -43,10 +43,11 @@
 
 #pragma link C++ class larcv::ChStatus+;
 #pragma link C++ class std::vector<larcv::ChStatus>+;
-#pragma link C++ class std::map<larcv::PlaneID_t,larcv::ChStatus>+;
+#pragma link C++ class std::map<larcv::ProjectionID_t,larcv::ChStatus>+;
 #pragma link C++ class larcv::EventChStatus+;
 
 #pragma link C++ class larcv::Voxel+;
+#pragma link C++ class std::vector<larcv::Voxel>+;
 #pragma link C++ class larcv::VoxelSet+;
 #pragma link C++ class larcv::EventPixel2D+;
 #pragma link C++ class larcv::Voxel3DMeta+;
@@ -55,17 +56,19 @@
 //#pragma link C++ class std::array<unsigned short,6>+;
 //#pragma link C++ class std::array<float,6>+;
 
-#pragma link C++ class larcv::IPartition+;
-#pragma link C++ class std::vector<larcv::IPartition>+;
-#pragma link C++ class larcv::EventIPartition+;
+#pragma link C++ class larcv::VoxelPartition+;
+#pragma link C++ class std::vector<larcv::VoxelPartition>+;
+#pragma link C++ class larcv::VoxelPartitionSet+;
+#pragma link C++ class larcv::EventVoxelPartition+;
 
 #pragma link C++ class larcv::Particle+;
 #pragma link C++ class std::vector<larcv::Particle>+;
 #pragma link C++ class larcv::EventParticle+;
-#pragma link C++ class Point+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
+
 
 
 

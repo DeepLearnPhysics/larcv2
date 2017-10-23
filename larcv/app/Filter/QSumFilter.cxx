@@ -30,7 +30,7 @@ namespace larcv {
   {
     auto const& ev_image = mgr.get_data<larcv::EventImage2D>(_image_producer);
 
-    auto const& image_v = ev_image.Image2DArray();
+    auto const& image_v = ev_image.image2d_array();
 
     if(image_v.size() != _min_qsum_v.size()) {
       if(image_v.empty()) {

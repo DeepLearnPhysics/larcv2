@@ -26,7 +26,7 @@ namespace larcv {
     \brief Event-wise class to store a collection of larcv::Pixel2D and larcv::Pixel2DCluster
   */
   class EventPixel2D : public EventBase,
-		       public VoxelSet {
+		       public std::vector<larcv::VoxelSet> {
     
   public:
     
@@ -40,12 +40,12 @@ namespace larcv {
     void clear();
 
     /// Meta getter
-    inline const ImageMeta& Meta() const
+    inline const ImageMeta& meta() const
     { return _meta; }
 
     /// Meta setter
-    inline void Meta(const ImageMeta& meta)
-    { VoxelSet::Clear(); _meta = meta; }
+    inline void meta(const ImageMeta& meta)
+    { std::vector<larcv::VoxelSet>::clear(); _meta = meta; }
 
   private:
     ImageMeta _meta;

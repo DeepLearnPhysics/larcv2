@@ -28,12 +28,12 @@ def make_meta(plane):
 
 def make_particle(pdg, start, end):
     res = larcv.Particle()
-    res.PdgCode(pdg)
-    res.Position(start[0],start[1],start[2],0.)
-    res.EndPosition(end[0],end[1],end[2],0.)
+    res.pdg_code(pdg)
+    res.position(start[0],start[1],start[2],0.)
+    res.end_position(end[0],end[1],end[2],0.)
     return res
 
-def fill_vox(event_vox3d, start, end):
+def fill_vox(vox3d_set, start, end):
 
     distance  = start.distance(end)
     direction = start.direction(end)
@@ -45,8 +45,8 @@ def fill_vox(event_vox3d, start, end):
     while step < num_steps:
         sys.stdout.write('    Filling voxel step %d/%d\r' % (step,num_steps))
         sys.stdout.flush()
-        vox.Set( VOX_DEF.id(where), edep )
-        event_vox3d.Add(vox)
+        vox.set( VOX_DEF.id(where), edep )
+        vox3d_set.add(vox)
         where += direction
         step += 1
     print('')
@@ -129,9 +129,10 @@ while ctr<NUM_EVENT:
 
     # fill voxel3d
     event_vox3d = o.get_data("voxel3d","fake")
-    fill_vox(event_vox3d, vtx, end0)
-    fill_vox(event_vox3d, vtx, end1)
-    event_vox3d.Meta(VOX_DEF)
+    event_vox3d.meta(VOX_DEF)
+    event_vox3d.resize(2)
+    fill_vox(event_vox3d.at(0), vtx, end0)
+    fill_vox(event_vox3d.at(1), vtx, end1)
 
     # fill projection image2d
     event_image2d = o.get_data("image2d","fake_plane")
@@ -140,7 +141,7 @@ while ctr<NUM_EVENT:
         img2d = larcv.Image2D(meta)
         fill_image(img2d, vtx, end0, axis=plane)
         fill_image(img2d, vtx, end1, axis=plane)
-        event_image2d.Append(img2d)
+        event_image2d.append(img2d)
 
     o.set_id(0,0,ctr)
     o.save_entry()

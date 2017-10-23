@@ -2,7 +2,7 @@
  * \file HistADC.h
  *
  * \ingroup Package_Name
- * 
+ *
  * \brief Class def header for a class HistADC
  *
  * @author taritree
@@ -31,12 +31,12 @@ namespace larcv {
   class HistADC : public ProcessBase {
 
   public:
-    
+
     /// Default constructor
-    HistADC(const std::string name="HistADC");
-    
+    HistADC(const std::string name = "HistADC");
+
     /// Default destructor
-    ~HistADC(){}
+    ~HistADC() {}
 
     void configure(const PSet&);
 
@@ -66,7 +66,7 @@ namespace larcv {
   class HistADCProcessFactory : public ProcessFactoryBase {
   public:
     /// ctor
-    HistADCProcessFactory() { ProcessFactory::get().add_factory("HistADC",this); }
+    HistADCProcessFactory() { ProcessFactory::get().add_factory("HistADC", this); }
     /// dtor
     ~HistADCProcessFactory() {}
     /// creation method
@@ -76,5 +76,5 @@ namespace larcv {
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

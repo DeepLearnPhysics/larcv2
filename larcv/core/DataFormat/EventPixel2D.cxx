@@ -11,7 +11,7 @@ namespace larcv {
   void EventPixel2D::clear()
   {
     EventBase::clear();
-    VoxelSet::Clear();
+    std::vector<larcv::VoxelSet>::clear();
     _meta = ImageMeta();
   }
 

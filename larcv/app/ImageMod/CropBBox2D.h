@@ -2,7 +2,7 @@
  * \file CropBBox2D.h
  *
  * \ingroup Package_Name
- * 
+ *
  * \brief Class def header for a class CropBBox2D
  *
  * @author kazuhiro
@@ -26,12 +26,12 @@ namespace larcv {
   class CropBBox2D : public ProcessBase {
 
   public:
-    
+
     /// Default constructor
-    CropBBox2D(const std::string name="CropBBox2D");
-    
+    CropBBox2D(const std::string name = "CropBBox2D");
+
     /// Default destructor
-    ~CropBBox2D(){}
+    ~CropBBox2D() {}
 
     void configure(const PSet&);
 
@@ -57,7 +57,7 @@ namespace larcv {
   class CropBBox2DProcessFactory : public ProcessFactoryBase {
   public:
     /// ctor
-    CropBBox2DProcessFactory() { ProcessFactory::get().add_factory("CropBBox2D",this); }
+    CropBBox2DProcessFactory() { ProcessFactory::get().add_factory("CropBBox2D", this); }
     /// dtor
     ~CropBBox2DProcessFactory() {}
     /// creation method
@@ -67,5 +67,5 @@ namespace larcv {
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

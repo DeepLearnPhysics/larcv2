@@ -2,7 +2,7 @@
  * \file Voxel.h
  *
  * \ingroup core_DataFormat
- * 
+ *
  * \brief Class def header for a class larcv::Voxel
  *
  * @author kazuhiro
@@ -21,22 +21,22 @@ namespace larcv {
      \class Voxel
      @brief 3D voxel definition element class consisting of ID and stored value
   */
-  class Voxel{
-    
+  class Voxel {
+
   public:
-    
+
     /// Default constructor
-    Voxel(VoxelID_t id=kINVALID_VOXELID, float value=kINVALID_FLOAT);
+    Voxel(VoxelID_t id = kINVALID_VOXELID, float value = kINVALID_FLOAT);
     /// Default destructor
-    ~Voxel(){}
-    
+    ~Voxel() {}
+
     /// ID getter
-    inline VoxelID_t ID() const { return _id; }
+    inline VoxelID_t id() const { return _id; }
     /// Value getter
-    inline float  Value() const { return _value; }
+    inline float  value() const { return _value; }
 
     /// Value setter
-    inline void Set(VoxelID_t id, float value) { _id = id; _value = value; }
+    inline void set(VoxelID_t id, float value) { _id = id; _value = value; }
 
     //
     // uniry operators
@@ -57,8 +57,8 @@ namespace larcv {
     { return (_id == rhs._id); }
     inline bool operator <  (const Voxel& rhs) const
     {
-      if( _id < rhs._id) return true;
-      if( _id > rhs._id) return false;
+      if ( _id < rhs._id) return true;
+      if ( _id > rhs._id) return false;
       return false;
     }
     inline bool operator <= (const Voxel& rhs) const
@@ -91,26 +91,26 @@ namespace larcv {
   class VoxelSet {
   public:
     /// Default ctor
-    VoxelSet(){}
+    VoxelSet() {}
     /// Default dtor
-    ~VoxelSet(){}
+    ~VoxelSet() {}
     /// getter
-    inline const std::vector<larcv::Voxel>& VoxelArray() const
+    inline const std::vector<larcv::Voxel>& voxel_array() const
     { return _voxel_v; }
     /// clear
-    inline void Clear() { _voxel_v.clear(); }
+    inline void clear() { _voxel_v.clear(); }
     /// adder
-    void Add(const Voxel& vox);
+    void add(const Voxel& vox);
     /// adder
-    void Emplace(Voxel&& vox);
+    void emplace(Voxel&& vox);
   private:
-    /// Ordered sparse vector of voxels 
+    /// Ordered sparse vector of voxels
     std::vector<larcv::Voxel> _voxel_v;
   };
 
-  
+
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

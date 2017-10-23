@@ -7,16 +7,16 @@
 
 namespace larcv {
 
-  void  ChStatus::Initialize(size_t nwires, short init_status)
+  void  ChStatus::initialize(size_t nwires, short init_status)
   {
     _status_v.resize(nwires);
-    Reset(init_status);
+    reset(init_status);
   }
 
-  void  ChStatus::Reset(short init_status)
+  void  ChStatus::reset(short init_status)
   { for(auto& s : _status_v) s = init_status; }
   
-  void  ChStatus::Status(size_t wire, short status)
+  void  ChStatus::status(size_t wire, short status)
   {
     if(wire >= _status_v.size()) {
       std::stringstream ss;
@@ -28,7 +28,7 @@ namespace larcv {
     _status_v[wire] = status;
   }
   
-  short ChStatus::Status(size_t wire) const
+  short ChStatus::status(size_t wire) const
   {
     if(wire >= _status_v.size()) {
       std::stringstream ss;
@@ -43,7 +43,7 @@ namespace larcv {
   std::string ChStatus::dump() const
   {
     std::stringstream ss;
-    ss << "Plane " << _plane << " ... " << _status_v.size() << " wires:" << std::endl;
+    ss << "Projection " << _id << " ... " << _status_v.size() << " wires:" << std::endl;
     for(size_t i=0; i<_status_v.size(); ++i) {
       if(_status_v[i] >= chstatus::kGOOD)
 	ss << _status_v[i] << " ";

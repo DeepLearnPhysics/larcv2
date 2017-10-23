@@ -53,7 +53,7 @@ namespace larcv {
     _meta = ImageMeta(cols * _meta.pixel_width(), rows * _meta.pixel_height(),
 		      rows, cols,
 		      _meta.min_x(), _meta.min_y(),
-		      _meta.plane(), _meta.unit());
+		      _meta.id(), _meta.unit());
     _img = std::move(img);
   }
   
@@ -214,7 +214,7 @@ namespace larcv {
   void Image2D::compress(size_t rows, size_t cols, CompressionModes_t mode)
   {
     _img = copy_compress(rows,cols,mode);
-    _meta = ImageMeta(_meta.width(),_meta.height(),rows,cols,_meta.min_x(),_meta.min_y(),_meta.plane(),_meta.unit());
+    _meta = ImageMeta(_meta.width(),_meta.height(),rows,cols,_meta.min_x(),_meta.min_y(),_meta.id(),_meta.unit());
   }
 
   Image2D Image2D::crop(const ImageMeta& crop_meta) const
@@ -243,7 +243,7 @@ namespace larcv {
 			(max_col - min_col + 1),
 			_meta.min_x() + min_col * _meta.pixel_width(),
 			_meta.min_y() + min_row * _meta.pixel_height(),
-			_meta.plane(), _meta.unit());
+			_meta.id(), _meta.unit());
     
     std::vector<float> img;
     img.resize(res_meta.cols() * res_meta.rows());
@@ -287,7 +287,7 @@ namespace larcv {
 			(max_col - min_col + 1),
 			_meta.min_x() + min_col * _meta.pixel_width(),
 			_meta.min_y() + min_row * _meta.pixel_height(),
-			_meta.plane(), _meta.unit());
+			_meta.id(), _meta.unit());
     
     std::vector<float> img;
     img.resize(res_meta.cols() * res_meta.rows());

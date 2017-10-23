@@ -35,8 +35,8 @@ namespace larcv {
     }
 
     size_t ctr=0;
-    for(auto const& vox : event_voxel->VoxelArray()) {
-      if(vox.Value()<_min_voxel_value) continue;
+    for(auto const& vox : event_voxel->voxel_array()) {
+      if(vox.value()<_min_voxel_value) continue;
       ctr++;
     }
     return (ctr >= _min_voxel_count);

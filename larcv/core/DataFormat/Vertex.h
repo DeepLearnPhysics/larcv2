@@ -10,15 +10,15 @@ namespace larcv {
     Vertex(double x, double y, double z, double t);
     
     /// Reset function 
-    void Reset();
+    void reset();
 
     /// Reset function for x, y, z, t
-    void Reset(double x, double y, double z, double t);
+    void reset(double x, double y, double z, double t);
     
-    inline double X() const { return _x; }
-    inline double Y() const { return _y; }
-    inline double Z() const { return _z; }
-    inline double T() const { return _t; }
+    inline double x() const { return _x; }
+    inline double y() const { return _y; }
+    inline double z() const { return _z; }
+    inline double t() const { return _t; }
     
     /// Default destructor
     virtual ~Vertex(){};
@@ -50,7 +50,7 @@ namespace larcv {
     
     double _x, _y, _z, _t;
     
-    void Approx();
+    void approx();
   };
 }
 

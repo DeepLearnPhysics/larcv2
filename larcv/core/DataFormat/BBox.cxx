@@ -7,23 +7,24 @@
 #include "larcv/core/Base/larbys.h"
 namespace larcv {
 
-  BBox2D::BBox2D(double xmin, double ymin, double xmax, double ymax)
-    : _p1(xmin,ymin) , _p2(xmax,ymax)
+  BBox2D::BBox2D(double xmin, double ymin, double xmax, double ymax, ProjectionID_t id)
+    : _p1(xmin,ymin) , _p2(xmax,ymax), _id(id)
   {
     if(xmin > xmax) throw larbys("xmin > xmax not allowed for BBox2D construction!");
     if(ymin > ymax) throw larbys("ymin > ymax not allowed for BBox2D construction!");
   }
 
-  void BBox2D::update(double xmin, double ymin, double xmax, double ymax)
+  void BBox2D::update(double xmin, double ymin, double xmax, double ymax, ProjectionID_t id)
   {
     if(xmin > xmax) throw larbys("xmin > xmax not allowed for BBox2D::Update!");
     if(ymin > ymax) throw larbys("ymin > ymax not allowed for BBox2D::Update!");
     _p1.x = xmin; _p1.y = ymin;
     _p2.x = xmax, _p2.y = ymax;
+    _id = id;
   }
   
-  void BBox2D::update(const Point2D& p1, const Point2D& p2)
-  { update(p1.x,p1.y,p2.x,p2.y); }
+  void BBox2D::update(const Point2D& p1, const Point2D& p2, ProjectionID_t id)
+  { update(p1.x,p1.y,p2.x,p2.y); _id = id; }
   
   BBox2D BBox2D::overlap(const BBox2D& box) const
   {
