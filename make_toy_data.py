@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 
 from larcv import larcv
 import os, sys
@@ -38,6 +38,7 @@ def fill_vox(vox3d_set, start, end):
     distance  = start.distance(end)
     direction = start.direction(end)
     num_steps = distance / STEP_SIZE
+    print "num_steps:" + str(num_steps)
     where = larcv.Point3D(start)
     edep = STEP_SIZE * DEDX
     vox = larcv.Voxel()
@@ -98,7 +99,8 @@ if not o.initialize():
     sys.exit(1)
 
 ctr = 0
-while ctr<NUM_EVENT:
+# while ctr<NUM_EVENT:
+while ctr<1:
     print('Event %d' % ctr)
 
     vtx_x = npr.uniform() * VOX_DEF.width()  + VOX_DEF.min_x()
