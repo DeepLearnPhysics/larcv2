@@ -109,6 +109,15 @@ namespace larcv {
     /// id getter
     inline InstanceID_t id() const { return _id; }
 
+    inline VoxelSet& operator += (float value)
+    { for(auto& vox : _voxel_v) vox += value; return (*this); }
+    inline VoxelSet& operator -= (float value)
+    { for(auto& vox : _voxel_v) vox -= value; return (*this); }
+    inline VoxelSet& operator *= (float factor)
+    { for(auto& vox : _voxel_v) vox *= factor; return (*this); }
+    inline VoxelSet& operator /= (float factor)
+    { for(auto& vox : _voxel_v) vox /= factor; return (*this); }
+
   private:
     /// Instance ID
     InstanceID_t _id;
@@ -128,6 +137,8 @@ namespace larcv {
     ~VoxelSetArray() {}
 
     inline void clear() { _voxel_vv.clear(); }
+
+    inline size_t size() const { return _voxel_vv.size(); }
 
     const larcv::VoxelSet& get_voxel_set(InstanceID_t id) const;
 
