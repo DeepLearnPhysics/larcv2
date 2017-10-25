@@ -39,20 +39,20 @@ namespace larcv {
   {
     auto box = BBox2D::overlap((BBox2D)meta);
 
-    return ImageMeta(box.width(), box.height(),
+    return ImageMeta(box, 
                      box.height() / pixel_height(),
-                     box.width() / pixel_width(),
-                     box.min_x(), box.min_y(), id(), _unit);
+                     box.width() / pixel_width(), 
+                     _unit);
   }
 
   ImageMeta ImageMeta::inclusive(const ImageMeta& meta) const
   {
     auto box = BBox2D::inclusive((BBox2D)meta);
 
-    return ImageMeta(box.width(), box.height(),
+    return ImageMeta(box,
                      box.height() / pixel_height(),
                      box.width() / pixel_width(),
-                     box.min_x(), box.min_y(), id(), _unit);
+                     _unit);
   }
 
   std::string ImageMeta::dump() const

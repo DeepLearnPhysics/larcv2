@@ -39,6 +39,7 @@ namespace larcv {
   public:
 
     /// Default constructor: width, height, and origin coordinate won't be modifiable
+    /*
     ImageMeta(const double width = 0.,     const double height = 0.,
               const size_t row_count = 0., const size_t col_count = 0,
               const double origin_x = 0.,  const double origin_y = 0.,
@@ -50,7 +51,21 @@ namespace larcv {
       if ( height < 0. ) throw larbys("Height must be a positive floating point!");
       update(row_count, col_count);
     }
+    */
+    ImageMeta(double x_min = 0., double y_min = 0., double x_max = 0., double y_max = 0.,
+	      size_t y_row_count = 0, size_t x_column_count = 0,
+	      ProjectionID_t id = larcv::kINVALID_PROJECTIONID,
+	      DistanceUnit_t unit = kUnitUnknown)
+      : BBox2D(x_min, y_min, x_max, y_max, id)
+      , _unit(unit)
+    { update(y_row_count, x_column_count); }
 
+    ImageMeta(const BBox2D& box,
+              size_t y_row_count = 0, size_t x_column_count = 0,
+              DistanceUnit_t unit = kUnitUnknown)
+      : BBox2D(box), _unit(unit)
+    { update(y_row_count, x_column_count); }
+    
     /// Default destructor
     ~ImageMeta() {}
 
