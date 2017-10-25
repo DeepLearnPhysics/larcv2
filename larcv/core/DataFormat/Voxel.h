@@ -134,6 +134,11 @@ namespace larcv {
     inline const std::vector<larcv::VoxelSet>& get_voxel_set_array() const
     { return _voxel_vv; }
 
+    inline void resize(const size_t num)
+    { _voxel_vv.resize(num); for(size_t i=0; i<num; ++i) _voxel_vv[i].id(i); }
+
+    larcv::VoxelSet& writeable_voxel_set(const InstanceID_t id);
+
     inline void emplace(std::vector<larcv::VoxelSet>&& voxel_vv)
     { _voxel_vv = std::move(voxel_vv); }
 

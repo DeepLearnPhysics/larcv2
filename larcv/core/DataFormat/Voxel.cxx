@@ -81,6 +81,15 @@ namespace larcv {
     _voxel_vv[id] = voxel_v;
   }
 
+  larcv::VoxelSet& VoxelSetArray::writeable_voxel_set(const InstanceID_t id)
+  {
+    if(id >= _voxel_vv.size()) {
+      std::cerr << "VoxelSetArray has no VoxelSet with InstanceID_t " << id << std::endl;
+      throw std::exception();
+    }
+    return _voxel_vv[id];
+  }
+
   const larcv::VoxelSet& 
   VoxelSetArray2D::get_voxel_set(ProjectionID_t p_id, InstanceID_t i_id) const
   {
