@@ -2,7 +2,7 @@
 #define __BINARIZE_CXX__
 
 #include "Binarize.h"
-#include "DataFormat/EventImage2D.h"
+#include "larcv/core/DataFormat/EventImage2D.h"
 
 namespace larcv {
 
@@ -37,10 +37,10 @@ namespace larcv {
 
   bool Binarize::process(IOManager& mgr)
   {
-    auto input_imgs  = (larcv::EventImage2D*)(mgr.get_data(kProductImage2D,fInputImageProducer));
+	  auto input_imgs  = mgr.get_data<larcv::EventImage2D*>(fInputImageProducer);
 
     std::vector<larcv::Image2D> image_v;
-    input_imgs->Move(image_v);
+    input_imgs->move(image_v);
 
     if(image_v.empty()) {
       LARCV_INFO() << "Skipping empty image event" << std::endl;
@@ -48,7 +48,7 @@ namespace larcv {
     }
     if(image_v.size() != fChannelThresholds.size()) {
       LARCV_CRITICAL() << "Channel # do not match between input image and data!" << std::endl;
-      input_imgs->Emplace(std::move(image_v));
+      input_imgs->emplace(std::move(image_v));
       throw larbys();
     }
     
@@ -59,12 +59,12 @@ namespace larcv {
       auto const& high  = fHighADCs[i];
 
       auto& img = image_v[i];
-      img.binary_threshold(thres,low,high);
+      img.binarize(thres,low,high);
 
     }
 
-    auto output_imgs = (larcv::EventImage2D*)(mgr.get_data(kProductImage2D,fOutputImageProducer));
-    output_imgs->Emplace(std::move(image_v));
+    auto output_imgs = mgr.get_data<larcv::EventImage2D*>(fOutputImageProducer);
+    output_imgs->emplace(std::move(image_v));
 
     return true;
   }
