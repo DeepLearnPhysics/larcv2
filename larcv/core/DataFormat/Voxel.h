@@ -15,6 +15,7 @@
 #define VOXEL3D_H
 
 #include "DataFormatTypes.h"
+#include "Image2D.h"
 namespace larcv {
 
   /**
@@ -162,21 +163,24 @@ namespace larcv {
 
     const larcv::VoxelSet& get_voxel_set(ProjectionID_t p_id, InstanceID_t i_id) const;
 
+    const larcv::ImageMeta& get_meta(ProjectionID_t p_id) const;
+
     inline const std::vector<larcv::VoxelSetArray>& get_voxel_set_array2d() const
     { return _voxel_vvv; }
 
-    inline void emplace(std::vector<larcv::VoxelSetArray>&& voxel_vvv)
-    { _voxel_vvv = std::move(voxel_vvv); }
+    void emplace(std::vector<larcv::VoxelSetArray>&& voxel_vvv,
+                 std::vector<larcv::ImageMeta>&& meta_v);
 
-    inline void set(const std::vector<larcv::VoxelSetArray>& voxel_vvv)
-    { _voxel_vvv = voxel_vvv; }
+    void set(const std::vector<larcv::VoxelSetArray>& voxel_vvv,
+             const std::vector<larcv::ImageMeta>& meta_v);
 
-    void emplace(larcv::VoxelSetArray&& voxel_vv, ProjectionID_t id);
+    void emplace(larcv::VoxelSetArray&& voxel_vv, larcv::ImageMeta&& meta);
 
-    void set(const larcv::VoxelSetArray& voxel_vv, ProjectionID_t id);
+    void set(const larcv::VoxelSetArray& voxel_vv, const larcv::ImageMeta& meta);
 
   private:
     std::vector<larcv::VoxelSetArray> _voxel_vvv;
+    std::vector<larcv::ImageMeta> _meta_v;
   };  
 
 }

@@ -30,7 +30,7 @@ namespace larcv {
     
     /// Default constructor
     Particle(larcv::ShapeType_t shape=larcv::kShapeUnknown)
-      : _index      (kINVALID_INDEX)
+      : _id         (kINVALID_INDEX)
       , _mcst_index (kINVALID_INDEX)
       , _mct_index  (kINVALID_INDEX)
       , _shape      (shape)
@@ -54,7 +54,7 @@ namespace larcv {
     /// Default destructor
     ~Particle(){}
     /// particle's ID getter
-    inline ParticleIndex_t index   () const { return _index;      }
+    inline ParticleIndex_t id      () const { return _id;         }
     // origin/generator info getter
     inline ShapeType_t  shape      () const { return _shape;      }
     inline MCSTIndex_t  mcst_index () const { return _mcst_index; }
@@ -105,27 +105,27 @@ namespace larcv {
     // Setters
     //
     // generator/origin info setter
-    inline void index         (ParticleIndex_t id  ) { _index = id;         }
-    inline void mcst_index     (MCSTIndex_t id )    { _mcst_index = id;    }
-    inline void mct_index      (MCTIndex_t id )     { _mct_index = id;     }
-    inline void shape         (ShapeType_t shape ) { _shape = shape;      }
+    inline void id              (InstanceID_t id  )  { _id = id;         }
+    inline void mcst_index      (MCSTIndex_t id )    { _mcst_index = id;    }
+    inline void mct_index       (MCTIndex_t id )     { _mct_index = id;     }
+    inline void shape           (ShapeType_t shape ) { _shape = shape;      }
     inline void nu_current_type (short curr) { curr = -1; _current_type = curr; }
     inline void nu_interaction_type (short itype) { itype = -1; _interaction_type = itype; }
     // particle's info setter
-    inline void track_id       (unsigned int id )   { _trackid = id;       }
-    inline void pdg_code       (int code)           { _pdg = code;         }
-    inline void momentum      (double px, double py, double pz) { _px = px; _py = py; _pz = pz; }
-    inline void position      (const larcv::Vertex& vtx) { _vtx = vtx;    }
-    inline void position      (double x, double y, double z, double t) { _vtx = Vertex(x,y,z,t); }
-    inline void end_position   (const larcv::Vertex& vtx) { _end_pt = vtx; }
-    inline void end_position   (double x, double y, double z, double t) { _end_pt = Vertex(x,y,z,t); }
-    inline void first_step     (const larcv::Vertex& vtx) { _first_step = vtx; }
-    inline void first_step     (double x, double y, double z, double t) { _first_step = Vertex(x,y,z,t); }
-    inline void last_step      (const larcv::Vertex& vtx) { _last_step = vtx; }
-    inline void last_step      (double x, double y, double z, double t) { _last_step = Vertex(x,y,z,t); }
+    inline void track_id        (unsigned int id )   { _trackid = id;       }
+    inline void pdg_code        (int code)           { _pdg = code;         }
+    inline void momentum        (double px, double py, double pz) { _px = px; _py = py; _pz = pz; }
+    inline void position        (const larcv::Vertex& vtx) { _vtx = vtx;    }
+    inline void position        (double x, double y, double z, double t) { _vtx = Vertex(x,y,z,t); }
+    inline void end_position    (const larcv::Vertex& vtx) { _end_pt = vtx; }
+    inline void end_position    (double x, double y, double z, double t) { _end_pt = Vertex(x,y,z,t); }
+    inline void first_step      (const larcv::Vertex& vtx) { _first_step = vtx; }
+    inline void first_step      (double x, double y, double z, double t) { _first_step = Vertex(x,y,z,t); }
+    inline void last_step       (const larcv::Vertex& vtx) { _last_step = vtx; }
+    inline void last_step       (double x, double y, double z, double t) { _last_step = Vertex(x,y,z,t); }
     inline void distance_travel ( double dist ) { _dist_travel = dist; }
-    inline void energy_init    (double e)           { _energy_init = e;    }
-    inline void energy_deposit (double e)           { _energy_deposit = e; }
+    inline void energy_init     (double e)           { _energy_init = e;    }
+    inline void energy_deposit  (double e)           { _energy_deposit = e; }
     inline void creation_process (const std::string& proc) { _process = proc; }
     inline void boundingbox_2d(const std::vector<larcv::BBox2D>& bb_v) { _bb2d_v = bb_v; }
     inline void boundingbox_2d(const BBox2D& bb, ProjectionID_t id=0) { _bb2d_v.resize(id+1); _bb2d_v[id] = bb; }
@@ -147,7 +147,7 @@ namespace larcv {
     
   private:
 
-    ParticleIndex_t   _index;  ///< "ID" of this particle
+    InstanceID_t   _id; ///< "ID" of this particle
     /// index number in the origin MCShower/MCTrack container array (kINVALID_USHORT if neither)
     MCSTIndex_t  _mcst_index;
     ///< index number in the origin MCTruth container array (kINVALID_USHORT if MCShower/MCTrack)

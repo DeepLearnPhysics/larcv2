@@ -12,7 +12,6 @@ namespace larcv {
   {
     EventBase::clear();
     VoxelSetArray2D::clear();
-    _meta = ImageMeta();
   }
 
 }

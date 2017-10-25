@@ -39,16 +39,6 @@ namespace larcv {
     /// EventBase::clear() override
     void clear();
 
-    /// Meta getter
-    inline const ImageMeta& meta() const
-    { return _meta; }
-
-    /// Meta setter
-    inline void meta(const ImageMeta& meta)
-    { VoxelSetArray2D::clear(); _meta = meta; }
-
-  private:
-    ImageMeta _meta;
   };
 }
 
