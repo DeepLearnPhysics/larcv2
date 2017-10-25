@@ -181,6 +181,29 @@ namespace larcv {
     //std::vector<float> _type_score_v;
 
   };
+
+  /**
+     \class ParticleSet
+     \brief Particle/Interaction collection
+  */
+  class ParticleSet {
+  public:
+    ParticleSet() {}
+    ~ParticleSet() {}
+
+    void clear() { _part_v.clear(); }
+
+    inline const std::vector<larcv::Particle>& particle_array() const
+    { return _part_v; }
+
+    void append(const larcv::Particle& part);
+
+    void emplace_back(larcv::Particle&& part);
+
+  private:
+
+    std::vector<larcv::Particle> _part_v; ///< a collection of particles (index maintained)
+  };
 }
 #endif
 /** @} */ // end of doxygen group 
