@@ -196,9 +196,13 @@ namespace larcv {
     inline const std::vector<larcv::Particle>& particle_array() const
     { return _part_v; }
 
+    void set(const std::vector<larcv::Particle>& part_v);
+
     void append(const larcv::Particle& part);
 
     void emplace_back(larcv::Particle&& part);
+
+    void emplace(std::vector<larcv::Particle>&& part_v);
 
   private:
 

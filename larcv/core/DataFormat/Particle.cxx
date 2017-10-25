@@ -37,6 +37,13 @@ namespace larcv {
     return ss.str();
   }
 
+  void ParticleSet::set(const std::vector<larcv::Particle>& part_v)
+  {
+    _part_v = part_v;
+    for(size_t i=0; i<_part_v.size(); ++i)
+      _part_v[i].index(i);
+  }
+
   void ParticleSet::append(const larcv::Particle& part)
   {
     _part_v.push_back(part);
@@ -47,6 +54,13 @@ namespace larcv {
   {
     _part_v.emplace_back(std::move(part));
     _part_v.back().index(_part_v.size()-1);
+  }
+
+  void ParticleSet::emplace(std::vector<larcv::Particle>&& part_v)
+  {
+    _part_v = std::move(part_v);
+    for(size_t i=0; i<_part_v.size(); ++i)
+      _part_v[i].index(i);
   }
 }
 
