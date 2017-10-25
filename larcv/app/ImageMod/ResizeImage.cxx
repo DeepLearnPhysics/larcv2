@@ -2,7 +2,7 @@
 #define __RESIZEIMAGE_CXX__
 
 #include "ResizeImage.h"
-#include "DataFormat/EventImage2D.h"
+#include "larcv/core/DataFormat/EventImage2D.h"
 namespace larcv {
 
   static ResizeImageProcessFactory __global_ResizeImageProcessFactory__;
@@ -37,9 +37,9 @@ namespace larcv {
 
   bool ResizeImage::process(IOManager& mgr)
   {
-    auto event_image = (EventImage2D*)(mgr.get_data(kProductImage2D,_output_producer));
+	  auto event_image = mgr.get_data<EventImage2D*>(_output_producer);
 
-    auto const& image_v = event_image->Image2DArray();
+    auto const& image_v = event_image->image2d_array();
     std::vector<larcv::Image2D> res_image_v;
     
     if(image_v.size() != _origin_x_v.size()) {
@@ -58,16 +58,16 @@ namespace larcv {
       ImageMeta res_meta(_width_v[i], _height_v[i],
 			 _rows_v[i], _cols_v[i],
 			 _origin_x_v[i], _origin_y_v[i],
-			 image.meta().plane());
+			 image.meta().id());
       Image2D res(res_meta);
       res.paint(0.);
       res.overlay(image);
       res_image_v.emplace_back(std::move(res));
     }
 
-    auto output_image = (EventImage2D*)(mgr.get_data(kProductImage2D,_input_producer));
+    auto output_image = mgr.get_data<EventImage2D*>(_input_producer);
 
-    output_image->Emplace(std::move(res_image_v));
+    output_image->emplace(std::move(res_image_v));
 
     return true;
   }
