@@ -31,7 +31,7 @@ namespace larcv {
 
       auto const& producer = _producer_v[i];
 
-      auto event_image = mgr.get_data<EventImage2D>(producer);
+      auto& event_image = mgr.get_data<EventImage2D>(producer);
 
       if(event_image.image2d_array().size()!=_nplanes) {
 	LARCV_CRITICAL() << "Producer " << producer 
@@ -49,7 +49,7 @@ namespace larcv {
       
     }
 
-    auto out_image = mgr.get_data<EventImage2D>(_out_producer);
+    auto& out_image = mgr.get_data<EventImage2D>(_out_producer);
 
     out_image.emplace(std::move(image_v));
 
