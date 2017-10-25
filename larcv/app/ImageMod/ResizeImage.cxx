@@ -37,9 +37,9 @@ namespace larcv {
 
   bool ResizeImage::process(IOManager& mgr)
   {
-	  auto event_image = mgr.get_data<EventImage2D*>(_output_producer);
+    auto& event_image = mgr.get_data<EventImage2D>(_output_producer);
 
-    auto const& image_v = event_image->image2d_array();
+    auto const& image_v = event_image.image2d_array();
     std::vector<larcv::Image2D> res_image_v;
     
     if(image_v.size() != _origin_x_v.size()) {
@@ -65,9 +65,9 @@ namespace larcv {
       res_image_v.emplace_back(std::move(res));
     }
 
-    auto output_image = mgr.get_data<EventImage2D*>(_input_producer);
+    auto& output_image = mgr.get_data<EventImage2D>(_input_producer);
 
-    output_image->emplace(std::move(res_image_v));
+    output_image.emplace(std::move(res_image_v));
 
     return true;
   }

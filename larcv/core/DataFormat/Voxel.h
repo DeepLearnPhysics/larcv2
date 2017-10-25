@@ -194,6 +194,9 @@ namespace larcv {
 
     void set(const larcv::VoxelSetArray& voxel_vv, const larcv::ImageMeta& meta);
 
+    void move(larcv::VoxelSetArray2D&& target)
+    { _voxel_vvv = std::move(target._voxel_vvv); _meta_v = std::move(target._meta_v); }
+
   private:
     std::vector<larcv::VoxelSetArray> _voxel_vvv;
     std::vector<larcv::ImageMeta> _meta_v;

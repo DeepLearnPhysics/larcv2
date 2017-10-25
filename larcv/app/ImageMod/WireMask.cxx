@@ -35,7 +35,7 @@ namespace larcv {
 
   bool WireMask::process(IOManager& mgr)
   {
-    auto input_image_v = mgr.get_data<EventImage2D*>(_image_producer);
+    auto input_image_v = (EventImage2D*)(mgr.get_data("image2d",_image_producer));
     LARCV_DEBUG() << "input_image_v ptr : " << input_image_v << "\n";
     if(!input_image_v) {
       LARCV_CRITICAL() << "Invalid image producer name: " << _image_producer << std::endl;
@@ -43,11 +43,12 @@ namespace larcv {
     }
     EventChStatus* ev_chstatus = nullptr;
     if(!_chstatus_producer.empty()) {
-		ev_chstatus = mgr.get_data<EventChStatus*>(_chstatus_producer);
+      ev_chstatus = (EventChStatus*)(mgr.get_data("chstatus",_chstatus_producer));
       if(!ev_chstatus) {
 	LARCV_CRITICAL() << "ChStatus by " << _chstatus_producer << " not found!" << std::endl;
 	throw larbys();
       }
+
     }
 
     // For operation, move an array to this scope
