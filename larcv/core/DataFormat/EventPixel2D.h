@@ -2,7 +2,7 @@
  * \file EventPixel2D.h
  *
  * \ingroup core_DataFormat
- * 
+ *
  * \brief Class def header for a class larcv::EventPixel2D
  *
  * @author kazuhiro
@@ -20,22 +20,22 @@
 #include "Voxel.h"
 #include "ImageMeta.h"
 namespace larcv {
-  
+
   /**
     \class EventPixel2D
     \brief Event-wise class to store a collection of larcv::Pixel2D and larcv::Pixel2DCluster
   */
   class EventPixel2D : public EventBase,
-		       public std::vector<larcv::VoxelSet> {
-    
+    public larcv::VoxelSetArray2D {
+
   public:
-    
+
     /// Default constructor
-    EventPixel2D(){}
-    
+    EventPixel2D() {}
+
     /// Default destructor
-    virtual ~EventPixel2D(){}
-    
+    virtual ~EventPixel2D() {}
+
     /// EventBase::clear() override
     void clear();
 
@@ -45,7 +45,7 @@ namespace larcv {
 
     /// Meta setter
     inline void meta(const ImageMeta& meta)
-    { std::vector<larcv::VoxelSet>::clear(); _meta = meta; }
+    { VoxelSetArray2D::clear(); _meta = meta; }
 
   private:
     ImageMeta _meta;
@@ -68,7 +68,7 @@ namespace larcv {
   public:
     /// ctor
     EventPixel2DFactory()
-    { DataProductFactory::get().add_factory(product_unique_name<larcv::EventPixel2D>(),this); }
+    { DataProductFactory::get().add_factory(product_unique_name<larcv::EventPixel2D>(), this); }
     /// dtor
     ~EventPixel2DFactory() {}
     /// create method
@@ -78,5 +78,5 @@ namespace larcv {
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

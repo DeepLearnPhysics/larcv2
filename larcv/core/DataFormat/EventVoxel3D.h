@@ -25,7 +25,7 @@ namespace larcv {
     Event-wise class to store a collection of larcv::Voxel3D
   */
   class EventVoxel3D : public EventBase,
-		       public std::vector<larcv::VoxelSet> {
+		       public VoxelSetArray {
     
   public:
     
@@ -44,7 +44,7 @@ namespace larcv {
     
     /// Meta setter
     inline void meta(const Voxel3DMeta& meta)
-    { std::vector<larcv::VoxelSet>::clear(); _meta = meta; }
+    { VoxelSetArray::clear(); _meta = meta; }
 
   private:
     Voxel3DMeta _meta;
