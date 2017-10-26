@@ -112,6 +112,8 @@ namespace larcv {
     void add(const Voxel& vox);
     /// Emplace a new voxel. Same logic as VoxelSet::add but consumes removable reference.
     void emplace(Voxel&& vox);
+    /// Emplace a new voxel from id & value
+    inline void emplace(VoxelID_t id, float value) { emplace(Voxel(id,value)); }
     /// InstanceID_t setter
     inline void id(const InstanceID_t id) { _id = id; }
 
