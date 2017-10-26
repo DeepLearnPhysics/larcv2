@@ -38,7 +38,7 @@ namespace larcv {
     //
     // Write-access
     //
-    void add(const double x, const double y, const double z, const float val);
+    void emplace(const double x, const double y, const double z, const float val);
     /// Clear everything
     inline void clear() { VoxelSet::clear(); _meta = Voxel3DMeta(); }
     /// Meta setter

@@ -6,11 +6,11 @@
 
 namespace larcv {
 
-  void SparseTensor3D::add(const double x, const double y, const double z, 
+  void SparseTensor3D::emplace(const double x, const double y, const double z, 
     const float val)
   {
     auto id = _meta.id(x,y,z);
-    if(id != kINVALID_VOXELID) emplace(id,val);
+    if(id != kINVALID_VOXELID) VoxelSet::emplace(id,val);
   }
 
 
