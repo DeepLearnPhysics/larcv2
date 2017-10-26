@@ -66,7 +66,7 @@ namespace larcv {
 namespace larcv {
 
   // Template instantiation for IO
-  template<> inline std::string product_unique_name<larcv::EventClusterVoxel3D>() { return "cluster2d"; }
+  template<> inline std::string product_unique_name<larcv::EventClusterVoxel3D>() { return "cluster3d"; }
   template EventClusterVoxel3D& IOManager::get_data<larcv::EventClusterVoxel3D>(const std::string&);
   template EventClusterVoxel3D& IOManager::get_data<larcv::EventClusterVoxel3D>(const ProducerID_t);
 
@@ -86,7 +86,7 @@ namespace larcv {
   };
 
   // Template instantiation for IO
-  template<> inline std::string product_unique_name<larcv::EventSparseTensor3D>() { return "sparse2d"; }
+  template<> inline std::string product_unique_name<larcv::EventSparseTensor3D>() { return "sparse3d"; }
   template EventSparseTensor3D& IOManager::get_data<larcv::EventSparseTensor3D>(const std::string&);
   template EventSparseTensor3D& IOManager::get_data<larcv::EventSparseTensor3D>(const ProducerID_t);
 

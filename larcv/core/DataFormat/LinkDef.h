@@ -55,11 +55,13 @@
 #pragma link C++ class larcv::ClusterPixel2D+;
 #pragma link C++ class larcv::SparseTensor2D+;
 #pragma link C++ class larcv::EventClusterPixel2D+;
-#pragma link C++ class larcv::EventSpraseTensor2D+;
+#pragma link C++ class larcv::EventSparseTensor2D+;
 
 #pragma link C++ class larcv::Voxel3DMeta+;
+#pragma link C++ class larcv::ClusterVoxel3D+;
+#pragma link C++ class larcv::SparseTensor3D+;
 #pragma link C++ class larcv::EventClusterVoxel3D+;
-#pragma link C++ class larcv::EventSpraseTensor3D+;
+#pragma link C++ class larcv::EventSparseTensor3D+;
 
 //#pragma link C++ class std::array<unsigned short,6>+;
 //#pragma link C++ class std::array<float,6>+;
@@ -71,6 +73,7 @@
 
 #pragma link C++ class larcv::Particle+;
 #pragma link C++ class std::vector<larcv::Particle>+;
+#pragma link C++ class larcv::ParticleSet+;
 #pragma link C++ class larcv::EventParticle+;
 //ADD_NEW_CLASS ... do not change this line
 

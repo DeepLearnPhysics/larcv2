@@ -40,7 +40,7 @@ namespace larcv {
     output_voxel.meta(meta);
     for(auto const& in_vox : event_voxel.as_vector()) {
       Voxel out_vox(meta.id(orig_meta.position(in_vox.id())), in_vox.value());
-      output_voxel.emplace(std::move(out_vox));
+      ((VoxelSet)output_voxel).emplace(std::move(out_vox));
     }
 
     return true;
