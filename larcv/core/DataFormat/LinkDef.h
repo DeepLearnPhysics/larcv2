@@ -49,17 +49,25 @@
 #pragma link C++ class larcv::Voxel+;
 #pragma link C++ class std::vector<larcv::Voxel>+;
 #pragma link C++ class larcv::VoxelSet+;
-#pragma link C++ class larcv::EventPixel2D+;
+#pragma link C++ class larcv::VoxelSetArray+;
+
+
+#pragma link C++ class larcv::ClusterPixel2D+;
+#pragma link C++ class larcv::SparseTensor2D+;
+#pragma link C++ class larcv::EventClusterPixel2D+;
+#pragma link C++ class larcv::EventSpraseTensor2D+;
+
 #pragma link C++ class larcv::Voxel3DMeta+;
-#pragma link C++ class larcv::EventVoxel3D+;
+#pragma link C++ class larcv::EventClusterVoxel3D+;
+#pragma link C++ class larcv::EventSpraseTensor3D+;
 
 //#pragma link C++ class std::array<unsigned short,6>+;
 //#pragma link C++ class std::array<float,6>+;
 
-#pragma link C++ class larcv::VoxelPartition+;
-#pragma link C++ class std::vector<larcv::VoxelPartition>+;
-#pragma link C++ class larcv::VoxelPartitionSet+;
-#pragma link C++ class larcv::EventVoxelPartition+;
+//#pragma link C++ class larcv::VoxelPartition+;
+//#pragma link C++ class std::vector<larcv::VoxelPartition>+;
+//#pragma link C++ class larcv::VoxelPartitionSet+;
+//#pragma link C++ class larcv::EventVoxelPartition+;
 
 #pragma link C++ class larcv::Particle+;
 #pragma link C++ class std::vector<larcv::Particle>+;

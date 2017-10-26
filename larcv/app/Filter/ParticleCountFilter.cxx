@@ -24,13 +24,13 @@ namespace larcv {
 
   bool ParticleCountFilter::process(IOManager& mgr)
   {
-    auto const& ev_part = mgr.get_data<larcv::EventParticle>(_part_producer);
-    if(ev_part.size() >= _part_count_v.size()) {
-      _part_count_v.resize(ev_part.size()+1,0);
+    auto const& part_v = mgr.get_data<larcv::EventParticle>(_part_producer).as_vector();
+    if(part_v.size() >= _part_count_v.size()) {
+      _part_count_v.resize(part_v.size()+1,0);
     }
-    _part_count_v[ev_part.size()] += 1;
+    _part_count_v[part_v.size()] += 1;
     
-    return (_min_part_count <= ev_part.size() && ev_part.size() <= _max_part_count);
+    return (_min_part_count <= part_v.size() && part_v.size() <= _max_part_count);
   }
 
   void ParticleCountFilter::finalize()

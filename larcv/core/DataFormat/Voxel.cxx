@@ -60,7 +60,11 @@ namespace larcv {
     return;
   }
 
-  const larcv::VoxelSet& VoxelSetArray::get_voxel_set(InstanceID_t id) const
+  //
+  // VoxelSetArray
+  //
+
+  const larcv::VoxelSet& VoxelSetArray::voxel_set(InstanceID_t id) const
   {
     if(id >= _voxel_vv.size()) {
       std::cerr << "VoxelSetArray has no VoxelSet with InstanceID_t " << id << std::endl;
@@ -69,16 +73,40 @@ namespace larcv {
     return _voxel_vv[id];
   }
 
-  void VoxelSetArray::emplace(larcv::VoxelSet&& voxel_v, InstanceID_t id)
-  {
-    if(id >= _voxel_vv.size()) _voxel_vv.resize(id+1);
-    _voxel_vv[id] = std::move(voxel_v);
+  void VoxelSetArray::emplace(std::vector<larcv::VoxelSet>&& voxel_vv)
+  { 
+    _voxel_vv = std::move(voxel_vv); 
+    for(size_t id=0; id<_voxel_vv.size(); ++id)
+      _voxel_vv[id].id(id);
   }
 
-  void VoxelSetArray::set(const larcv::VoxelSet& voxel_v, InstanceID_t id)
+  inline void VoxelSetArray::set(const std::vector<larcv::VoxelSet>& voxel_vv)
+  { 
+    _voxel_vv = voxel_vv;
+    for(size_t id=0; id<_voxel_vv.size(); ++id)
+      _voxel_vv[id].id(id);
+  }
+
+  void VoxelSetArray::emplace(larcv::VoxelSet&& voxel_v)
   {
-    if(id >= _voxel_vv.size()) _voxel_vv.resize(id+1);
-    _voxel_vv[id] = voxel_v;
+    if(voxel_v.id() >= _voxel_vv.size()) {
+      size_t orig_size = _voxel_vv.size();
+      _voxel_vv.resize(voxel_v.id()+1);
+      for(size_t id=orig_size; id<_voxel_vv.size(); ++id)
+        _voxel_vv[id].id(id);
+    }
+    _voxel_vv[voxel_v.id()] = std::move(voxel_v);
+  }
+
+  void VoxelSetArray::set(const larcv::VoxelSet& voxel_v)
+  {
+    if(voxel_v.id() >= _voxel_vv.size()) {
+      size_t orig_size = _voxel_vv.size();
+      _voxel_vv.resize(voxel_v.id()+1);
+      for(size_t id=orig_size; id<_voxel_vv.size(); ++id)
+        _voxel_vv[id].id(id);
+    }
+    _voxel_vv[voxel_v.id()] = voxel_v;
   }
 
   larcv::VoxelSet& VoxelSetArray::writeable_voxel_set(const InstanceID_t id)
@@ -88,79 +116,6 @@ namespace larcv {
       throw std::exception();
     }
     return _voxel_vv[id];
-  }
-
-  const larcv::VoxelSetArray& 
-  VoxelSetArray2D::get_voxel_set_array(ProjectionID_t p_id) const
-  {
-    if(p_id >= _voxel_vvv.size()) {
-      std::cerr << "VoxelSetArray2D has no VoxelSetArray with ProjectionID_t " << p_id << std::endl;
-      throw std::exception();
-    }
-    return _voxel_vvv[p_id];
-  }
-
-  const larcv::VoxelSet& 
-  VoxelSetArray2D::get_voxel_set(ProjectionID_t p_id, InstanceID_t i_id) const
-  { return get_voxel_set_array(p_id).get_voxel_set(i_id); }
-
-  const larcv::ImageMeta& VoxelSetArray2D::get_meta(ProjectionID_t p_id) const
-  {
-    if(p_id >= _meta_v.size()) {
-      std::cerr << "VoxelSetArray2D has no ImageMeta with ProjectionID_t " << p_id << std::endl;
-      throw std::exception();
-    }
-    return _meta_v[p_id];
-  }
-
-  void VoxelSetArray2D::emplace(std::vector<larcv::VoxelSetArray>&& voxel_vvv,
-               std::vector<larcv::ImageMeta>&& meta_v)
-  {
-    for(auto const& meta : meta_v) {
-      if(meta.id() == larcv::kINVALID_PROJECTIONID) {
-        std::cerr << "Cannot accommodate ImageMeta with kINVALID_PROJECTIONID" << std::endl;
-        throw std::exception();
-      }
-    }
-    _voxel_vvv = std::move(voxel_vvv);
-    _meta_v = std::move(meta_v);
-  }
-
-  void VoxelSetArray2D::set(const std::vector<larcv::VoxelSetArray>& voxel_vvv,
-           const std::vector<larcv::ImageMeta>& meta_v)
-  {
-    for(auto const& meta : meta_v) {
-      if(meta.id() == larcv::kINVALID_PROJECTIONID) {
-        std::cerr << "Cannot accommodate ImageMeta with kINVALID_PROJECTIONID" << std::endl;
-        throw std::exception();
-      }
-    }
-    _voxel_vvv = voxel_vvv;
-    _meta_v = meta_v;
-  }
-
-  void VoxelSetArray2D::emplace(larcv::VoxelSetArray&& voxel_vv, larcv::ImageMeta&& meta)
-  {
-    if(meta.id() == larcv::kINVALID_PROJECTIONID) {
-        std::cerr << "Cannot accommodate ImageMeta with kINVALID_PROJECTIONID" << std::endl;
-        throw std::exception();
-    }
-    if(meta.id() >= _voxel_vvv.size()) _voxel_vvv.resize(meta.id()+1);
-    if(meta.id() >= _meta_v.size()) _meta_v.resize(meta.id()+1);
-    _voxel_vvv[meta.id()] = std::move(voxel_vv);
-    _meta_v[meta.id()] = std::move(meta);
-  }
-
-  void VoxelSetArray2D::set(const larcv::VoxelSetArray& voxel_vv, const larcv::ImageMeta& meta)
-  {
-    if(meta.id() == larcv::kINVALID_PROJECTIONID) {
-        std::cerr << "Cannot accommodate ImageMeta with kINVALID_PROJECTIONID" << std::endl;
-        throw std::exception();
-    }
-    if(meta.id() >= _voxel_vvv.size()) _voxel_vvv.resize(meta.id()+1);
-    if(meta.id() >= _meta_v.size()) _meta_v.resize(meta.id()+1);
-    _voxel_vvv[meta.id()] = voxel_vv;
-    _meta_v[meta.id()] = meta;
   }
 
 };

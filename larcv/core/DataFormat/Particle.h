@@ -193,7 +193,7 @@ namespace larcv {
 
     void clear() { _part_v.clear(); }
 
-    inline const std::vector<larcv::Particle>& particle_array() const
+    inline const std::vector<larcv::Particle>& as_vector() const
     { return _part_v; }
 
     void set(const std::vector<larcv::Particle>& part_v);

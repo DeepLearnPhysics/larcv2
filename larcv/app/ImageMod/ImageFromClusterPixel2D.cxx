@@ -1,18 +1,18 @@
-#ifndef __IMAGEFROMPIXEL2D_CXX__
-#define __IMAGEFROMPIXEL2D_CXX__
+#ifndef __IMAGEFROMCLUSTERPIXEL2D_CXX__
+#define __IMAGEFROMCLUSTERPIXEL2D_CXX__
 
-#include "ImageFromPixel2D.h"
-#include "larcv/core/DataFormat/EventPixel2D.h"
+#include "ImageFromClusterPixel2D.h"
+#include "larcv/core/DataFormat/EventVoxel2D.h"
 #include "larcv/core/DataFormat/EventImage2D.h"
 namespace larcv {
 
-  static ImageFromPixel2DProcessFactory __global_ImageFromPixel2DProcessFactory__;
+  static ImageFromClusterPixel2DProcessFactory __global_ImageFromClusterPixel2DProcessFactory__;
 
-  ImageFromPixel2D::ImageFromPixel2D(const std::string name)
+  ImageFromClusterPixel2D::ImageFromClusterPixel2D(const std::string name)
     : ProcessBase(name)
   {}
 
-  void ImageFromPixel2D::configure(const PSet& cfg)
+  void ImageFromClusterPixel2D::configure(const PSet& cfg)
   {
     _pixel2d_producer  = cfg.get<std::string>("Pixel2DProducer");
     _output_producer = cfg.get<std::string>("OutputProducer");
@@ -20,17 +20,19 @@ namespace larcv {
     _fixed_pi = cfg.get<float>("FixedPI", 100);
   }
 
-  void ImageFromPixel2D::initialize()
+  void ImageFromClusterPixel2D::initialize()
   {}
 
-  bool ImageFromPixel2D::process(IOManager& mgr)
+  bool ImageFromClusterPixel2D::process(IOManager& mgr)
   {
-    auto const& ev_pixel2d = mgr.get_data<larcv::EventPixel2D>(_pixel2d_producer);
+    auto const& ev_cluster2d = mgr.get_data<larcv::EventClusterPixel2D>(_pixel2d_producer);
     auto& ev_out_image = mgr.get_data<larcv::EventImage2D>(_output_producer);
 
     std::vector<larcv::Image2D> image_v;
     static std::vector<float> voxel_value_v;
-    for(auto meta : ev_pixel2d.get_meta_array()) {
+    for(auto const& cluster2d_v : ev_cluster2d.as_vector()) {
+
+      auto const& meta = cluster2d_v.meta();
 
       if(image_v.size() <= meta.id()) image_v.resize(meta.id()+1);
 
@@ -41,12 +43,13 @@ namespace larcv {
 
       for(size_t i=0; i<voxel_value_v.size(); ++i) voxel_value_v[i] = 0.;
 
-      auto const& voxel_set_v = ev_pixel2d.get_voxel_set_array(meta.id());
+      auto const& voxel_set_v = cluster2d_v.as_vector();
 
       for(size_t cluster_id=0; cluster_id < voxel_set_v.size(); ++cluster_id) {
-        auto const& voxels = voxel_set_v.get_voxel_set(cluster_id);
 
-        for(auto const& vox : voxels.voxel_array()) {
+        auto const& voxels = voxel_set_v[cluster_id];
+
+        for(auto const& vox : voxels.as_vector()) {
           float val = _fixed_pi;
           switch (_type_pi) {
           case PIType_t::kPITypeFixedPI:
@@ -74,7 +77,7 @@ namespace larcv {
     return true;
   }
 
-  void ImageFromPixel2D::finalize()
+  void ImageFromClusterPixel2D::finalize()
   {}
 
 }

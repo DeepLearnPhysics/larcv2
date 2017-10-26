@@ -26,7 +26,7 @@ namespace larcv {
   {
     auto const& ev_part = mgr.get_data<larcv::EventParticle>(_part_producer);
     size_t part_ctr = 0;
-    for(auto const& part : ev_part) {
+    for(auto const& part : ev_part.as_vector()) {
       
       if(part.mcst_index() == kINVALID_USHORT) continue;
 

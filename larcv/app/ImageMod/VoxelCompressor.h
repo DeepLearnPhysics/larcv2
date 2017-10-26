@@ -2,7 +2,7 @@
  * \file VoxelCompressor.h
  *
  * \ingroup Package_Name
- * 
+ *
  * \brief Class def header for a class VoxelCompressor
  *
  * @author drinkingkazu
@@ -14,8 +14,8 @@
 #ifndef __VOXELCOMPRESSOR_H__
 #define __VOXELCOMPRESSOR_H__
 
-#include "Processor/ProcessBase.h"
-#include "Processor/ProcessFactory.h"
+#include "larcv/core/Processor/ProcessBase.h"
+#include "larcv/core/Processor/ProcessFactory.h"
 namespace larcv {
 
   /**
@@ -26,12 +26,12 @@ namespace larcv {
   class VoxelCompressor : public ProcessBase {
 
   public:
-    
+
     /// Default constructor
-    VoxelCompressor(const std::string name="VoxelCompressor");
-    
+    VoxelCompressor(const std::string name = "VoxelCompressor");
+
     /// Default destructor
-    ~VoxelCompressor(){}
+    ~VoxelCompressor() {}
 
     void configure(const PSet&);
 
@@ -55,7 +55,7 @@ namespace larcv {
   class VoxelCompressorProcessFactory : public ProcessFactoryBase {
   public:
     /// ctor
-    VoxelCompressorProcessFactory() { ProcessFactory::get().add_factory("VoxelCompressor",this); }
+    VoxelCompressorProcessFactory() { ProcessFactory::get().add_factory("VoxelCompressor", this); }
     /// dtor
     ~VoxelCompressorProcessFactory() {}
     /// creation method
@@ -65,5 +65,5 @@ namespace larcv {
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

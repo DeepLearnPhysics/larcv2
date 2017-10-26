@@ -11,11 +11,10 @@
 /** \addtogroup core_DataFormat
 
     @{*/
-#ifndef VOXEL3D_H
-#define VOXEL3D_H
+#ifndef LARCV_VOXEL_H
+#define LARCV_VOXEL_H
 
 #include "DataFormatTypes.h"
-#include "Image2D.h"
 namespace larcv {
 
   /**
@@ -95,20 +94,30 @@ namespace larcv {
     VoxelSet() {}
     /// Default dtor
     ~VoxelSet() {}
-    /// getter
-    inline const std::vector<larcv::Voxel>& voxel_array() const
-    { return _voxel_v; }
-    /// clear
-    inline void clear() { _voxel_v.clear(); }
-    /// adder
-    void add(const Voxel& vox);
-    /// adder
-    void emplace(Voxel&& vox);
-    /// id setter
-    inline void id(const InstanceID_t id) { _id = id; }
-    /// id getter
-    inline InstanceID_t id() const { return _id; }
 
+    //
+    // Read-access
+    //
+    /// InstanceID_t getter
+    inline InstanceID_t id() const { return _id; }
+    /// Access as a raw vector
+    inline const std::vector<larcv::Voxel>& as_vector() const { return _voxel_v; }
+
+    //
+    // Write-access
+    //    
+    /// Clear everything
+    inline void clear() { _voxel_v.clear(); }
+    /// Add a new voxel. If another voxel instance w/ same VoxelID exists, value is added
+    void add(const Voxel& vox);
+    /// Emplace a new voxel. Same logic as VoxelSet::add but consumes removable reference.
+    void emplace(Voxel&& vox);
+    /// InstanceID_t setter
+    inline void id(const InstanceID_t id) { _id = id; }
+
+    //
+    // Uniry operations
+    //
     inline VoxelSet& operator += (float value)
     { for(auto& vox : _voxel_v) vox += value; return (*this); }
     inline VoxelSet& operator -= (float value)
@@ -136,79 +145,42 @@ namespace larcv {
     /// Default dtor
     ~VoxelSetArray() {}
 
-    inline void clear() { _voxel_vv.clear(); }
-
+    //
+    // Read-access
+    //
+    /// Get # of VoxelSet
     inline size_t size() const { return _voxel_vv.size(); }
-
-    const larcv::VoxelSet& get_voxel_set(InstanceID_t id) const;
-
-    inline const std::vector<larcv::VoxelSet>& get_voxel_set_array() const
+    /// Access specific VoxelSet
+    const larcv::VoxelSet& voxel_set(InstanceID_t id) const;
+    /// Access all VoxelSet as a vector
+    inline const std::vector<larcv::VoxelSet>& as_vector() const
     { return _voxel_vv; }
 
+    //
+    // Write-access
+    //
+    /// Clear everything
+    inline void clear() { _voxel_vv.clear(); }
+    /// Resize voxel array
     inline void resize(const size_t num)
     { _voxel_vv.resize(num); for(size_t i=0; i<num; ++i) _voxel_vv[i].id(i); }
-
+    /// Access non-const reference of a specific VoxelSet 
     larcv::VoxelSet& writeable_voxel_set(const InstanceID_t id);
-
-    inline void emplace(std::vector<larcv::VoxelSet>&& voxel_vv)
-    { _voxel_vv = std::move(voxel_vv); }
-
-    inline void emplace(larcv::VoxelSetArray&& target)
-    { _voxel_vv = std::move(target._voxel_vv); }
-
-    inline void set(const std::vector<larcv::VoxelSet>& voxel_vv)
-    { _voxel_vv = voxel_vv; }
-
-    void emplace(larcv::VoxelSet&& voxel_v, InstanceID_t id);
-
-    void set(const larcv::VoxelSet& voxel_v, InstanceID_t id);
+    /// Move an arrray of VoxelSet. Each element's InstanceID_t gets updated
+    void emplace(std::vector<larcv::VoxelSet>&& voxel_vv);
+    /// Set an array of VoxelSet. Each element's InstanceID_t gets updated
+    void set(const std::vector<larcv::VoxelSet>& voxel_vv);
+    /// Move a VoxelSet into a collection. The InstanceID_t is respected.
+    void emplace(larcv::VoxelSet&& voxel_v);
+    /// Set a VoxelSet into a collection. The InstanceID_t is respected.
+    void set(const larcv::VoxelSet& voxel_v);
+    /// Mover
+    void move(larcv::VoxelSetArray&& orig)
+    { _voxel_vv = std::move(orig._voxel_vv); }
 
   private:
     std::vector<larcv::VoxelSet> _voxel_vv;
   };
-
-  /**
-     \class VoxelSetArray2D
-     @brief Container of multiple (2D-projected) voxel set array
-  */
-  class VoxelSetArray2D {
-  public:
-    /// Default ctor
-    VoxelSetArray2D() {}
-    /// Default dtor
-    ~VoxelSetArray2D() {}
-
-    inline void clear() { _voxel_vvv.clear(); }
-
-    const larcv::ImageMeta& get_meta(ProjectionID_t p_id) const;
-
-    inline const std::vector<larcv::ImageMeta>& get_meta_array() const
-    { return _meta_v; }
-
-    const larcv::VoxelSet& get_voxel_set(ProjectionID_t p_id, InstanceID_t i_id) const;
-
-    const larcv::VoxelSetArray& get_voxel_set_array(ProjectionID_t p_id) const;
-
-    inline const std::vector<larcv::VoxelSetArray>& get_voxel_set_array2d() const
-    { return _voxel_vvv; }
-
-    void emplace(std::vector<larcv::VoxelSetArray>&& voxel_vvv,
-                 std::vector<larcv::ImageMeta>&& meta_v);
-
-    void set(const std::vector<larcv::VoxelSetArray>& voxel_vvv,
-             const std::vector<larcv::ImageMeta>& meta_v);
-
-    void emplace(larcv::VoxelSetArray&& voxel_vv, larcv::ImageMeta&& meta);
-
-    void set(const larcv::VoxelSetArray& voxel_vv, const larcv::ImageMeta& meta);
-
-    inline void emplace(larcv::VoxelSetArray2D&& target)
-    { _voxel_vvv = std::move(target._voxel_vvv); _meta_v = std::move(target._meta_v); }
-
-  private:
-    std::vector<larcv::VoxelSetArray> _voxel_vvv;
-    std::vector<larcv::ImageMeta> _meta_v;
-  };  
 
 }
 
