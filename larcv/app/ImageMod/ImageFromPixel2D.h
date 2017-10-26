@@ -14,8 +14,8 @@
 #ifndef __IMAGEFROMPIXEL2D_H__
 #define __IMAGEFROMPIXEL2D_H__
 
-#include "Processor/ProcessBase.h"
-#include "Processor/ProcessFactory.h"
+#include "larcv/core/Processor/ProcessBase.h"
+#include "larcv/core/Processor/ProcessFactory.h"
 namespace larcv {
 
   /**
@@ -45,13 +45,13 @@ namespace larcv {
 
     enum class PIType_t {
       kPITypeFixedPI,
-      kPITypeInputImage,
+      kPITypeInputVoxel,
       kPITypeClusterIndex,
       kPITypeUndefined
     };
     float _fixed_pi;
     PIType_t _type_pi;
-    std::string _pixel_producer;
+    std::string _pixel2d_producer;
     std::string _image_producer;
     std::string _output_producer;
 

@@ -90,15 +90,19 @@ namespace larcv {
     return _voxel_vv[id];
   }
 
-  const larcv::VoxelSet& 
-  VoxelSetArray2D::get_voxel_set(ProjectionID_t p_id, InstanceID_t i_id) const
+  const larcv::VoxelSetArray& 
+  VoxelSetArray2D::get_voxel_set_array(ProjectionID_t p_id) const
   {
     if(p_id >= _voxel_vvv.size()) {
       std::cerr << "VoxelSetArray2D has no VoxelSetArray with ProjectionID_t " << p_id << std::endl;
       throw std::exception();
     }
-    return _voxel_vvv[p_id].get_voxel_set(i_id);
+    return _voxel_vvv[p_id];
   }
+
+  const larcv::VoxelSet& 
+  VoxelSetArray2D::get_voxel_set(ProjectionID_t p_id, InstanceID_t i_id) const
+  { return get_voxel_set_array(p_id).get_voxel_set(i_id); }
 
   const larcv::ImageMeta& VoxelSetArray2D::get_meta(ProjectionID_t p_id) const
   {

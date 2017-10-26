@@ -180,9 +180,14 @@ namespace larcv {
 
     inline void clear() { _voxel_vvv.clear(); }
 
+    const larcv::ImageMeta& get_meta(ProjectionID_t p_id) const;
+
+    inline const std::vector<larcv::ImageMeta>& get_meta_array() const
+    { return _meta_v; }
+
     const larcv::VoxelSet& get_voxel_set(ProjectionID_t p_id, InstanceID_t i_id) const;
 
-    const larcv::ImageMeta& get_meta(ProjectionID_t p_id) const;
+    const larcv::VoxelSetArray& get_voxel_set_array(ProjectionID_t p_id) const;
 
     inline const std::vector<larcv::VoxelSetArray>& get_voxel_set_array2d() const
     { return _voxel_vvv; }
