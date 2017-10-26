@@ -153,6 +153,9 @@ namespace larcv {
     inline void emplace(std::vector<larcv::VoxelSet>&& voxel_vv)
     { _voxel_vv = std::move(voxel_vv); }
 
+    inline void emplace(larcv::VoxelSetArray&& target)
+    { _voxel_vv = std::move(target._voxel_vv); }
+
     inline void set(const std::vector<larcv::VoxelSet>& voxel_vv)
     { _voxel_vv = voxel_vv; }
 
@@ -194,7 +197,7 @@ namespace larcv {
 
     void set(const larcv::VoxelSetArray& voxel_vv, const larcv::ImageMeta& meta);
 
-    void emplace(larcv::VoxelSetArray2D&& target)
+    inline void emplace(larcv::VoxelSetArray2D&& target)
     { _voxel_vvv = std::move(target._voxel_vvv); _meta_v = std::move(target._meta_v); }
 
   private:
