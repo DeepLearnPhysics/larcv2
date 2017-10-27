@@ -30,6 +30,10 @@ namespace larcv {
 
     std::vector<larcv::Image2D> image_v;
     static std::vector<float> voxel_value_v;
+
+    LARCV_INFO() << "processing " << ev_cluster2d.as_vector().size()
+		 << " clusters from " << _pixel2d_producer << std::endl;
+
     for(auto const& cluster2d_v : ev_cluster2d.as_vector()) {
 
       auto const& meta = cluster2d_v.meta();
@@ -49,6 +53,10 @@ namespace larcv {
 
         auto const& voxels = voxel_set_v[cluster_id];
 
+	LARCV_INFO() << "Projection " << meta.id()
+		     << " cluster id " << cluster_id
+		     << " with " << voxels.as_vector().size() << " voxels" << std::endl;
+
         for(auto const& vox : voxels.as_vector()) {
           float val = _fixed_pi;
           switch (_type_pi) {
@@ -58,17 +66,18 @@ namespace larcv {
             val = std::max(img_data[vox.id()],vox.value());
             break;
           case PIType_t::kPITypeClusterIndex:
-            val = cluster_id;
             if(vox.value() > voxel_value_v[vox.id()]) {
-              val = cluster_id;
+              val = cluster_id+1;
               voxel_value_v[vox.id()] = vox.value();
-            }
+            }else
+	      val = img_data[vox.id()];
             break;
           case PIType_t::kPITypeUndefined:
             throw larbys("PITypeUndefined not supported!");
             break;
           }
-          img_data[vox.id()] = val;
+	  LARCV_DEBUG() << "Voxel " << vox.id() << " value " << vox.value() << " => " << val << std::endl;
+	  img_data[vox.id()] = val;
         }
       }
       larcv::Image2D img2d(std::move(meta),std::move(img_data));
