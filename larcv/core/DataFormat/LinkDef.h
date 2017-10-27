@@ -75,9 +75,13 @@
 #pragma link C++ class std::vector<larcv::Particle>+;
 #pragma link C++ class larcv::ParticleSet+;
 #pragma link C++ class larcv::EventParticle+;
+
+#pragma link C++ class larcv::Meta+;
+#pragma link C++ class larcv::EventMeta+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
+
 
 
 
