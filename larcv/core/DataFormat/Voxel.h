@@ -102,6 +102,10 @@ namespace larcv {
     inline InstanceID_t id() const { return _id; }
     /// Access as a raw vector
     inline const std::vector<larcv::Voxel>& as_vector() const { return _voxel_v; }
+    /// Sum of contained voxel values
+    inline float sum() const { float res=0.; for(auto const& vox : _voxel_v) res+=vox.value(); return res;}
+    /// Mean of contained voxel values
+    inline float mean() const { return (_voxel_v.empty() ? 0. : sum() / (float)(_voxel_v.size())); }
 
     //
     // Write-access

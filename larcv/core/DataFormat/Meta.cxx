@@ -56,11 +56,11 @@ namespace larcv {
     }
     
     if(_darray_map.size()){
-      std::cout << "  Contents of double array shown below.\n";
+      std::cout << "  Contents of double array shown below.";
       for(std::map<std::string,std::vector<double> >::const_iterator iter(_darray_map.begin());
 	  iter!=_darray_map.end();
 	  ++iter){
-	std::cout << "    Key=" << (*iter).first.c_str() << std::endl;
+	std::cout << "\n    Key=" << (*iter).first.c_str() << std::endl;
 	int ctr=1;
 	std::cout << "      ";
 	for(std::vector<double>::const_iterator cont_iter((*iter).second.begin());
@@ -76,11 +76,11 @@ namespace larcv {
     }
     
     if(_iarray_map.size()){
-      std::cout << "  Contents of int array shown below.\n";
+      std::cout << "  Contents of int array shown below.";
       for(std::map<std::string,std::vector<int> >::const_iterator iter(_iarray_map.begin());
 	  iter!=_iarray_map.end();
 	  ++iter){
-	std::cout << "    Key=" << (*iter).first.c_str() << std::endl;
+	std::cout << "\n    Key=" << (*iter).first.c_str() << std::endl;
 	int ctr=1;
 	std::cout << "      ";
 	for(std::vector<int>::const_iterator cont_iter((*iter).second.begin());
@@ -96,11 +96,11 @@ namespace larcv {
     }
     
     if(_sarray_map.size()){
-      std::cout << "  Contents of std::string array shown below.\n";
+      std::cout << "  Contents of std::string array shown below.";
       for(std::map<std::string,std::vector<std::string> >::const_iterator iter(_sarray_map.begin());
 	  iter!=_sarray_map.end();
 	  ++iter){
-	std::cout << "    Key=" << (*iter).first.c_str() << std::endl;
+	std::cout << "\n    Key=" << (*iter).first.c_str() << std::endl;
 	int ctr=1;
 	std::cout << "      ";
 	for(std::vector<std::string>::const_iterator cont_iter((*iter).second.begin());

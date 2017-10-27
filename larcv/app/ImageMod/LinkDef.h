@@ -43,8 +43,10 @@
 
 #pragma link C++ class larcv::UnionROI+;
 #pragma link C++ class larcv::VoxelCompressor+;
+#pragma link C++ class larcv::ImageFromClusterVoxel3D+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 
