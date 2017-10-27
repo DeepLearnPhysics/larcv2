@@ -11,11 +11,11 @@
 /** \addtogroup DataFormat
 
     @{*/
-#ifndef EVENTMETA_H
-#define EVENTMETA_H
+#ifndef LARCV_EVENTMETA_H
+#define LARCV_EVENTMETA_H
 
-#include "larcv/core/DataFormat/EventBase.h"
-#include "larcv/core/DataFormat/DataProductFactory.h"
+#include "EventBase.h"
+#include "DataProductFactory.h"
 #include "Meta.h"
 
 namespace larcv {

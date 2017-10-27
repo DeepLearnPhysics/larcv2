@@ -1,5 +1,5 @@
-#ifndef EVENTMETA_CXX
-#define EVENTMETA_CXX
+#ifndef LARCV_EVENTMETA_CXX
+#define LARCV_EVENTMETA_CXX
 
 #include "EventMeta.h"
 
