@@ -18,22 +18,14 @@ Image/Volumetric data processing framework for LAr TPC-derived images. Developed
   * ROOT: determined through the ability to run rootcling
   * OPENCV: the presence of OPENCV_INCDIR and OPENCV_LIBDIR
 
-1. clone the repository
-'''
-git clone https://github.com/LArbys/LArCV.git
-'''
-
-2. go into the LArCV directory
-3. run the build configuration script
-
-      source configure.sh
-      
-4. build
-
-      make
-      
-
-That's it.
+1. Clone & build
+```
+git clone https://github.com/DeepLearnPhysics/larcv2.git
+cd larcv2
+source configure.sh
+make
+```
+That's it. When you want to use the built larcv from a different process, you only need to repeat ```source configure.sh``` and no need to re-```make```.
 
 
 ## Wiki
