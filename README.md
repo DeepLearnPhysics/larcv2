@@ -19,8 +19,9 @@ Image/Volumetric data processing framework for LAr TPC-derived images. Developed
   * OPENCV: the presence of OPENCV_INCDIR and OPENCV_LIBDIR
 
 1. clone the repository
-
-      git clone https://github.com/LArbys/LArCV.git
+'''
+git clone https://github.com/LArbys/LArCV.git
+'''
 
 2. go into the LArCV directory
 3. run the build configuration script
