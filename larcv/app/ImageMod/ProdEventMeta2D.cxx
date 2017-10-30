@@ -58,6 +58,8 @@ namespace larcv {
     output_meta->store("y_max", y_max);
     output_meta->store("x_n_pixels", x_n_pixels);
     output_meta->store("y_n_pixels", y_n_pixels);
+
+
     return true;
   }
 
