@@ -528,11 +528,10 @@ namespace larcv {
       LARCV_ERROR() << "Invalid producer ID requested:" << id << std::endl;
       throw larbys();
     }
-    LARCV_WARNING() << "HEYHEYHEY id = " << id
-    << " _in_tree_index = " << _in_tree_index
-    << " _in_tree_index_v[id] = " << _in_tree_index_v[id] << std::endl;
+
     if (_io_mode != kWRITE && _in_tree_index != kINVALID_SIZE &&
-        _in_tree_index_v[id] != _in_tree_index && _read_id_bool[id] ) {
+        _in_tree_index_v[id] != _in_tree_index && 
+	(id >= _read_id_bool.size() || _read_id_bool[id])) {
 
       if (_in_tree_entries_v[id]) {
         LARCV_DEBUG() << "Reading in TTree " << _in_tree_v[id]->GetName() << " index " << _in_tree_index << std::endl;
@@ -546,17 +545,17 @@ namespace larcv {
         LARCV_INFO() << "Setting event id (" << ptr->run() << "," << ptr->subrun() << "," << ptr->event() << ")" << std::endl;
         _event_id = (EventBase)(*ptr);
       }else if (ptr->valid() && _event_id != *ptr) {
-        LARCV_CRITICAL() << "Event alignment error (run,subrun,event) detected: "
-                         << "Current (" << _event_id.run() << "," << _event_id.subrun() << "," << _event_id.event() << ") vs. "
-                         << "Read-in (" << ptr->run() << "," << ptr->subrun() << "," << ptr->event() << ")" << std::endl;
-        throw larbys();
-      }else{
-        LARCV_NORMAL() << "Event alignment is checked: "
-                      << "Current (" << _event_id.run() << "," << _event_id.subrun() << "," << _event_id.event() << ") vs. "
-                      << "Read-in (" << ptr->run() << "," << ptr->subrun() << "," << ptr->event() << ")" << std::endl;
+	
+	if(id >= _read_id_bool.size())
+	  ptr->set(_event_id.run(),_event_id.subrun(),_event_id.event());
+	else{
+	  LARCV_CRITICAL() << "Event alignment error (run,subrun,event) detected: "
+			   << "Current (" << _event_id.run() << "," << _event_id.subrun() << "," << _event_id.event() << ") vs. "
+			   << "Read-in (" << ptr->run() << "," << ptr->subrun() << "," << ptr->event() << ")" << std::endl;
+	  throw larbys();
+	}
       }
     }
-    LARCV_WARNING() << "YOYOYO" << std::endl;
     __ioman_mtx.unlock();
     return _product_ptr_v[id];
   }
