@@ -2,8 +2,8 @@
 #define BATCHDATASTORAGE_CXX
 
 #include "BatchDataStorage.h"
-#include "Base/larcv_logger.h"
-#include "Base/larbys.h"
+#include "larcv/core/Base/larcv_logger.h"
+#include "larcv/core/Base/larbys.h"
 
 namespace larcv {
 

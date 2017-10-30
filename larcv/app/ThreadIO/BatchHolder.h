@@ -14,7 +14,7 @@
 #ifndef __BATCHHOLDER_H__
 #define __BATCHHOLDER_H__
 
-#include "Processor/ProcessBase.h"
+#include "larcv/core/Processor/ProcessBase.h"
 #include "ThreadIOTypes.h"
 namespace larcv {
   class ThreadProcessor;

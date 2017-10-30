@@ -2,8 +2,8 @@
 #define BATCHDATA_CXX
 
 #include "BatchData.h"
-#include "Base/larcv_logger.h"
-#include "Base/larbys.h"
+#include "larcv/core/Base/larcv_logger.h"
+#include "larcv/core/Base/larbys.h"
 namespace larcv {
 
   template<class T>

@@ -14,7 +14,7 @@
 #ifndef __BATCHFILLERPIDLABEL_H__
 #define __BATCHFILLERPIDLABEL_H__
 
-#include "Processor/ProcessFactory.h"
+#include "larcv/core/Processor/ProcessFactory.h"
 #include "BatchFillerTemplate.h"
 
 namespace larcv {
@@ -47,10 +47,10 @@ namespace larcv {
     void finalize();
 
   private:
-    std::string _roi_producer;
-    std::vector<size_t> _roitype_to_class;
+    std::string _part_producer;
     std::vector<float> _entry_data;
     size_t _num_class;
+    std::vector<int> _pdg_list;
   };
 
   /**
