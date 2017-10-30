@@ -59,6 +59,7 @@ namespace larcv {
     output_meta->store("x_n_pixels", x_n_pixels);
     output_meta->store("y_n_pixels", y_n_pixels);
 
+    LARCV_NORMAL() << output_meta->event_key() << std::endl;
 
     return true;
   }
