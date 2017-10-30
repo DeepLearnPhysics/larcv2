@@ -1,20 +1,20 @@
-#ifndef __IMAGEFROMCLUSTERVOXEL3D_CXX__
-#define __IMAGEFROMCLUSTERVOXEL3D_CXX__
+#ifndef __IMAGEFROMSPARSETENSOR3D_CXX__
+#define __IMAGEFROMSPARSETENSOR3D_CXX__
 
-#include "ImageFromClusterVoxel3D.h"
+#include "ImageFromSparseTensor3D.h"
 #include "larcv/core/DataFormat/EventVoxel3D.h"
 #include "larcv/core/DataFormat/EventImage2D.h"
 namespace larcv {
 
-  static ImageFromClusterVoxel3DProcessFactory __global_ImageFromClusterVoxel3DProcessFactory__;
+  static ImageFromSparseTensor3DProcessFactory __global_ImageFromSparseTensor3DProcessFactory__;
 
-  ImageFromClusterVoxel3D::ImageFromClusterVoxel3D(const std::string name)
+  ImageFromSparseTensor3D::ImageFromSparseTensor3D(const std::string name)
     : ProcessBase(name)
   {}
     
-  void ImageFromClusterVoxel3D::configure(const PSet& cfg)
+  void ImageFromSparseTensor3D::configure(const PSet& cfg)
   {
-    _voxel3d_producer = cfg.get<std::string>("ClusterVoxel3DProducer");
+    _voxel3d_producer = cfg.get<std::string>("SparseTensor3DProducer");
     _output_producer = _voxel3d_producer + "_xyz";
     _output_producer = cfg.get<std::string>("OutputProducer",_output_producer);
     _xy = cfg.get<bool>("XY",true);
@@ -23,12 +23,12 @@ namespace larcv {
 
   }
 
-  void ImageFromClusterVoxel3D::initialize()
+  void ImageFromSparseTensor3D::initialize()
   {}
 
-  bool ImageFromClusterVoxel3D::process(IOManager& mgr)
+  bool ImageFromSparseTensor3D::process(IOManager& mgr)
   {
-    auto const& ev_voxel3d = mgr.get_data<larcv::EventClusterVoxel3D>(_voxel3d_producer);
+    auto const& ev_voxel3d = mgr.get_data<larcv::EventSparseTensor3D>(_voxel3d_producer);
     auto const& meta3d = ev_voxel3d.meta();
 
     auto& ev_image2d = mgr.get_data<larcv::EventImage2D>(_output_producer);
@@ -60,25 +60,23 @@ namespace larcv {
     LARCV_DEBUG() << "Processing " << ev_voxel3d.as_vector().size() 
                   << " voxel 3D clusters" << std::endl;
 
-    for(auto const& voxel_v : ev_voxel3d.as_vector()) {
-      for(auto const& vox : voxel_v.as_vector()) {
-        auto const pos = meta3d.position(vox.id());
-        LARCV_DEBUG() << "Voxel " << vox.id() << " value " << vox.value() << std::endl;
-        if(_xy) {
-          LARCV_DEBUG() << "(x,y) = (" << pos.x << "," << pos.y << ")" << std::endl
-          << meta_xy.dump() << std::endl;
-          img_data_xy[meta_xy.index(meta_xy.row(pos.y),meta_xy.col(pos.x))] += vox.value();
-        }
-        if(_yz) {
-          LARCV_DEBUG() << "(y,z) = (" << pos.y << "," << pos.z << ")" << std::endl
-          << meta_yz.dump() << std::endl;
-          img_data_yz[meta_yz.index(meta_yz.row(pos.z),meta_xy.col(pos.y))] += vox.value();
-        }
-        if(_xy) {
-          LARCV_DEBUG() << "(z,x) = (" << pos.z << "," << pos.x << ")" << std::endl
-          << meta_zx.dump() << std::endl;
-          img_data_zx[meta_zx.index(meta_zx.row(pos.x),meta_zx.col(pos.z))] += vox.value();
-        }
+    for(auto const& vox : ev_voxel3d.as_vector()) {
+      auto const pos = meta3d.position(vox.id());
+      LARCV_DEBUG() << "Voxel " << vox.id() << " value " << vox.value() << std::endl;
+      if(_xy) {
+	LARCV_DEBUG() << "(x,y) = (" << pos.x << "," << pos.y << ")" << std::endl
+		      << meta_xy.dump() << std::endl;
+	img_data_xy[meta_xy.index(meta_xy.row(pos.y),meta_xy.col(pos.x))] += vox.value();
+      }
+      if(_yz) {
+	LARCV_DEBUG() << "(y,z) = (" << pos.y << "," << pos.z << ")" << std::endl
+		      << meta_yz.dump() << std::endl;
+	img_data_yz[meta_yz.index(meta_yz.row(pos.z),meta_xy.col(pos.y))] += vox.value();
+      }
+      if(_xy) {
+	LARCV_DEBUG() << "(z,x) = (" << pos.z << "," << pos.x << ")" << std::endl
+		      << meta_zx.dump() << std::endl;
+	img_data_zx[meta_zx.index(meta_zx.row(pos.x),meta_zx.col(pos.z))] += vox.value();
       }
     }
 
@@ -89,7 +87,7 @@ namespace larcv {
     return true;
   }
 
-  void ImageFromClusterVoxel3D::finalize()
+  void ImageFromSparseTensor3D::finalize()
   {}
 
 }
