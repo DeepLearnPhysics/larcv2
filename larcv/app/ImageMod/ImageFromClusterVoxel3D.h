@@ -43,10 +43,9 @@ namespace larcv {
 
   private:
 
-    enum ProjectionPlane_t { kXY, kYZ, kZX };
-
     std::string _voxel3d_producer;
-    ProjectionPlane_t _plane_type;
+    std::string _output_producer;
+    bool _xy, _yz, _zx;
     
   };
 

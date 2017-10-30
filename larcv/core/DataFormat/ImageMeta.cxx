@@ -19,7 +19,7 @@ namespace larcv {
   {
     if (x < min_x() || x >= max_x()) {
       std::stringstream ss;
-      ss << "Requested col for x=" << x << " ... but the x (rows) span only " << min_x() << " => " << max_x() << "!" << std::endl;
+      ss << "Requested col for x=" << x << " ... but the x (cols) span only " << min_x() << " => " << max_x() << "!" << std::endl;
       throw larbys(ss.str());
     }
     return (size_t)((x - min_x()) / pixel_width());
@@ -29,7 +29,7 @@ namespace larcv {
   {
     if (y < min_y() || y >= max_y()) {
       std::stringstream ss;
-      ss << "Requested col for y=" << y << " ... but the y (cols) spans only " << min_y() << " => " << max_y() << "!" << std::endl;
+      ss << "Requested col for y=" << y << " ... but the y (rows) spans only " << min_y() << " => " << max_y() << "!" << std::endl;
       throw larbys(ss.str());
     }
     return (size_t)((y - min_y()) / pixel_height());
