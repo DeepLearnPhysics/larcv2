@@ -124,7 +124,7 @@ larcv::Image2D as_image2d(PyObject *pyarray) {
   PyArray_Free(pyarray, (void *)carray);
 
   ImageMeta meta((double)(dims[0]), (double)(dims[1]), (size_t)(dims[1]),
-                 (size_t)(dims[0]), 0., 0., larcv::kINVALID_PLANE);
+                 (size_t)(dims[0]), 0., 0., larcv::kINVALID_PROJECTIONID);
 
   Image2D res(std::move(meta), std::move(res_data));
   return res;

@@ -15,9 +15,9 @@
 #define RANDOMCROPPER_H
 
 #include <iostream>
-#include "Base/larcv_base.h"
-#include "Base/PSet.h"
-#include "DataFormat/Image2D.h"
+#include "larcv/core/Base/larcv_base.h"
+#include "larcv/core/Base/PSet.h"
+#include "larcv/core/DataFormat/Image2D.h"
 
 namespace larcv {
   /**

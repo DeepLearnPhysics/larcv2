@@ -14,7 +14,7 @@
 #ifndef THREADPROCESSOR_H
 #define THREADPROCESSOR_H
 
-#include "Processor/ProcessDriver.h"
+#include "larcv/core/Processor/ProcessDriver.h"
 #include "ThreadIOTypes.h"
 #include <thread>
 

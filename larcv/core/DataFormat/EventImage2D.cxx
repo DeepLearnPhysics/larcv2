@@ -21,19 +21,19 @@ namespace larcv {
     return _image_v[id];
   }
 
-  void EventImage2D::Append(const Image2D& img)
+  void EventImage2D::append(const Image2D& img)
   {
     _image_v.push_back(img);
     _image_v.back().index((ImageIndex_t)(_image_v.size()-1));
   }
 
-  void EventImage2D::Emplace(Image2D&& img)
+  void EventImage2D::emplace(Image2D&& img)
   {
     _image_v.emplace_back(img);
     _image_v.back().index((ImageIndex_t)(_image_v.size()-1));
   }
 
-  void EventImage2D::Emplace(std::vector<larcv::Image2D>&& image_v)
+  void EventImage2D::emplace(std::vector<larcv::Image2D>&& image_v)
   {
     _image_v = std::move(image_v);
     for(size_t i=0; i<_image_v.size(); ++i) _image_v[i].index((ImageIndex_t)i);

@@ -2,7 +2,7 @@
  * \file ImageCompressor.h
  *
  * \ingroup Package_Name
- * 
+ *
  * \brief Class def header for a class ImageCompressor
  *
  * @author kazuhiro
@@ -27,12 +27,12 @@ namespace larcv {
   class ImageCompressor : public ProcessBase {
 
   public:
-    
+
     /// Default constructor
-    ImageCompressor(const std::string name="ImageCompressor");
-    
+    ImageCompressor(const std::string name = "ImageCompressor");
+
     /// Default destructor
-    ~ImageCompressor(){}
+    ~ImageCompressor() {}
 
     void configure(const PSet&);
 
@@ -58,7 +58,7 @@ namespace larcv {
   class ImageCompressorProcessFactory : public ProcessFactoryBase {
   public:
     /// ctor
-    ImageCompressorProcessFactory() { ProcessFactory::get().add_factory("ImageCompressor",this); }
+    ImageCompressorProcessFactory() { ProcessFactory::get().add_factory("ImageCompressor", this); }
     /// dtor
     ~ImageCompressorProcessFactory() {}
     /// creation method
@@ -68,5 +68,5 @@ namespace larcv {
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

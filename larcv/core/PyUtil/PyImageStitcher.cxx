@@ -44,7 +44,7 @@ namespace larcv {
       throw larbys();
     }
 
-    if(image_v->Image2DArray().size()) {
+    if(image_v->image2d_array().size()) {
       LARCV_CRITICAL() << "Image2D by " << _producer_name << " is not empty!" << std::endl;
       throw larbys();
     }
@@ -81,7 +81,7 @@ namespace larcv {
       out_img_v.emplace_back(std::move(out_img));
     }
 
-    image_v->Emplace(std::move(out_img_v));
+    image_v->emplace(std::move(out_img_v));
     _image_vv.clear();
     return true;
   }

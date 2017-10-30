@@ -2,7 +2,7 @@
  * \file Voxel.h
  *
  * \ingroup core_DataFormat
- * 
+ *
  * \brief Class def header for a class larcv::Voxel
  *
  * @author kazuhiro
@@ -11,8 +11,8 @@
 /** \addtogroup core_DataFormat
 
     @{*/
-#ifndef VOXEL3D_H
-#define VOXEL3D_H
+#ifndef LARCV_VOXEL_H
+#define LARCV_VOXEL_H
 
 #include "DataFormatTypes.h"
 namespace larcv {
@@ -21,22 +21,22 @@ namespace larcv {
      \class Voxel
      @brief 3D voxel definition element class consisting of ID and stored value
   */
-  class Voxel{
-    
+  class Voxel {
+
   public:
-    
+
     /// Default constructor
-    Voxel(VoxelID_t id=kINVALID_VOXELID, float value=kINVALID_FLOAT);
+    Voxel(VoxelID_t id = kINVALID_VOXELID, float value = kINVALID_FLOAT);
     /// Default destructor
-    ~Voxel(){}
-    
+    ~Voxel() {}
+
     /// ID getter
-    inline VoxelID_t ID() const { return _id; }
+    inline VoxelID_t id() const { return _id; }
     /// Value getter
-    inline float  Value() const { return _value; }
+    inline float  value() const { return _value; }
 
     /// Value setter
-    inline void Set(VoxelID_t id, float value) { _id = id; _value = value; }
+    inline void set(VoxelID_t id, float value) { _id = id; _value = value; }
 
     //
     // uniry operators
@@ -57,8 +57,8 @@ namespace larcv {
     { return (_id == rhs._id); }
     inline bool operator <  (const Voxel& rhs) const
     {
-      if( _id < rhs._id) return true;
-      if( _id > rhs._id) return false;
+      if ( _id < rhs._id) return true;
+      if ( _id > rhs._id) return false;
       return false;
     }
     inline bool operator <= (const Voxel& rhs) const
@@ -91,26 +91,105 @@ namespace larcv {
   class VoxelSet {
   public:
     /// Default ctor
-    VoxelSet(){}
+    VoxelSet() {}
     /// Default dtor
-    ~VoxelSet(){}
-    /// getter
-    inline const std::vector<larcv::Voxel>& VoxelArray() const
-    { return _voxel_v; }
-    /// clear
-    inline void Clear() { _voxel_v.clear(); }
-    /// adder
-    void Add(const Voxel& vox);
-    /// adder
-    void Emplace(Voxel&& vox);
+    ~VoxelSet() {}
+
+    //
+    // Read-access
+    //
+    /// InstanceID_t getter
+    inline InstanceID_t id() const { return _id; }
+    /// Access as a raw vector
+    inline const std::vector<larcv::Voxel>& as_vector() const { return _voxel_v; }
+    /// Sum of contained voxel values
+    inline float sum() const { float res=0.; for(auto const& vox : _voxel_v) res+=vox.value(); return res;}
+    /// Mean of contained voxel values
+    inline float mean() const { return (_voxel_v.empty() ? 0. : sum() / (float)(_voxel_v.size())); }
+
+    //
+    // Write-access
+    //    
+    /// Clear everything
+    inline void clear() { _voxel_v.clear(); }
+    /// Add a new voxel. If another voxel instance w/ same VoxelID exists, value is added
+    void add(const Voxel& vox);
+    /// Emplace a new voxel. Same logic as VoxelSet::add but consumes removable reference.
+    void emplace(Voxel&& vox);
+    /// Emplace a new voxel from id & value
+    inline void emplace(VoxelID_t id, float value) { emplace(Voxel(id,value)); }
+    /// InstanceID_t setter
+    inline void id(const InstanceID_t id) { _id = id; }
+
+    //
+    // Uniry operations
+    //
+    inline VoxelSet& operator += (float value)
+    { for(auto& vox : _voxel_v) vox += value; return (*this); }
+    inline VoxelSet& operator -= (float value)
+    { for(auto& vox : _voxel_v) vox -= value; return (*this); }
+    inline VoxelSet& operator *= (float factor)
+    { for(auto& vox : _voxel_v) vox *= factor; return (*this); }
+    inline VoxelSet& operator /= (float factor)
+    { for(auto& vox : _voxel_v) vox /= factor; return (*this); }
+
   private:
-    /// Ordered sparse vector of voxels 
+    /// Instance ID
+    InstanceID_t _id;
+    /// Ordered sparse vector of voxels
     std::vector<larcv::Voxel> _voxel_v;
   };
 
-  
+  /**
+     \class VoxelSetArray
+     @brief Container of multiple VoxelSet (i.e. container w/ InstanceID_t & VoxelSet pairs)
+  */
+  class VoxelSetArray {
+  public:
+    /// Default ctor
+    VoxelSetArray() {}
+    /// Default dtor
+    ~VoxelSetArray() {}
+
+    //
+    // Read-access
+    //
+    /// Get # of VoxelSet
+    inline size_t size() const { return _voxel_vv.size(); }
+    /// Access specific VoxelSet
+    const larcv::VoxelSet& voxel_set(InstanceID_t id) const;
+    /// Access all VoxelSet as a vector
+    inline const std::vector<larcv::VoxelSet>& as_vector() const
+    { return _voxel_vv; }
+
+    //
+    // Write-access
+    //
+    /// Clear everything
+    inline void clear() { _voxel_vv.clear(); }
+    /// Resize voxel array
+    inline void resize(const size_t num)
+    { _voxel_vv.resize(num); for(size_t i=0; i<num; ++i) _voxel_vv[i].id(i); }
+    /// Access non-const reference of a specific VoxelSet 
+    larcv::VoxelSet& writeable_voxel_set(const InstanceID_t id);
+    /// Move an arrray of VoxelSet. Each element's InstanceID_t gets updated
+    void emplace(std::vector<larcv::VoxelSet>&& voxel_vv);
+    /// Set an array of VoxelSet. Each element's InstanceID_t gets updated
+    void set(const std::vector<larcv::VoxelSet>& voxel_vv);
+    /// Move a VoxelSet into a collection. The InstanceID_t is respected.
+    void emplace(larcv::VoxelSet&& voxel_v);
+    /// Set a VoxelSet into a collection. The InstanceID_t is respected.
+    void set(const larcv::VoxelSet& voxel_v);
+    /// Mover
+    void move(larcv::VoxelSetArray&& orig)
+    { _voxel_vv = std::move(orig._voxel_vv); }
+
+  private:
+    std::vector<larcv::VoxelSet> _voxel_vv;
+  };
+
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

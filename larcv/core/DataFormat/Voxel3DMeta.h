@@ -35,17 +35,22 @@ namespace larcv {
     /// Define dimensions
     inline void set(double xmin, double ymin, double zmin,
 		    double xmax, double ymax, double zmax,
-		    size_t xnum,size_t ynum,size_t znum)
+		    size_t xnum,size_t ynum,size_t znum,
+		    DistanceUnit_t unit=kUnitCM)
     { BBox3D::update(xmin,ymin,zmin,xmax,ymax,zmax);
-      Voxel3DMeta::update(xnum,ynum,znum); }
+      Voxel3DMeta::update(xnum,ynum,znum);
+      _unit = unit;
+    }
     /// Clear method
     void clear();
     /// Checker if the meta parameters are set properly or not
     inline bool valid() const { return _valid; }
     /// Returns size
     inline VoxelID_t size() const { return _num_element; }
+    inline VoxelID_t id(const Point3D& pt) const
+    { return id(pt.x, pt.y, pt.z); }
     /// Given a position, returns voxel ID
-    VoxelID_t index(double x, double y, double z) const;
+    VoxelID_t id(double x, double y, double z) const;
     /// Given a valid voxel ID, returns a position array
     Point3D position(VoxelID_t id) const;
     /// Given a valid voxel ID, returns X position
@@ -66,6 +71,8 @@ namespace larcv {
     inline double size_voxel_y() const { return _ylen; }
     /// Returns voxel size along z-axis;
     inline double size_voxel_z() const { return _zlen; }
+    /// Distance unit
+    inline DistanceUnit_t unit() const { return _unit; }
     /// text dumper
     std::string  dump() const;
     
@@ -81,6 +88,8 @@ namespace larcv {
     size_t _xnum; ///< Number of voxels along X
     size_t _ynum; ///< Number of voxels along Y
     size_t _znum; ///< Number of voxels along Z
+
+    DistanceUnit_t _unit; ///< length unit
   };  
 }
 

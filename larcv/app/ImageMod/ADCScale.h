@@ -2,7 +2,7 @@
  * \file ADCScale.h
  *
  * \ingroup Package_Name
- * 
+ *
  * \brief Class def header for a class ADCScale
  *
  * @author kazuhiro
@@ -28,12 +28,12 @@ namespace larcv {
   class ADCScale : public ProcessBase {
 
   public:
-    
+
     /// Default constructor
-    ADCScale(const std::string name="ADCScale");
-    
+    ADCScale(const std::string name = "ADCScale");
+
     /// Default destructor
-    ~ADCScale(){}
+    ~ADCScale() {}
 
     void configure(const PSet&);
 
@@ -51,11 +51,11 @@ namespace larcv {
     std::vector<double> _gaus_sigma_v;
     std::vector<size_t> _gaus_pool_size_v;
     bool _per_pixel;
-    #ifndef __CINT__
-    #ifndef __CLING__
+#ifndef __CINT__
+#ifndef __CLING__
     std::vector<larcv::RandomGaus > _randg_v;
-    #endif
-    #endif
+#endif
+#endif
   };
 
   /**
@@ -65,7 +65,7 @@ namespace larcv {
   class ADCScaleProcessFactory : public ProcessFactoryBase {
   public:
     /// ctor
-    ADCScaleProcessFactory() { ProcessFactory::get().add_factory("ADCScale",this); }
+    ADCScaleProcessFactory() { ProcessFactory::get().add_factory("ADCScale", this); }
     /// dtor
     ~ADCScaleProcessFactory() {}
     /// creation method
@@ -75,5 +75,5 @@ namespace larcv {
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

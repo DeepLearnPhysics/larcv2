@@ -14,10 +14,10 @@
 #ifndef __BATCHFILLERIMAGE2D_H__
 #define __BATCHFILLERIMAGE2D_H__
 
-#include "Processor/ProcessFactory.h"
+#include "larcv/core/Processor/ProcessFactory.h"
 #include "BatchFillerTemplate.h"
 #include "RandomCropper.h"
-#include "DataFormat/EventImage2D.h"
+#include "larcv/core/DataFormat/EventImage2D.h"
 namespace larcv {
 
   /**

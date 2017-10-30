@@ -28,15 +28,11 @@ namespace larcv {
       ProducerName_t name_id("voxel3d",_voxel_producer);
       producer_id = mgr.producer_id(name_id);
     }
-    auto event_voxel = (VoxelSet*)(mgr.get_data(producer_id));
-    if(!event_voxel) {
-      LARCV_CRITICAL() << "VoxelSet with name " << _voxel_producer << " not found..." << std::endl;
-      throw larbys();
-    }
+    auto const& event_voxel3d = mgr.get_data<larcv::EventSparseTensor3D>(producer_id);
 
     size_t ctr=0;
-    for(auto const& vox : event_voxel->VoxelArray()) {
-      if(vox.Value()<_min_voxel_value) continue;
+    for(auto const& vox : event_voxel3d.as_vector()) {
+      if(vox.value()<_min_voxel_value) continue;
       ctr++;
     }
     return (ctr >= _min_voxel_count);

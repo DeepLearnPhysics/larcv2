@@ -2,8 +2,8 @@
 #define __WIREMASK_CXX__
 
 #include "WireMask.h"
-#include "DataFormat/EventImage2D.h"
-#include "DataFormat/EventChStatus.h"
+#include "larcv/core/DataFormat/EventImage2D.h"
+#include "larcv/core/DataFormat/EventChStatus.h"
 namespace larcv {
 
   static WireMaskProcessFactory __global_WireMaskProcessFactory__;
@@ -35,7 +35,7 @@ namespace larcv {
 
   bool WireMask::process(IOManager& mgr)
   {
-    auto input_image_v = (EventImage2D*)(mgr.get_data(kProductImage2D,_image_producer));
+    auto input_image_v = (EventImage2D*)(mgr.get_data("image2d",_image_producer));
     LARCV_DEBUG() << "input_image_v ptr : " << input_image_v << "\n";
     if(!input_image_v) {
       LARCV_CRITICAL() << "Invalid image producer name: " << _image_producer << std::endl;
@@ -43,16 +43,17 @@ namespace larcv {
     }
     EventChStatus* ev_chstatus = nullptr;
     if(!_chstatus_producer.empty()) {
-      ev_chstatus = (EventChStatus*)(mgr.get_data(kProductChStatus,_chstatus_producer));
+      ev_chstatus = (EventChStatus*)(mgr.get_data("chstatus",_chstatus_producer));
       if(!ev_chstatus) {
 	LARCV_CRITICAL() << "ChStatus by " << _chstatus_producer << " not found!" << std::endl;
 	throw larbys();
       }
+
     }
 
     // For operation, move an array to this scope
     std::vector<Image2D> image_v;
-    input_image_v->Move(image_v);
+    input_image_v->move(image_v);
 
     // make sure plane id is valid
     if(_plane_id >=0 && (int)(image_v.size()) <= _plane_id) {
@@ -69,7 +70,7 @@ namespace larcv {
       std::set<size_t> wire_s;
       for(auto const& w : _wire_v) wire_s.insert(w);
       if(ev_chstatus) {
-	auto const& status_v = ev_chstatus->Status(plane).as_vector();
+	auto const& status_v = ev_chstatus->status(plane).as_vector();
 
 	for(size_t w=0; w<status_v.size(); ++w) {
 	  if(status_v[w] < _threshold) wire_s.insert(w);
@@ -94,7 +95,7 @@ namespace larcv {
     }
 
     // put back an image
-    input_image_v->Emplace(std::move(image_v));
+    input_image_v->emplace(std::move(image_v));
 
     return true;
   }

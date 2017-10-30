@@ -2,7 +2,7 @@
 #define THREADPROCESSOR_CXX
 
 #include "ThreadProcessor.h"
-#include "Base/LArCVBaseUtilFunc.h"
+#include "larcv/core/Base/LArCVBaseUtilFunc.h"
 #include <random>
 #include <sstream>
 #include <unistd.h>

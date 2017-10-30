@@ -40,17 +40,17 @@ namespace larcv {
     void clear();
 
     /// Getter for a const reference of core data
-    const std::map<larcv::PlaneID_t,larcv::ChStatus>& ChStatusMap() const { return _status_m; }
+    const std::map<larcv::ProjectionID_t,larcv::ChStatus>& chstatus_map() const { return _status_m; }
 
     /// Get larcv::ChStatus for a specified plane
-    const ChStatus& Status(larcv::PlaneID_t id) const;
+    const ChStatus& status(larcv::ProjectionID_t id) const;
 
     /// Insert larcv::ChStatus into a collection
-    void Insert(const ChStatus& status);
+    void insert(const ChStatus& status);
     
 #ifndef __CINT__
     /// Emplace larcv::ChStatus into a collection
-    void Emplace(ChStatus&& status);
+    void emplace(ChStatus&& status);
 #endif
 
     /// Dump contents in string representation
@@ -58,7 +58,7 @@ namespace larcv {
     
   private:
 
-    std::map< ::larcv::PlaneID_t, ::larcv::ChStatus > _status_m;
+    std::map< ::larcv::ProjectionID_t, ::larcv::ChStatus > _status_m;
 
   };
 }

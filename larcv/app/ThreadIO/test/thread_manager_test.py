@@ -1,7 +1,7 @@
 from larcv import larcv
 import sys, time
 
-batch_size=50
+batch_size=10
 report_cycle=2
 sleep_time=0.02
 consume_cycle=0.1

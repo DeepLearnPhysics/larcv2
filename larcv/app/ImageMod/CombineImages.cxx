@@ -2,7 +2,7 @@
 #define __COMBINEIMAGES_CXX__
 
 #include "CombineImages.h"
-#include "DataFormat/EventImage2D.h"
+#include "larcv/core/DataFormat/EventImage2D.h"
 
 namespace larcv {
 
@@ -31,17 +31,17 @@ namespace larcv {
 
       auto const& producer = _producer_v[i];
 
-      auto event_image = (EventImage2D*)(mgr.get_data(kProductImage2D,producer));
+      auto& event_image = mgr.get_data<EventImage2D>(producer);
 
-      if(event_image->Image2DArray().size()!=_nplanes) {
+      if(event_image.image2d_array().size()!=_nplanes) {
 	LARCV_CRITICAL() << "Producer " << producer 
-			 << " has # images " << event_image->Image2DArray().size() 
+			 << " has # images " << event_image.image2d_array().size() 
 			 << " != # planes " << _nplanes << std::endl;
 	throw larbys();
       }
 
       std::vector<larcv::Image2D> images;
-      event_image->Move(images);
+      event_image.move(images);
 
       for(size_t plane=0; plane<_nplanes; ++plane)
 
@@ -49,9 +49,9 @@ namespace larcv {
       
     }
 
-    auto out_image = (EventImage2D*)(mgr.get_data(kProductImage2D,_out_producer));
+    auto& out_image = mgr.get_data<EventImage2D>(_out_producer);
 
-    out_image->Emplace(std::move(image_v));
+    out_image.emplace(std::move(image_v));
 
     return true;
   }

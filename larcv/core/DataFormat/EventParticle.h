@@ -24,7 +24,7 @@ namespace larcv {
     User-defined data product class (please comment!)
   */
   class EventParticle : public EventBase,
-			public std::vector<larcv::Particle> {
+			public larcv::ParticleSet {
     
   public:
     
@@ -36,7 +36,7 @@ namespace larcv {
 
     /// Data clear method
     inline void clear()
-    { EventBase::clear(); std::vector<larcv::Particle>::clear(); }
+    { EventBase::clear(); larcv::ParticleSet::clear(); }
 
   };
 }

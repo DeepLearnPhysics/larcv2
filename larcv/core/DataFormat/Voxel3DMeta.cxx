@@ -43,7 +43,7 @@ namespace larcv {
     _valid = true;
   }
 
-  VoxelID_t Voxel3DMeta::index(double x, double y, double z) const
+  VoxelID_t Voxel3DMeta::id(double x, double y, double z) const
   {
     if(!_valid) throw larbys("Voxel3DMeta::ID cannot be called on invalid meta!");
     if(x > max_x() || x < min_x()) return kINVALID_VOXELID;
