@@ -17,9 +17,9 @@ namespace larcv {
     _voxel3d_producer = cfg.get<std::string>("ClusterVoxel3DProducer");
     _output_producer = _voxel3d_producer + "_xyz";
     _output_producer = cfg.get<std::string>("OutputProducer",_output_producer);
-    _xy = cfg.get<bool>("XY",true);
-    _yz = cfg.get<bool>("YZ",true);
-    _zx = cfg.get<bool>("ZX",true);
+    _xy = cfg.get<int>("XY",1);
+    _yz = cfg.get<int>("YZ",1);
+    _zx = cfg.get<int>("ZX",1);
 
   }
 
@@ -72,9 +72,9 @@ namespace larcv {
         if(_yz) {
           LARCV_DEBUG() << "(y,z) = (" << pos.y << "," << pos.z << ")" << std::endl
           << meta_yz.dump() << std::endl;
-          img_data_yz[meta_yz.index(meta_yz.row(pos.z),meta_xy.col(pos.y))] += vox.value();
+          img_data_yz[meta_yz.index(meta_yz.row(pos.z),meta_yz.col(pos.y))] += vox.value();
         }
-        if(_xy) {
+        if(_zx) {
           LARCV_DEBUG() << "(z,x) = (" << pos.z << "," << pos.x << ")" << std::endl
           << meta_zx.dump() << std::endl;
           img_data_zx[meta_zx.index(meta_zx.row(pos.x),meta_zx.col(pos.z))] += vox.value();

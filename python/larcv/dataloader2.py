@@ -118,13 +118,14 @@ class larcv_threadio (object):
       if not self._cfg_file or not os.path.isfile(self._cfg_file):
          sys.stderr.write('filler_cfg file does not exist: %s\n' % self._cfg_file)
          raise ValueError
-         
+
       # set verbosity
       if 'verbosity' in cfg:
          self._verbose = bool(cfg['verbosity'])
 
       # configure thread processor
       self._proc = larcv.ThreadProcessor(self._name)
+
       self._proc.configure(self._cfg_file)
 
       # fetch batch filler info
@@ -206,9 +207,9 @@ class larcv_threadio (object):
       return self._tree_entries
 
 def sig_kill(signal,frame):
-   print '\033[95mSIGINT detected.\033[00m Finishing the program gracefully.'
+   print('\033[95mSIGINT detected.\033[00m Finishing the program gracefully.')
    for name,ptr in larcv_threadio._instance_m.iteritems():
-      print 'Terminating filler:',name
+      print('Terminating filler: %s' % name)
       ptr.reset()
 
 signal.signal(signal.SIGINT,  sig_kill)

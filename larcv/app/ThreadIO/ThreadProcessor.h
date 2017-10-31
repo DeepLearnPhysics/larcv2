@@ -126,7 +126,6 @@ namespace larcv {
 
     // main thread
     std::thread _manager_thread;
-
     // thread-wise variables
     std::vector<larcv::ProcessDriver*> _driver_v;
     std::vector<std::thread> _thread_v;
