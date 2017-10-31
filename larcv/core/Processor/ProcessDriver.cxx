@@ -9,14 +9,14 @@ namespace larcv {
 
   ProcessDriver::ProcessDriver(std::string name)
     : larcv_base(name)
+    , _batch_start_entry(0)
+    , _batch_num_entry(0)
     , _enable_filter(false)
     , _random_access(false)
     , _proc_v()
     , _processing(false)
     , _fout(nullptr)
     , _fout_name("")
-    , _batch_start_entry(0)
-    , _batch_num_entry(0)
   {}
 
   void ProcessDriver::reset()

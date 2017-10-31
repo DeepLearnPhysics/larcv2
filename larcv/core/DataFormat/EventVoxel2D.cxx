@@ -26,19 +26,15 @@ namespace larcv {
 
   void EventClusterPixel2D::emplace(larcv::ClusterPixel2D&& clusters)
   {
-    if(_cluster_v.size() <= clusters.meta().id()) {
-      size_t original_size = _cluster_v.size();
+    if(_cluster_v.size() <= clusters.meta().id())
       _cluster_v.resize(clusters.meta().id()+1);
-    }
     _cluster_v[clusters.meta().id()] = std::move(clusters);
   }
 
   void EventClusterPixel2D::set(const larcv::ClusterPixel2D& clusters) 
   {
-    if(_cluster_v.size() <= clusters.meta().id()) {
-      size_t original_size = _cluster_v.size();
+    if(_cluster_v.size() <= clusters.meta().id())
       _cluster_v.resize(clusters.meta().id()+1);
-    }
     _cluster_v[clusters.meta().id()] = clusters;
     
   }
@@ -71,19 +67,15 @@ namespace larcv {
 
   void EventSparseTensor2D::emplace(larcv::SparseTensor2D&& cluster)
   {
-    if(_tensor_v.size() <= cluster.meta().id()) {
-      size_t original_size = _tensor_v.size();
+    if(_tensor_v.size() <= cluster.meta().id())
       _tensor_v.resize(cluster.meta().id()+1);
-    }
     _tensor_v[cluster.meta().id()] = std::move(cluster);
   }
 
   void EventSparseTensor2D::set(const larcv::SparseTensor2D& cluster) 
   {
-    if(_tensor_v.size() <= cluster.meta().id()) {
-      size_t original_size = _tensor_v.size();
+    if(_tensor_v.size() <= cluster.meta().id())
       _tensor_v.resize(cluster.meta().id()+1);
-    }
     _tensor_v[cluster.meta().id()] = cluster;
   }
   

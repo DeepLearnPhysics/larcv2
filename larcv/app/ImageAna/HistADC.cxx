@@ -41,9 +41,8 @@ namespace larcv {
   {
 
     auto const& event_image = mgr.get_data<larcv::EventImage2D>(fImageProducer);
-    auto const& event_part  = mgr.get_data<larcv::EventParticle>(fParticleProducer);
-
-    auto const& part = event_part.as_vector().front();
+    //auto const& event_part  = mgr.get_data<larcv::EventParticle>(fParticleProducer);
+    //auto const& part = event_part.as_vector().front();
 
     // if ( fFillCosmic && roi.Type()!=kROICosmic)
     //   return true;

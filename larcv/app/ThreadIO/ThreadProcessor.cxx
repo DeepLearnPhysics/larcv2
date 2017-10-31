@@ -20,9 +20,9 @@ namespace larcv {
     , _processing(false)
     , _configured(false)
     , _enable_filter(false)
-    , _optional_next_index(kINVALID_SIZE)
     , _next_entry(0)
     , _num_batch_storage(0)
+    , _optional_next_index(kINVALID_SIZE)
     , _batch_global_counter(0)
   {}
 

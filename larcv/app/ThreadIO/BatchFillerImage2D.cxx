@@ -216,7 +216,7 @@ namespace larcv {
 
       auto const& input_image = (_crop_image ? _cropper.crop(input_img2d) : input_img2d.as_vector());
 
-      size_t caffe_idx = 0;
+      //size_t caffe_idx = 0;
       size_t target_idx = ch * _rows * _cols;
 
       for (size_t caffe_idx = 0; caffe_idx < (_rows * _cols); ++caffe_idx) {

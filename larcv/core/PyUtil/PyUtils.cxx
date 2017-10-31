@@ -57,7 +57,7 @@ void copy_array(PyObject *arrayin, const std::vector<float> &cvec) {
     throw std::exception();
   }
 
-  if (cvec.size() != PyArray_SIZE(ptr))
+  if ((long)(cvec.size()) != PyArray_SIZE(ptr))
     throw std::exception();
   npy_intp loc[1];
   loc[0] = 0;
@@ -130,9 +130,10 @@ larcv::Image2D as_image2d(PyObject *pyarray) {
   return res;
 }
 
-void fill_img_col(Image2D &img, std::vector<short> &adcs, const int col,
-                  const int timedownsampling, const float pedestal) {
-  if (col < 0 || col >= img.meta().cols())
+void fill_img_col(Image2D &img, std::vector<short> &adcs, const int col, const float pedestal) 
+//const int timedownsampling, const float pedestal) {
+{
+  if (col < 0 || col >= (long)(img.meta().cols()))
     return;
 
   for (int iadc = 0; iadc < (int)adcs.size(); iadc++) {

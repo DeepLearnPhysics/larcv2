@@ -8,7 +8,7 @@
 namespace larcv {
 
   BBox2D::BBox2D(double xmin, double ymin, double xmax, double ymax, ProjectionID_t id)
-    : _p1(xmin,ymin) , _p2(xmax,ymax), _id(id)
+    : _id(id), _p1(xmin,ymin) , _p2(xmax,ymax)
   {
     if(xmin > xmax) throw larbys("xmin > xmax not allowed for BBox2D construction!");
     if(ymin > ymax) throw larbys("ymin > ymax not allowed for BBox2D construction!");
