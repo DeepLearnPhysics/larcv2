@@ -11,6 +11,8 @@ namespace larcv {
 
   BatchFillerImage2D::BatchFillerImage2D(const std::string name)
     : BatchFillerTemplate<float>(name)
+    , _rows(kINVALID_SIZE)
+    , _cols(kINVALID_SIZE)
     , _slice_v()
     , _max_ch(0)
   {}
@@ -65,7 +67,7 @@ namespace larcv {
     }
     if (_slice_v.empty()) {
       _slice_v.resize(image_v.size());
-      for (size_t i = 0; i < _slice_v.size(); ++i) _slice_v[i] = i;
+      for (size_t i = 0; i < _slice_v.size(); ++i) _slice_v.at(i) = i;
     }
 
     _num_channels = _slice_v.size();
@@ -79,13 +81,13 @@ namespace larcv {
     }
     if ( !_crop_image ) {
       // set the dimensions from the image
-      _rows = image_v.front().meta().rows();
-      _cols = image_v.front().meta().cols();
+      _rows = image_v.at(_slice_v.front()).meta().rows();
+      _cols = image_v.at(_slice_v.front()).meta().cols();
     }
     else {
       // gonna crop (if speicifed dim is smaller than image dim)
-      _rows = std::min( image_v.front().meta().rows(), _cropper.rows() );
-      _cols = std::min( image_v.front().meta().cols(), _cropper.cols() );
+      _rows = std::min( image_v.at(_slice_v.front()).meta().rows(), _cropper.rows() );
+      _cols = std::min( image_v.at(_slice_v.front()).meta().cols(), _cropper.cols() );
     }
 
     LARCV_INFO() << "Rows = " << _rows << " ... Cols = " << _cols << std::endl;
@@ -96,8 +98,8 @@ namespace larcv {
     size_t caffe_idx = 0;
     for (size_t row = 0; row < _rows; ++row) {
       for (size_t col = 0; col < _cols; ++col) {
-        _caffe_idx_to_img_idx[caffe_idx] = col * _rows + row;
-        _mirror_caffe_idx_to_img_idx[caffe_idx] = (_cols - col - 1) * _rows + row;
+        _caffe_idx_to_img_idx.at(caffe_idx) = col * _rows + row;
+        _mirror_caffe_idx_to_img_idx.at(caffe_idx) = (_cols - col - 1) * _rows + row;
         ++caffe_idx;
       }
     }
@@ -115,8 +117,8 @@ namespace larcv {
     bool valid_ch   = (image_v.size() > _max_ch);
     bool valid_rows = true;
     for (size_t ch = 0; ch < _num_channels; ++ch) {
-      size_t input_ch = _slice_v[ch];
-      auto const& img = image_v[input_ch];
+      size_t input_ch = _slice_v.at(ch);
+      auto const& img = image_v.at(input_ch);
 
       if ( !_crop_image )
         valid_rows = ( _rows == img.meta().rows() );
@@ -129,8 +131,8 @@ namespace larcv {
 
     bool valid_cols = true;
     for (size_t ch = 0; ch < _num_channels; ++ch) {
-      size_t input_ch = _slice_v[ch];
-      auto const& img = image_v[input_ch];
+      size_t input_ch = _slice_v.at(ch);
+      auto const& img = image_v.at(input_ch);
       if ( !_crop_image )
         valid_cols = ( _cols == img.meta().cols() );
       if (!valid_cols) {
@@ -207,9 +209,9 @@ namespace larcv {
 
     for (size_t ch = 0; ch < _num_channels; ++ch) {
 
-      size_t input_ch = _slice_v[ch];
+      size_t input_ch = _slice_v.at(ch);
 
-      auto const& input_img2d = image_v[input_ch];
+      auto const& input_img2d = image_v.at(input_ch);
       auto const& input_meta  = input_img2d.meta();
 
       if (_crop_image) _cropper.set_crop_region(input_meta.rows(), input_meta.cols());
@@ -225,21 +227,21 @@ namespace larcv {
 
           if (mirror_image)
 
-            _entry_data[target_idx] = input_image[_mirror_caffe_idx_to_img_idx[caffe_idx]];
+            _entry_data.at(target_idx) = input_image.at(_mirror_caffe_idx_to_img_idx[caffe_idx]);
 
           else
 
-            _entry_data[target_idx] = input_image[_caffe_idx_to_img_idx[caffe_idx]];
+            _entry_data.at(target_idx) = input_image.at(_caffe_idx_to_img_idx[caffe_idx]);
 
         } else {
 
           if (mirror_image)
 
-            _entry_data[caffe_idx * _num_channels + ch] = input_image[_mirror_caffe_idx_to_img_idx[caffe_idx]];
+            _entry_data.at(caffe_idx * _num_channels + ch) = input_image.at(_mirror_caffe_idx_to_img_idx[caffe_idx]);
 
           else
 
-            _entry_data[caffe_idx * _num_channels + ch] = input_image[_caffe_idx_to_img_idx[caffe_idx]];
+            _entry_data.at(caffe_idx * _num_channels + ch) = input_image.at(_caffe_idx_to_img_idx[caffe_idx]);
 
         }
         ++target_idx;
