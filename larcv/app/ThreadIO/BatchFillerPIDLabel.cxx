@@ -18,7 +18,7 @@ namespace larcv {
   {
     _part_producer = cfg.get<std::string>("ParticleProducer");
 
-    auto _pdg_list = cfg.get<std::vector<int> >("PdgClassList");
+    _pdg_list = cfg.get<std::vector<int> >("PdgClassList");
     if (_pdg_list.empty()) {
       LARCV_CRITICAL() << "PdgClassList needed to define classes!" << std::endl;
       throw larbys();
