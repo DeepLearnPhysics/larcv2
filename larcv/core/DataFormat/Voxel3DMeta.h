@@ -51,6 +51,8 @@ namespace larcv {
     { return id(pt.x, pt.y, pt.z); }
     /// Given a position, returns voxel ID
     VoxelID_t id(double x, double y, double z) const;
+    /// Return value of invalid voxel ID:
+    VoxelID_t invalid_voxel_id() const{return kINVALID_VOXELID;}
     /// Given a valid voxel ID, returns a position array
     Point3D position(VoxelID_t id) const;
     /// Given a valid voxel ID, returns X position
