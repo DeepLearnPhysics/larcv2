@@ -70,6 +70,8 @@ namespace larcv {
     /// Must be called after initialize() or process_entry/batch_process. Closes IO and calls finalize method of process modules.
     void finalize();
 
+    inline void clear_entry(){_io.clear_entry();}
+
     //
     // Information setter method
     //
