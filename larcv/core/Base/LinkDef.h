@@ -19,7 +19,7 @@
 //#pragma link C++ class larcv::UniqueRangeSet<size_t>+;
 //#pragma link C++ class larcv::UniqueRangeSet<double>+;
 
-#pragma link C++ class larcv::Point2D+;
+//#pragma link C++ class larcv::Point2D+;
 #pragma link C++ namespace larcv::msg+;
 #pragma link C++ enum  larcv::msg::Level_t+;
 #pragma link C++ class larcv::logger+;
