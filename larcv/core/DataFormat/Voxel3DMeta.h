@@ -43,14 +43,26 @@ namespace larcv {
     }
     /// Clear method
     void clear();
+    /// Uniry == operator
+    inline bool operator ==(const Voxel3DMeta& rhs) const
+    { return ((BBox3D)(rhs) == (BBox3D)(*this) && 
+              _xlen == rhs._xlen && _ylen == rhs._ylen && _zlen == rhs._zlen &&
+              _xnum == rhs._xnum && _ynum == rhs._ynum && _znum == rhs._znum); }
+    /// Uniry != operator
+    inline bool operator !=(const Voxel3DMeta& rhs) const
+    { return !((*this) == rhs); }
     /// Checker if the meta parameters are set properly or not
     inline bool valid() const { return _valid; }
     /// Returns size
     inline VoxelID_t size() const { return _num_element; }
+    /// Given a position, returns voxel ID
     inline VoxelID_t id(const Point3D& pt) const
     { return id(pt.x, pt.y, pt.z); }
     /// Given a position, returns voxel ID
-    VoxelID_t id(double x, double y, double z) const;
+    VoxelID_t id(const double x, const double y, const double z) const;
+    /// Given a voxel id, returns a neighbor voxel ID with (x,y,z) shift
+    VoxelID_t shift(const VoxelID_t origin_id, 
+                    const int shift_x, const int shift_y, const int shift_z) const;
     /// Return value of invalid voxel ID:
     VoxelID_t invalid_voxel_id() const{return kINVALID_VOXELID;}
     /// Given a valid voxel ID, returns a position array

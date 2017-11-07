@@ -61,6 +61,28 @@ namespace larcv {
     return (zindex * (_xnum * _ynum) + yindex * _xnum + xindex);
   }
 
+  VoxelID_t Voxel3DMeta::shift(const VoxelID_t origin_id, 
+                               const int shift_x, 
+                               const int shift_y, 
+                               const int shift_z) const
+  {
+    int id = origin_id;
+    int zid = id / (_xnum * _ynum);
+    id -= zid * (_xnum * _ynum);
+    zid += shift_z;
+    if(zid < 0 || zid >= _znum) return kINVALID_VOXELID;
+
+    int yid = id / _xnum;
+    int xid = id - yid * _xnum;
+
+    yid += shift_y;
+    if(yid < 0 || yid >= _ynum) return kINVALID_VOXELID;
+
+    if(xid < 0 || xid >= _xnum) return kINVALID_VOXELID;
+
+    return (zid * (_xnum * _ynum) + yid * _xnum + xid);
+  }
+
   Point3D Voxel3DMeta::position(VoxelID_t id) const
   {
     if(!_valid) throw larbys("Voxel3DMeta::pos cannot be called on invalid meta!");

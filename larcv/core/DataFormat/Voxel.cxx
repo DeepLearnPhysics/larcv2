@@ -12,10 +12,33 @@ namespace larcv {
   void VoxelSet::add(const Voxel& vox)
   {
     Voxel copy(vox);
-    emplace(std::move(copy));
+    emplace(std::move(copy),true);
   }
 
-  void VoxelSet::emplace(Voxel&& vox)
+  void VoxelSet::set(const Voxel& vox)
+  {
+    Voxel copy(vox);
+    emplace(std::move(copy),false);
+  }
+
+  const Voxel& VoxelSet::find(VoxelID_t id) const
+  {
+    if(_voxel_v.empty() ||
+       id < _voxel_v.front().id() ||
+       id > _voxel_v.back().id())
+      return kINVALID_VOXEL;
+    
+    Voxel vox(id,0.);
+    // Else do log(N) search
+    auto iter = std::lower_bound(_voxel_v.begin(), _voxel_v.end(), vox);
+    if( (*iter).id() == id ) return (*iter);
+    else {
+      //std::cout << "Returning invalid voxel since lower_bound had an id " << (*iter).id() << std::endl;
+      return kINVALID_VOXEL;
+    }
+  }
+
+  void VoxelSet::emplace(Voxel&& vox, const bool add)
   {
     // In case it's empty or greater than the last one
     if (_voxel_v.empty() || _voxel_v.back() < vox) {
@@ -43,8 +66,9 @@ namespace larcv {
     }
 
     // If found, merge
-    if ( !(vox < (*iter)) ) {
-      (*iter) += vox.value();
+    if ( vox.id() == (*iter).id() ) {
+      if(add) (*iter) += vox.value();
+      else (*iter).set(vox.id(),vox.value());
       return;
     }
     // Else insert @ appropriate place

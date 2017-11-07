@@ -84,6 +84,8 @@ namespace larcv {
     float  _value; ///< Pixel Value
   };
 
+  static const larcv::Voxel kINVALID_VOXEL(kINVALID_VOXELID,0.);
+
   /**
      \class VoxelSet
      @brief Container of multiple voxels consisting of ordered sparse vector and meta data
@@ -102,6 +104,8 @@ namespace larcv {
     inline InstanceID_t id() const { return _id; }
     /// Access as a raw vector
     inline const std::vector<larcv::Voxel>& as_vector() const { return _voxel_v; }
+    /// Returns a const reference to a voxel with specified id. if not present, invalid voxel is returned.
+    const Voxel& find(VoxelID_t id) const;
     /// Sum of contained voxel values
     inline float sum() const { float res=0.; for(auto const& vox : _voxel_v) res+=vox.value(); return res;}
     /// Mean of contained voxel values
@@ -111,13 +115,16 @@ namespace larcv {
     // Write-access
     //    
     /// Clear everything
-    inline void clear() { _voxel_v.clear(); }
+    inline virtual void clear() { _voxel_v.clear(); }
     /// Add a new voxel. If another voxel instance w/ same VoxelID exists, value is added
     void add(const Voxel& vox);
+    /// Set a voxel. If another voxel instance w/ same VoxelID exists, value is set
+    void set(const Voxel& vox);
     /// Emplace a new voxel. Same logic as VoxelSet::add but consumes removable reference.
-    void emplace(Voxel&& vox);
+    void emplace(Voxel&& vox, const bool add);
     /// Emplace a new voxel from id & value
-    inline void emplace(VoxelID_t id, float value) { emplace(Voxel(id,value)); }
+    inline void emplace(VoxelID_t id, float value, const bool add) 
+    { emplace(Voxel(id,value),add); }
     /// InstanceID_t setter
     inline void id(const InstanceID_t id) { _id = id; }
 

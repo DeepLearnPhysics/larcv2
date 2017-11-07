@@ -7,10 +7,10 @@
 namespace larcv {
 
   void SparseTensor3D::emplace(const double x, const double y, const double z, 
-    const float val)
+    const float val, const bool add)
   {
     auto id = _meta.id(x,y,z);
-    if(id != kINVALID_VOXELID) VoxelSet::emplace(id,val);
+    if(id != kINVALID_VOXELID) VoxelSet::emplace(id,val,add);
   }
 
 
