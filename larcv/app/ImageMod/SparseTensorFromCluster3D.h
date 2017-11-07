@@ -43,8 +43,17 @@ namespace larcv {
 
   private:
 
+    enum class PIType_t {
+      kPITypeFixedPI,
+      kPITypeInputVoxel,
+      kPITypeClusterIndex,
+      kPITypeUndefined
+    };
+
     std::string _cluster3d_producer;
-    // std::string _output_producer;
+    std::string _output_producer;
+    PIType_t _pi_type;
+    float _fixed_pi;
   };
 
   /**

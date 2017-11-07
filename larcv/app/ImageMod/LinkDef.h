@@ -46,8 +46,10 @@
 #pragma link C++ class larcv::ImageFromClusterVoxel3D+;
 #pragma link C++ class larcv::SparseTensorFromCluster3D+;
 #pragma link C++ class larcv::ImageFromSparseTensor3D+;
+#pragma link C++ class larcv::SegWeightInstance3D+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 

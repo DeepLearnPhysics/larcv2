@@ -30,35 +30,35 @@ namespace larcv {
 
     std::vector<larcv::Image2D> image_v;
     static std::vector<float> voxel_value_v;
-    for(auto const& tensor2d_v : ev_tensor2d.as_vector()) {
+    for (auto const& tensor2d_v : ev_tensor2d.as_vector()) {
 
       auto const& meta = tensor2d_v.meta();
-      
-      if(image_v.size() <= meta.id()) image_v.resize(meta.id()+1);
+
+      if (image_v.size() <= meta.id()) image_v.resize(meta.id() + 1);
 
       std::vector<float> img_data(meta.rows() * meta.cols());
 
-      if(voxel_value_v.size() < img_data.size())
+      if (voxel_value_v.size() < img_data.size())
         voxel_value_v.resize(img_data.size());
 
-      for(size_t i=0; i<voxel_value_v.size(); ++i) voxel_value_v[i] = 0.;
+      for (size_t i = 0; i < voxel_value_v.size(); ++i) voxel_value_v[i] = 0.;
 
-      for(auto const& vox : tensor2d_v.as_vector()) {
-	float val = _fixed_pi;
-	switch (_type_pi) {
-	case PIType_t::kPITypeFixedPI:
-	  break;
-	case PIType_t::kPITypeInputVoxel:
-	  val = std::max(img_data[vox.id()],vox.value());
-	  break;
-	case PIType_t::kPITypeClusterIndex:
-	case PIType_t::kPITypeUndefined:
-	  throw larbys("PITypeUndefined and kPITypeClusterIndex not supported!");
-	  break;
-	}
-	img_data[vox.id()] = val;
+      for (auto const& vox : tensor2d_v.as_vector()) {
+        float val = _fixed_pi;
+        switch (_type_pi) {
+        case PIType_t::kPITypeFixedPI:
+          break;
+        case PIType_t::kPITypeInputVoxel:
+          val = std::max(img_data[vox.id()], vox.value());
+          break;
+        case PIType_t::kPITypeClusterIndex:
+        case PIType_t::kPITypeUndefined:
+          throw larbys("PITypeUndefined and kPITypeClusterIndex not supported!");
+          break;
+        }
+        img_data[vox.id()] = val;
       }
-      larcv::Image2D img2d(std::move(meta),std::move(img_data));
+      larcv::Image2D img2d(std::move(meta), std::move(img_data));
       ev_out_image.emplace(std::move(img2d));
     }
     return true;
