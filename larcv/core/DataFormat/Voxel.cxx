@@ -73,9 +73,9 @@ namespace larcv {
     }
     // Else insert @ appropriate place
     else {
-      size_t target_loc = iter - _voxel_v.begin();
+      size_t target_ctr = _voxel_v.size() - (iter - _voxel_v.begin());
       _voxel_v.emplace_back(std::move(vox));
-      for (size_t idx = target_loc; (idx + 1) < _voxel_v.size(); ++idx) {
+      for (size_t idx = 0; idx < target_ctr; ++idx) {
         auto& element1 = _voxel_v[ _voxel_v.size() - (idx + 1) ];
         auto& element2 = _voxel_v[ _voxel_v.size() - (idx + 2) ];
         std::swap( element1, element2 );
