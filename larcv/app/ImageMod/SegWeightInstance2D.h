@@ -1,9 +1,9 @@
 /**
- * \file SegWeightInstance.h
+ * \file SegWeightInstance2D.h
  *
  * \ingroup Package_Name
- * 
- * \brief Class def header for a class SegWeightInstance
+ *
+ * \brief Class def header for a class SegWeightInstance2D
  *
  * @author drinkingkazu
  */
@@ -14,24 +14,24 @@
 #ifndef __SEGWEIGHTTRACKSHOWER_H__
 #define __SEGWEIGHTTRACKSHOWER_H__
 
-#include "Processor/ProcessBase.h"
-#include "Processor/ProcessFactory.h"
+#include "larcv/core/Processor/ProcessBase.h"
+#include "larcv/core/Processor/ProcessFactory.h"
 namespace larcv {
 
   /**
      \class ProcessBase
-     User defined class SegWeightInstance ... these comments are used to generate
+     User defined class SegWeightInstance2D ... these comments are used to generate
      doxygen documentation!
   */
-  class SegWeightInstance : public ProcessBase {
+  class SegWeightInstance2D : public ProcessBase {
 
   public:
-    
+
     /// Default constructor
-    SegWeightInstance(const std::string name="SegWeightInstance");
-    
+    SegWeightInstance2D(const std::string name = "SegWeightInstance2D");
+
     /// Default destructor
-    ~SegWeightInstance(){}
+    ~SegWeightInstance2D() {}
 
     void configure(const PSet&);
 
@@ -53,7 +53,7 @@ namespace larcv {
     std::string _label_image_producer;
     std::string _instance_image_producer;
     std::string _keypt_pixel2d_producer;
-    
+
     std::string _weight_producer;
 
     PoolType_t _pool_type;
@@ -64,28 +64,32 @@ namespace larcv {
 
     size_t _weight_vertex;
 
-    std::vector<size_t> _plane_v;
+    std::vector<size_t> _projection_v;
+
+    std::vector<float> _temp_weight_data;
+
+    std::vector<float> _boundary_data;
 
     unsigned int _weight_max;
 
   };
 
   /**
-     \class larcv::SegWeightInstanceFactory
-     \brief A concrete factory class for larcv::SegWeightInstance
+     \class larcv::SegWeightInstance2DFactory
+     \brief A concrete factory class for larcv::SegWeightInstance2D
   */
-  class SegWeightInstanceProcessFactory : public ProcessFactoryBase {
+  class SegWeightInstance2DProcessFactory : public ProcessFactoryBase {
   public:
     /// ctor
-    SegWeightInstanceProcessFactory() { ProcessFactory::get().add_factory("SegWeightInstance",this); }
+    SegWeightInstance2DProcessFactory() { ProcessFactory::get().add_factory("SegWeightInstance2D", this); }
     /// dtor
-    ~SegWeightInstanceProcessFactory() {}
+    ~SegWeightInstance2DProcessFactory() {}
     /// creation method
-    ProcessBase* create(const std::string instance_name) { return new SegWeightInstance(instance_name); }
+    ProcessBase* create(const std::string instance_name) { return new SegWeightInstance2D(instance_name); }
   };
 
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 
