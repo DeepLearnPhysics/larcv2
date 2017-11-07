@@ -1,7 +1,7 @@
 #
 # This is an example GNUmakefile for my packages
 #
-PACKAGE_NAME = DLInterface
+PACKAGE_NAME = ThreadIO
 
 # specific names for this package
 SOURCES = $(wildcard *.cxx)
@@ -21,7 +21,6 @@ OSNAMEMODE      = $(OSNAME)
 include $(LARCV_BASEDIR)/Makefile/Makefile.${OSNAME}
 
 LDFLAGS += $(shell larcv-config --libs)
-LDFLAGS += -L/usr/local/Cellar/python/2.7.11/Frameworks/Python.framework/Versions/2.7/lib -lpython2.7
 
 # call the common GNUmakefile
 include $(LARCV_BASEDIR)/Makefile/GNUmakefile.CORE
