@@ -36,11 +36,11 @@ namespace larcv {
              orig_meta.num_voxel_z() / _comp_factor,
              orig_meta.unit());
 
-    auto& output_voxel = mgr.get_data<larcv::EventSparseTensor3D>(_output_producer);
-    output_voxel.meta(meta);
+    auto output_voxel = (larcv::EventSparseTensor3D*)(mgr.get_data("tensor3d",_output_producer));
+    output_voxel->meta(meta);
     for(auto const& in_vox : event_voxel.as_vector()) {
       Voxel out_vox(meta.id(orig_meta.position(in_vox.id())), in_vox.value());
-      ((VoxelSet)output_voxel).emplace(std::move(out_vox));
+      ((VoxelSet*)output_voxel)->emplace(std::move(out_vox),true);
     }
 
     return true;
