@@ -47,8 +47,16 @@
 #pragma link C++ class larcv::SparseTensorFromCluster3D+;
 #pragma link C++ class larcv::ImageFromSparseTensor3D+;
 #pragma link C++ class larcv::SegWeightInstance3D+;
+#pragma link C++ class larcv::SegLabelFromCluster3D+;
+#pragma link C++ class larcv::MaskSparseTensor3D+;
+#pragma link C++ class larcv::ThresholdVoxel3D+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
+
+
+
 
 
 

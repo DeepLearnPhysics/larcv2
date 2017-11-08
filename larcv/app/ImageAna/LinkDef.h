@@ -11,8 +11,10 @@
 
 #pragma link C++ class larcv::HistADC+;
 //#pragma link C++ class larcv::SegImageAna+;
+#pragma link C++ class larcv::HistVoxel3D+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 

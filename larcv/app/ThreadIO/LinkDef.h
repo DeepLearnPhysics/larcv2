@@ -36,8 +36,10 @@
 #pragma link C++ class larcv::RandomCropper+;
 //#pragma link C++ class larcv::ExampleCircularBuffer+;
 //#pragma link C++ class larcv::BatchFillerImage2D+;
+#pragma link C++ class larcv::BatchFillerSegmentLabel3D+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 
