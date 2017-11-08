@@ -74,23 +74,13 @@ bool BatchFillerTensor3D::process(IOManager& mgr) {
   if (batch_data().dim().empty()) {
     auto const& voxel_meta = voxel_data.meta();
     std::vector<int> dim;
-    if (_num_channel > 1) {
-      dim.resize(5);
-      dim[0] = batch_size();
-      dim[1] = _nz = voxel_meta.num_voxel_z();
-      dim[2] = _ny = voxel_meta.num_voxel_y();
-      dim[3] = _nx = voxel_meta.num_voxel_x();
-      dim[4] = _num_channel;
-      this->set_dim(dim);
-    }
-    else{
-      dim.resize(4);
-      dim[0] = batch_size();
-      dim[1] = _nz = voxel_meta.num_voxel_z();
-      dim[2] = _ny = voxel_meta.num_voxel_y();
-      dim[3] = _nx = voxel_meta.num_voxel_x();
-      this->set_dim(dim);      
-    }
+    dim.resize(5);
+    dim[0] = batch_size();
+    dim[1] = _nz = voxel_meta.num_voxel_z();
+    dim[2] = _ny = voxel_meta.num_voxel_y();
+    dim[3] = _nx = voxel_meta.num_voxel_x();
+    dim[4] = _num_channel;
+    this->set_dim(dim);
   } else
     this->assert_dimension(voxel_data);
 
