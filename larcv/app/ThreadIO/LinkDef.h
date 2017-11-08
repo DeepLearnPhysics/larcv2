@@ -31,6 +31,7 @@
 #pragma link C++ class larcv::BatchDataStorageFactory<string>+;
 #pragma link C++ class larcv::BatchHolder;
 #pragma link C++ class larcv::BatchFillerPIDLabel+;
+#pragma link C++ class larcv::BatchFillerMultiLabel+;
 #pragma link C++ class larcv::BatchFillerImage2D+;
 //#pragma link C++ class larcv::ThreadFillerFactory+;
 #pragma link C++ class larcv::RandomCropper+;

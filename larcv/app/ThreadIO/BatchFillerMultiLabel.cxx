@@ -69,21 +69,12 @@ bool BatchFillerMultiLabel::process(IOManager& mgr) {
 
   // Check presence of each class:
   for (auto const& part : part_v) {
-    std::cout << part.pdg_code() << std::endl;
-    std::cout << "pdg size: " << _pdg_list.size() << std::endl;
     for (size_t class_idx = 0; class_idx < _pdg_list.size(); ++class_idx) {
-      std::cout << "pdg_list " << _pdg_list[class_idx] << std::endl;
       // if (part.pdg_code() != _pdg_list[class_idx]) continue;
       if (part.pdg_code() == _pdg_list[class_idx]) {
         _entry_data[class_idx] = 1;
       }
     }
-    std::cout << "part loop" << std::endl;
-  }
-  std::cout << std::endl;
-
-  for (auto entry : _entry_data){
-    std::cout << entry << std::endl;
   }
 
   set_entry_data(_entry_data);
