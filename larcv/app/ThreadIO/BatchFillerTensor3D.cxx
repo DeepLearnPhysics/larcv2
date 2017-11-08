@@ -18,7 +18,12 @@ namespace larcv {
   {
     LARCV_DEBUG() << "start" << std::endl;
     _tensor3d_producer = cfg.get<std::string>("Tensor3DProducer");
-
+    _num_channel = cfg.get<size_t>("MakeHotLabel",0);
+    if(_num_channel==1){
+      LARCV_CRITICAL() << "Cannot make hot label of length 1!" << std::endl;
+      throw larbys();
+    }
+    if(_num_channel<1) _num_channel = 1;
     LARCV_DEBUG() << "done" << std::endl;
   }
 
@@ -73,7 +78,7 @@ namespace larcv {
       dim[1] = _nz = voxel_meta.num_voxel_z();
       dim[2] = _ny = voxel_meta.num_voxel_y();
       dim[3] = _nx = voxel_meta.num_voxel_x();
-      dim[4] = 1;
+      dim[4] = _num_channel;
       this->set_dim(dim);
     }
     else
@@ -84,9 +89,23 @@ namespace larcv {
 
     for(auto& v : _entry_data) v = 0.;
 
-    for(auto const& voxel : voxel_data.as_vector())
-      _entry_data[voxel.id()] += voxel.value();
-
+    if(_num_channel == 1) {
+      for(auto const& voxel : voxel_data.as_vector())
+	_entry_data[voxel.id()] += voxel.value();
+    }else{
+      int ch = 0;
+      for(auto const& voxel : voxel_data.as_vector()) {
+	ch = (int)(voxel.value());
+	if(ch<0 || ch >= _num_channel) {
+	  LARCV_CRITICAL() << "Voxel ID " << voxel.id() << " has value "
+			   << voxel.value() << " ... cannt map to hot label array of length "
+			   << _num_channel << "!" << std::endl;
+	  throw larbys();
+	}
+	_entry_data[voxel.id() * _num_channel + ch] = 1.;
+      }
+    }
+      
     // record the entry data
     LARCV_INFO() <<"Inserting entry data of size " << _entry_data.size() << std::endl;
     set_entry_data(_entry_data);

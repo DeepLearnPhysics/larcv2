@@ -58,7 +58,7 @@ namespace larcv {
     size_t _ny;
     size_t _nz;
     std::vector<float>  _entry_data;
-
+    size_t _num_channel;
   };
 
   /**
