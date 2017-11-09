@@ -26,6 +26,10 @@ namespace larcv {
   public:
     /// Default ctor
     SparseTensor3D() {}
+    SparseTensor3D(VoxelSet&& vs, Voxel3DMeta meta)
+      : VoxelSet(std::move(vs))
+      , _meta(meta)
+    {}
     /// Default dtor
     ~SparseTensor3D() {}
 
