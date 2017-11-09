@@ -11,6 +11,7 @@ typedef _object PyObject;
 #endif
 
 #include "larcv/core/DataFormat/Image2D.h"
+#include "larcv/core/DataFormat/Voxel.h"
 
 namespace larcv {
 /// Utility function: call one-time-only numpy module initialization (you don't
@@ -29,6 +30,8 @@ void copy_array(PyObject *arrayin, const std::vector<float> &cvec);
 Image2D as_image2d_meta(PyObject *, ImageMeta meta);
 
 Image2D as_image2d(PyObject *);
+
+VoxelSet as_tensor3d(PyObject *, float min_threshold=0);
 
 // allows one to avoid some loops in python
 void fill_img_col(Image2D &img, std::vector<short> &adcs, const int col,const float pedestal = 0.0);

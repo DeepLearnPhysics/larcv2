@@ -83,7 +83,7 @@ larcv::Image2D as_image2d_meta(PyObject *pyarray, ImageMeta meta) {
   // Create C arrays from numpy objects:
   const int dtype = NPY_FLOAT;
   PyArray_Descr *descr = PyArray_DescrFromType(dtype);
-  npy_intp dims[3];
+  npy_intp dims[2];
   if (PyArray_AsCArray(&pyarray, (void **)&carray, dims, 2, descr) < 0) {
     logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
                                "ERROR: cannot convert to 2D C-array");
@@ -93,7 +93,7 @@ larcv::Image2D as_image2d_meta(PyObject *pyarray, ImageMeta meta) {
   std::vector<float> res_data(dims[0] * dims[1], 0.);
   for (int i = 0; i < dims[0]; ++i) {
     for (int j = 0; j < dims[1]; ++j) {
-      res_data[i * dims[1] + j] = (float)(carray[j][i]);
+      res_data[i + j * dims[0]] = (float)(carray[i][j]);
     }
   }
   PyArray_Free(pyarray, (void *)carray);
@@ -108,26 +108,56 @@ larcv::Image2D as_image2d(PyObject *pyarray) {
   // Create C arrays from numpy objects:
   const int dtype = NPY_FLOAT;
   PyArray_Descr *descr = PyArray_DescrFromType(dtype);
-  npy_intp dims[3];
+  npy_intp dims[2];
   if (PyArray_AsCArray(&pyarray, (void **)&carray, dims, 2, descr) < 0) {
     logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
-                               "ERROR: cannot convert to 2D C-array");
+                               "ERROR: cannot convert to 2D C-array\n");
     throw larbys();
   }
 
   std::vector<float> res_data(dims[0] * dims[1], 0.);
   for (int i = 0; i < dims[0]; ++i) {
     for (int j = 0; j < dims[1]; ++j) {
-      res_data[i * dims[1] + j] = (float)(carray[j][i]);
+      res_data[i + j * dims[0]] = (float)(carray[i][j]);
     }
   }
   PyArray_Free(pyarray, (void *)carray);
 
-  ImageMeta meta((double)(dims[0]), (double)(dims[1]), (size_t)(dims[1]),
-                 (size_t)(dims[0]), 0., 0., larcv::kINVALID_PROJECTIONID);
+  ImageMeta meta(0., 0., (double)(dims[0]), (double)(dims[1]), 
+                 (size_t)(dims[0]),
+                 (size_t)(dims[1]), 
+                 larcv::kINVALID_PROJECTIONID);
 
   Image2D res(std::move(meta), std::move(res_data));
   return res;
+}
+
+VoxelSet as_tensor3d(PyObject* pyarray, float min_threshold) {
+  SetPyUtil();
+  float ***carray;
+  // Create C arrays from numpy objects:
+  const int dtype = NPY_FLOAT;
+  PyArray_Descr *descr = PyArray_DescrFromType(dtype);
+  npy_intp dims[4];
+  int ret = PyArray_AsCArray(&pyarray, carray, dims, 3, descr);
+  if ( ret < 0) {
+    LARCV_CRITICAL() << "Cannot convert to 3D C-array (return code " << ret << ")" << std::endl;
+    throw larbys();
+  }
+
+  std::vector<float> res_data(dims[0] * dims[1] * dims[2], 0.);
+  float val=0.;
+  for (int i = 0; i < dims[0]; ++i) {
+    for (int j = 0; j < dims[1]; ++j) {
+      for (int k = 0; k < dims[2]; ++k) {
+        val = (float)(carray[k][j][i]);
+        std::cout << "(k,j,i) = (" << k << "," << j << "," << i << ") @ " << val << std::endl;
+      }
+    }
+  }
+  PyArray_Free(pyarray, (void *)carray);
+
+  return VoxelSet();
 }
 
 void fill_img_col(Image2D &img, std::vector<short> &adcs, const int col, const float pedestal) 
