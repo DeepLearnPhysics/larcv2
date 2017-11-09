@@ -145,20 +145,24 @@ VoxelSet as_tensor3d(PyObject* pyarray, float min_threshold) {
     LARCV_CRITICAL() << "Cannot convert to 3D C-array (return code " << ret << ")" << std::endl;
     throw larbys();
   }
-  std::cout << dims[0] << " " << dims[1] << " " << dims[2] << std::endl;
-  std::vector<float> res_data(dims[0] * dims[1] * dims[2], 0.);
+  VoxelSet res;
   float val=0.;
+  size_t id = 0;
   for (int i = 0; i < dims[0]; ++i) {
     for (int j = 0; j < dims[1]; ++j) {
       for (int k = 0; k < dims[2]; ++k) {
+        if(val <= min_threshold) continue;
+        id = i * dims[1] * dims[1] + j * dims[2] + k;
         val = (float)(carray[i][j][k]);
+        res.emplace(id,val);
         std::cout << "(k,j,i) = (" << k << "," << j << "," << i << ") @ " << val << std::endl;
+
       }
     }
   }
   PyArray_Free(pyarray, (void *)carray);
 
-  return VoxelSet();
+  return res;
 }
 
 void fill_img_col(Image2D &img, std::vector<short> &adcs, const int col, const float pedestal) 
