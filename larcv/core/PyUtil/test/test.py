@@ -19,3 +19,5 @@ for r in xrange(k.meta().rows()):
         print k.pixel(r,c),
     print
         
+ar = larcv.as_ndarray(k)
+print ar

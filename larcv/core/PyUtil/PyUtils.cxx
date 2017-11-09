@@ -139,18 +139,18 @@ VoxelSet as_tensor3d(PyObject* pyarray, float min_threshold) {
   const int dtype = NPY_FLOAT;
   PyArray_Descr *descr = PyArray_DescrFromType(dtype);
   npy_intp dims[4];
-  int ret = PyArray_AsCArray(&pyarray, carray, dims, 3, descr);
+  int ret = PyArray_AsCArray(&pyarray, (void***)&carray, dims, 3, descr);
   if ( ret < 0) {
     LARCV_CRITICAL() << "Cannot convert to 3D C-array (return code " << ret << ")" << std::endl;
     throw larbys();
   }
-
+  std::cout << dims[0] << " " << dims[1] << " " << dims[2] << std::endl;
   std::vector<float> res_data(dims[0] * dims[1] * dims[2], 0.);
   float val=0.;
   for (int i = 0; i < dims[0]; ++i) {
     for (int j = 0; j < dims[1]; ++j) {
       for (int k = 0; k < dims[2]; ++k) {
-        val = (float)(carray[k][j][i]);
+        val = (float)(carray[i][j][k]);
         std::cout << "(k,j,i) = (" << k << "," << j << "," << i << ") @ " << val << std::endl;
       }
     }
