@@ -32,6 +32,8 @@ namespace larcv {
     {}
     /// Default dtor
     virtual ~SparseTensor3D() {}
+    SparseTensor3D& operator= (const VoxelSet& rhs)
+    { *((VoxelSet*)this) = rhs; return *this;}
 
     //
     // Read-access
@@ -43,6 +45,8 @@ namespace larcv {
     // Write-access
     //
     void emplace(const double x, const double y, const double z, const float val, const bool add=true);
+    inline void emplace(VoxelSet&& vs, const Voxel3DMeta& meta)
+    {*((VoxelSet*)this) = std::move(vs); _meta = meta;}
     /// Clear everything
     inline void clear() { VoxelSet::clear(); _meta = Voxel3DMeta(); }
     /// Meta setter
