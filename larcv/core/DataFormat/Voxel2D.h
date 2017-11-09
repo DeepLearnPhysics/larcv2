@@ -27,7 +27,7 @@ namespace larcv {
     /// Default ctor
     SparseTensor2D() {}
     /// Default dtor
-    ~SparseTensor2D() {}
+    virtual ~SparseTensor2D() {}
     /// copy ctor w/ VoxelSet
     SparseTensor2D(const larcv::VoxelSet& vs)
       : VoxelSet(vs)
@@ -66,7 +66,7 @@ namespace larcv {
     /// Default ctor
     ClusterPixel2D() {}
     /// Default dtor
-    ~ClusterPixel2D() {}
+    virtual ~ClusterPixel2D() {}
     /// Copy ctor w/ VoxelSetArray
     ClusterPixel2D(const VoxelSetArray& vsa)
       : VoxelSetArray(vsa)

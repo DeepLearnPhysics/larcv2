@@ -31,7 +31,7 @@ namespace larcv {
       , _meta(meta)
     {}
     /// Default dtor
-    ~SparseTensor3D() {}
+    virtual ~SparseTensor3D() {}
 
     //
     // Read-access
@@ -62,7 +62,7 @@ namespace larcv {
     /// Default ctor
     ClusterVoxel3D() {}
     /// Default dtor
-    ~ClusterVoxel3D() {}
+    virtual ~ClusterVoxel3D() {}
 
     //
     // Read-access
