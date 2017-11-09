@@ -1,5 +1,6 @@
 #ifndef PROCESSDRIVER_CXX
 #define PROCESSDRIVER_CXX
+#include <random>
 #include <sstream>
 #include <iomanip>
 #include "ProcessDriver.h"
@@ -12,7 +13,7 @@ namespace larcv {
     , _batch_start_entry(0)
     , _batch_num_entry(0)
     , _enable_filter(false)
-    , _random_access(false)
+    , _random_access(0)
     , _proc_v()
     , _processing(false)
     , _fout(nullptr)
@@ -23,7 +24,8 @@ namespace larcv {
   {
     LARCV_DEBUG() << "Called" << std::endl;
     _io.reset();
-    _enable_filter = _random_access = false;
+    _enable_filter = false;
+    _random_access = 0;
     for(size_t i=0; i<_proc_v.size(); ++i) { delete _proc_v[i]; _proc_v[i]=nullptr; }
     _proc_v.clear();
     _processing = false;
@@ -149,7 +151,13 @@ namespace larcv {
     set_verbosity((msg::Level_t)(cfg.get<unsigned short>("Verbosity",logger().level())));
     larcv::logger::get_shared().set(logger().level());
     _enable_filter = cfg.get<bool>("EnableFilter");
-    _random_access = cfg.get<bool>("RandomAccess");
+    auto random_access_bool = cfg.get<bool>("RandomAccess");
+    if(!random_access_bool) _random_access = 0;
+    else _random_access = -1;
+    try{
+      auto random_access_int = cfg.get<int>("RandomAccess");
+      if(random_access_int!=0) _random_access = random_access_int;
+    }catch(...){}      
     _fout_name = cfg.get<std::string>("AnaFile","");
     _batch_start_entry = cfg.get<int>("StartEntry",0);
     _batch_num_entry   = cfg.get<int>("NumEntries",0);
@@ -221,7 +229,7 @@ namespace larcv {
     auto const io_mode  = _io.io_mode();
     
     // Random access + write mode cannot be combined
-    if(_random_access && io_mode == IOManager::kWRITE) {
+    if(_random_access!=0 && io_mode == IOManager::kWRITE) {
       LARCV_CRITICAL() << "Random access mode not supported for kWRITE IO mode!" << std::endl;
       throw larbys();
     }
@@ -251,7 +259,15 @@ namespace larcv {
     if(nentries) {
       _access_entry_v.resize(nentries);
       for(size_t i=0; i<_access_entry_v.size(); ++i) _access_entry_v[i] = i;
-      if(_random_access) std::random_shuffle(_access_entry_v.begin(),_access_entry_v.end());
+      //if(_random_access) std::random_shuffle(_access_entry_v.begin(),_access_entry_v.end());
+      if(_random_access!=0) {
+	unsigned int seed = 0;
+	if(_random_access<0)
+	  seed = std::chrono::system_clock::now().time_since_epoch().count();
+	else
+	  seed = _random_access;
+	std::shuffle(_access_entry_v.begin(), _access_entry_v.end(), std::default_random_engine(seed));
+      }
     }
 
     _current_entry = 0;

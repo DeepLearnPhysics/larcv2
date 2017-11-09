@@ -2,8 +2,8 @@
 #define __LARCV_IOMANAGER_CXX__
 
 #include "IOManager.h"
-//#include "ProductMap.h"
 #include "DataProductFactory.h"
+#include "larcv/core/Base/LArCVBaseUtilFunc.h"
 #include <algorithm>
 
 #include <mutex>
@@ -32,26 +32,30 @@ namespace larcv {
   { reset(); }
 
   IOManager::IOManager(const PSet& cfg)
-    : larcv_base(cfg.get<std::string>("Name"))
-    , _io_mode          ( kREAD         )
-    , _prepared         ( false         )
-    , _out_file         ( nullptr       )
-    , _in_tree_index    ( 0             )
-    , _out_tree_index   ( 0             )
-    , _in_tree_entries  ( 0             )
-    , _out_tree_entries ( 0             )
-    , _out_file_name    ( ""            )
-    , _in_file_v        ()
-    , _in_dir_v         ()
-    , _key_list         ()
-    , _out_tree_v       ()
-    , _in_tree_v        ()
-    , _in_tree_index_v  ()
-    , _product_ctr      (0)
-    , _product_ptr_v    ()
-    , _product_type_v   ()
-
+    : IOManager(kREAD, cfg.get<std::string>("Name"))
   {
+    reset();
+    configure(cfg);
+  }
+
+  IOManager::IOManager(std::string config_file, std::string name)
+    : IOManager(kREAD, name)
+  {
+    // check cfg file
+    if (config_file.empty()) {
+      LARCV_CRITICAL() << "Config file not set!" << std::endl;
+      throw larbys();
+    }
+
+    // check cfg content top level
+    auto main_cfg = CreatePSetFromFile(config_file);
+    if (!main_cfg.contains_pset(name)) {
+      LARCV_CRITICAL() << "IOManager configuration (" << name << ") not found in the config file (dump below)" << std::endl
+                       << main_cfg.dump()
+                       << std::endl;
+      throw larbys();
+    }
+    auto const cfg = main_cfg.get<larcv::PSet>(name);
     reset();
     configure(cfg);
   }
@@ -530,8 +534,8 @@ namespace larcv {
     }
 
     if (_io_mode != kWRITE && _in_tree_index != kINVALID_SIZE &&
-        _in_tree_index_v[id] != _in_tree_index && 
-	(id >= _read_id_bool.size() || _read_id_bool[id])) {
+        _in_tree_index_v[id] != _in_tree_index &&
+        (id >= _read_id_bool.size() || _read_id_bool[id])) {
 
       if (_in_tree_entries_v[id]) {
         LARCV_DEBUG() << "Reading in TTree " << _in_tree_v[id]->GetName() << " index " << _in_tree_index << std::endl;
@@ -544,16 +548,16 @@ namespace larcv {
       if (!_event_id.valid()) {
         LARCV_INFO() << "Setting event id (" << ptr->run() << "," << ptr->subrun() << "," << ptr->event() << ")" << std::endl;
         _event_id = (EventBase)(*ptr);
-      }else if (ptr->valid() && _event_id != *ptr) {
-	
-	if(id >= _read_id_bool.size())
-	  ptr->set(_event_id.run(),_event_id.subrun(),_event_id.event());
-	else{
-	  LARCV_CRITICAL() << "Event alignment error (run,subrun,event) detected: "
-			   << "Current (" << _event_id.run() << "," << _event_id.subrun() << "," << _event_id.event() << ") vs. "
-			   << "Read-in (" << ptr->run() << "," << ptr->subrun() << "," << ptr->event() << ")" << std::endl;
-	  throw larbys();
-	}
+      } else if (ptr->valid() && _event_id != *ptr) {
+
+        if (id >= _read_id_bool.size())
+          ptr->set(_event_id.run(), _event_id.subrun(), _event_id.event());
+        else {
+          LARCV_CRITICAL() << "Event alignment error (run,subrun,event) detected: "
+                           << "Current (" << _event_id.run() << "," << _event_id.subrun() << "," << _event_id.event() << ") vs. "
+                           << "Read-in (" << ptr->run() << "," << ptr->subrun() << "," << ptr->event() << ")" << std::endl;
+          throw larbys();
+        }
       }
     }
     __ioman_mtx.unlock();

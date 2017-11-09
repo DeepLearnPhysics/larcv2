@@ -3,7 +3,6 @@
 
 #include "ThreadProcessor.h"
 #include "larcv/core/Base/LArCVBaseUtilFunc.h"
-#include <random>
 #include <sstream>
 #include <unistd.h>
 #include "BatchFillerTemplate.h"

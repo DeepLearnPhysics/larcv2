@@ -49,7 +49,7 @@ namespace larcv {
     /// When needs to override the name of output analysis file from what's specified in the configuration
     void override_ana_file(const std::string fname);
     /// When needs to override the randomized event access in IO from what's specified in the configuration
-    void random_access(bool doit) { _random_access = doit; }
+    void random_access(int flag) { _random_access = flag; }
 
     //
     // Process flow execution methods
@@ -106,7 +106,7 @@ namespace larcv {
     size_t _batch_num_entry;
     size_t _current_entry;
     bool _enable_filter;
-    bool _random_access;
+    int _random_access;
     std::vector<size_t> _access_entry_v;
     IOManager _io;
     std::map<std::string,larcv::ProcessID_t> _proc_m;

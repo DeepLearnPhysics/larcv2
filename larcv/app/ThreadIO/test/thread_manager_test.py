@@ -25,7 +25,10 @@ while 1:
         if status == 3:
             entries = proc.processed_entries(storage_id)
             batch_id = proc.batch_id(storage_id)
-            print 'Batch',batch_id,'done, contains entries:',entries.front(),'=>',entries.back()
+            print 'Batch',batch_id,'done, contains entries:',
+            for entry in xrange(entries.size()):
+                print entries[entry],
+            print
             print 'Releasing storage data',storage_id
             proc.release_data(storage_id)
 

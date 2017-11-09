@@ -2,7 +2,7 @@
  * \file IOManager.h
  *
  * \ingroup core_DataFormat
- * 
+ *
  * \brief Class def header for a class larcv::IOManager
  *
  * @author drinkingkazu
@@ -31,38 +31,41 @@ namespace larcv {
     \brief LArCV file IO hanlder class: it can read/write LArCV file.
   */
   class IOManager : public larcv::larcv_base {
-    
+
   public:
     /// Three IO modes: read, write, or read-and-write
     enum IOMode_t { kREAD, kWRITE, kBOTH };
 
     /// Default constructor
-    IOManager(IOMode_t mode=kREAD, std::string name="IOManager");
+    IOManager(IOMode_t mode = kREAD, std::string name = "IOManager");
 
     /// Configuration PSet construction so you don't have to call setter functions
     IOManager(const PSet& cfg);
-    
+
+    /// Configuration PSet file construction so you don't have to call setter functions
+    IOManager(std::string config_file, std::string name = "IOManager");
+
     /// Default destructor
-    ~IOManager(){}
+    ~IOManager() {}
     /// IO mode accessor
     IOMode_t io_mode() const { return _io_mode;}
     void reset();
-    void add_in_file(const std::string filename, const std::string dirname="");
+    void add_in_file(const std::string filename, const std::string dirname = "");
     void clear_in_file();
     void set_out_file(const std::string name);
     ProducerID_t producer_id(const ProducerName_t& name) const;
     void configure(const PSet& cfg);
     bool initialize();
-    bool read_entry(const size_t index,bool force_reload=false);
+    bool read_entry(const size_t index, bool force_reload = false);
     bool save_entry();
     void finalize();
     void clear_entry();
     void set_id(const size_t run, const size_t subrun, const size_t event);
     size_t current_entry() const { return _in_tree_index; }
-    
+
     size_t get_n_entries() const
     { return (_in_tree_entries ? _in_tree_entries : _out_tree_entries); }
-    
+
     EventBase* get_data(const std::string& type, const std::string& producer);
     EventBase* get_data(const ProducerID_t id);
 
@@ -71,16 +74,16 @@ namespace larcv {
     //
 
     template <class T> T& get_data(const std::string& producer)
-    { return *((T*)(this->get_data(product_unique_name<T>(),producer))); }
+    { return *((T*)(this->get_data(product_unique_name<T>(), producer))); }
 
     template <class T> T& get_data(const ProducerID_t id)
     {
-      if(id >= _product_type_v.size()) {
+      if (id >= _product_type_v.size()) {
         LARCV_CRITICAL() << "Invalid producer id: " << id << " requested " << std::endl;
         throw larbys();
       }
-      auto ptr = this->get_data(id); 
-      if(product_unique_name<T>() != _product_type_v[id]) {
+      auto ptr = this->get_data(id);
+      if (product_unique_name<T>() != _product_type_v[id]) {
         LARCV_CRITICAL() << "Unmatched type (in memory type = " << _product_type_v[id]
                          << " while specialization type = " << product_unique_name<T>()
                          << std::endl;
@@ -96,8 +99,8 @@ namespace larcv {
     const std::vector<std::string> producer_list(const std::string type) const
     {
       std::vector<std::string> res;
-      for(auto const& key_value : _key_list) {
-        if(key_value.first.first != type) continue;
+      for (auto const& key_value : _key_list) {
+        if (key_value.first.first != type) continue;
         res.push_back(key_value.first.second);
       }
       return res;
@@ -106,7 +109,7 @@ namespace larcv {
     const std::vector<std::string> product_list() const
     {
       std::vector<std::string> res;
-      for(auto const& key_value : _key_list) {
+      for (auto const& key_value : _key_list) {
         res.push_back(key_value.first.first);
       }
       return res;
@@ -114,7 +117,7 @@ namespace larcv {
 
     const std::vector<std::string>& file_list() const
     { return _in_file_v; }
-    
+
   private:
     void   set_id();
     void   prepare_input();
@@ -133,7 +136,7 @@ namespace larcv {
     std::string _out_file_name;
     std::vector<std::string>     _in_file_v;
     std::vector<std::string>     _in_dir_v;
-    std::map<larcv::ProducerName_t,larcv::ProducerID_t> _key_list;
+    std::map<larcv::ProducerName_t, larcv::ProducerID_t> _key_list;
     std::vector<TTree*>          _out_tree_v;
     std::vector<TChain*>         _in_tree_v;
     std::vector<size_t>          _in_tree_index_v;
@@ -152,4 +155,4 @@ namespace larcv {
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
