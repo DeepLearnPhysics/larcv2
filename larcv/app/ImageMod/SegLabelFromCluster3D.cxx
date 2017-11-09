@@ -19,7 +19,7 @@ namespace larcv {
     _particle_producer  = cfg.get<std::string>("ParticleProducer");
     _output_producer    = cfg.get<std::string>("OutputProducer");
     _undefined_label    = cfg.get<size_t>("UndefinedParticleLabel",0);
-
+    _min_num_voxel      = cfg.get<size_t>("MinVoxelCount",0);
     std::vector<int> empty_list;
     std::vector<std::set<int> > pdg_list;
     while(true) {
@@ -74,7 +74,8 @@ namespace larcv {
     if((particle_v.size()+1) != cluster3d_v.size()) {
       LARCV_CRITICAL() << "Logic error: input EventClusterVoxel3D has " << cluster3d_v.size() << " clusters"
       << " but EventParticle has " << particle_v.size() << " particles!" << std::endl;
-      throw larbys();
+      //throw larbys();
+      return false;
     }
 
     // Fill tensor3d
@@ -108,6 +109,15 @@ namespace larcv {
       }
     }
 
+    if(_min_num_voxel<1) return true;
+
+    size_t voxel_count=0;
+    if(event_tensor3d->as_vector().size() < _min_num_voxel) {
+      LARCV_NORMAL() << "Skipping event " << event_tensor3d->event_key() 
+		     << " due to voxel count (" << event_tensor3d->as_vector().size() 
+		     << " < " << _min_num_voxel << ")" << std::endl;
+      return false;
+    }
     return true;
   }
 

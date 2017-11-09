@@ -50,6 +50,7 @@ namespace larcv {
     size_t _undefined_label;
     std::vector<size_t> _particle_to_class;
     std::vector<size_t> _anti_particle_to_class;
+    size_t _min_num_voxel;
   };
 
   /**

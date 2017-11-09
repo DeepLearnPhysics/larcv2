@@ -95,7 +95,7 @@ namespace larcv {
     /// Default ctor
     VoxelSet() {}
     /// Default dtor
-    ~VoxelSet() {}
+    virtual ~VoxelSet() {}
 
     //
     // Read-access
@@ -156,7 +156,7 @@ namespace larcv {
     /// Default ctor
     VoxelSetArray() {}
     /// Default dtor
-    ~VoxelSetArray() {}
+    virtual ~VoxelSetArray() {}
 
     //
     // Read-access
