@@ -79,7 +79,7 @@ namespace larcv {
     std::string event_key() const;
 
     /// Setting the id
-    inline void set(const size_t run, const size_t subrun, const size_t event)
+    inline void set_id(const size_t run, const size_t subrun, const size_t event)
     { _run = run; _subrun = subrun; _event = event; }
     
   private:

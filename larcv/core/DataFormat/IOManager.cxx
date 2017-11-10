@@ -551,7 +551,7 @@ namespace larcv {
       } else if (ptr->valid() && _event_id != *ptr) {
 
         if (id >= _read_id_bool.size())
-          ptr->set(_event_id.run(), _event_id.subrun(), _event_id.event());
+          ptr->set_id(_event_id.run(), _event_id.subrun(), _event_id.event());
         else {
           LARCV_CRITICAL() << "Event alignment error (run,subrun,event) detected: "
                            << "Current (" << _event_id.run() << "," << _event_id.subrun() << "," << _event_id.event() << ") vs. "

@@ -27,7 +27,7 @@ namespace larcv {
     _id_m.clear();
     EventBase id;
     for(size_t i=0; i<run_v.size(); ++i) {
-      id.set( run_v[i], subrun_v[i], event_v[i] );
+      id.set_id( run_v[i], subrun_v[i], event_v[i] );
       _id_m[id] = false;
     }
     LARCV_INFO() << "Registered: " << _id_m.size() << " unique events to be kept..." << std::endl;
@@ -49,7 +49,7 @@ namespace larcv {
     auto ptr = mgr.get_data(_ref_type,_ref_producer);
 
     EventBase ref_id;
-    ref_id.set(ptr->run(),ptr->subrun(),ptr->event());
+    ref_id.set_id(ptr->run(),ptr->subrun(),ptr->event());
     auto itr = _id_m.find(ref_id);
 
     bool keepit = (itr != _id_m.end());

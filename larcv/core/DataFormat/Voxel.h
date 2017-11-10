@@ -119,7 +119,7 @@ namespace larcv {
     /// Add a new voxel. If another voxel instance w/ same VoxelID exists, value is added
     void add(const Voxel& vox);
     /// Set a voxel. If another voxel instance w/ same VoxelID exists, value is set
-    void set(const Voxel& vox);
+    void insert(const Voxel& vox);
     /// Emplace a new voxel. Same logic as VoxelSet::add but consumes removable reference.
     void emplace(Voxel&& vox, const bool add);
     /// Emplace a new voxel from id & value
@@ -182,11 +182,11 @@ namespace larcv {
     /// Move an arrray of VoxelSet. Each element's InstanceID_t gets updated
     void emplace(std::vector<larcv::VoxelSet>&& voxel_vv);
     /// Set an array of VoxelSet. Each element's InstanceID_t gets updated
-    void set(const std::vector<larcv::VoxelSet>& voxel_vv);
+    void insert(const std::vector<larcv::VoxelSet>& voxel_vv);
     /// Move a VoxelSet into a collection. The InstanceID_t is respected.
     void emplace(larcv::VoxelSet&& voxel_v);
     /// Set a VoxelSet into a collection. The InstanceID_t is respected.
-    void set(const larcv::VoxelSet& voxel_v);
+    void insert(const larcv::VoxelSet& voxel_v);
     /// Mover
     void move(larcv::VoxelSetArray&& orig)
     { _voxel_vv = std::move(orig._voxel_vv); }

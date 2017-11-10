@@ -31,7 +31,7 @@ namespace larcv {
     
     auto output_meta = (EventMeta*)(mgr.get_data("meta", _output_producer));
 
-    output_meta -> set(input_image->run(), input_image->subrun(), input_image->event());
+    output_meta -> set_id(input_image->run(), input_image->subrun(), input_image->event());
 
     auto meta_3d = input_image->meta();
 

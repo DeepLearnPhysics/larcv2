@@ -15,7 +15,7 @@ namespace larcv {
     emplace(std::move(copy),true);
   }
 
-  void VoxelSet::set(const Voxel& vox)
+  void VoxelSet::insert(const Voxel& vox)
   {
     Voxel copy(vox);
     emplace(std::move(copy),false);
@@ -104,7 +104,7 @@ namespace larcv {
       _voxel_vv[id].id(id);
   }
 
-  inline void VoxelSetArray::set(const std::vector<larcv::VoxelSet>& voxel_vv)
+  inline void VoxelSetArray::insert(const std::vector<larcv::VoxelSet>& voxel_vv)
   { 
     _voxel_vv = voxel_vv;
     for(size_t id=0; id<_voxel_vv.size(); ++id)
@@ -122,7 +122,7 @@ namespace larcv {
     _voxel_vv[voxel_v.id()] = std::move(voxel_v);
   }
 
-  void VoxelSetArray::set(const larcv::VoxelSet& voxel_v)
+  void VoxelSetArray::insert(const larcv::VoxelSet& voxel_v)
   {
     if(voxel_v.id() >= _voxel_vv.size()) {
       size_t orig_size = _voxel_vv.size();
