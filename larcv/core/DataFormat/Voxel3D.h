@@ -44,9 +44,14 @@ namespace larcv {
     //
     // Write-access
     //
+    /// Create & add/set a single voxel
     void emplace(const double x, const double y, const double z, const float val, const bool add=true);
+    /// Emplace the whole voxel set w/ meta
     inline void emplace(VoxelSet&& vs, const Voxel3DMeta& meta)
     {*((VoxelSet*)this) = std::move(vs); _meta = meta;}
+    /// Set the whole voxel set w/ meta
+    inline void set(const VoxelSet& vs, const Voxel3DMeta& meta)
+    {*((VoxelSet*)this) = vs; _meta = meta;} 
     /// Clear everything
     inline void clear_data() { VoxelSet::clear_data(); _meta = Voxel3DMeta(); }
     /// Meta setter
