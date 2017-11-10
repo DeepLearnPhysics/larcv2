@@ -48,8 +48,8 @@ namespace larcv {
     inline const Point2D& bottom_left () const { return _p1; }
     inline const Point2D& top_right   () const { return _p2; }
     inline Point2D center  () const { return Point2D(center_x(), center_y()); }
-    inline double center_x () const { return _p1.x + (_p2.x - _p1.x); }
-    inline double center_y () const { return _p1.y + (_p2.y - _p1.y); }
+    inline double center_x () const { return _p1.x + 0.5*(_p2.x - _p1.x); }
+    inline double center_y () const { return _p1.y + 0.5*(_p2.y - _p1.y); }
     inline double min_x  () const { return _p1.x; }
     inline double min_y  () const { return _p1.y; }
     inline double max_x  () const { return _p2.x; }
@@ -97,9 +97,9 @@ namespace larcv {
     inline const Point3D& bottom_left () const { return _p1; }
     inline const Point3D& top_right   () const { return _p2; }
     inline Point3D center  () const { return Point3D(center_x(), center_y(), center_z()); }
-    inline double center_x () const { return _p1.x + (_p2.x - _p1.x); }
-    inline double center_y () const { return _p1.y + (_p2.y - _p1.y); }
-    inline double center_z () const { return _p1.z + (_p2.z - _p1.z); }
+    inline double center_x () const { return _p1.x + 0.5*(_p2.x - _p1.x); }
+    inline double center_y () const { return _p1.y + 0.5*(_p2.y - _p1.y); }
+    inline double center_z () const { return _p1.z + 0.5*(_p2.z - _p1.z); }
     inline double min_x  () const { return _p1.x; }
     inline double min_y  () const { return _p1.y; }
     inline double min_z  () const { return _p1.z; }
