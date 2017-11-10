@@ -18,6 +18,7 @@ namespace larcv {
     _keypoint_producer = cfg.get<std::string>("KeyPointProducer");
     _weight_producer   = cfg.get<std::string>("WeightProducer");
     _weight_max = cfg.get<float>("WeightMax");
+    _weight_vertex = cfg.get<float>("WeightVertex");
     _weight_surrounding = cfg.get<bool>("WeightSurrounding", true);
   }
 
@@ -52,11 +53,13 @@ namespace larcv {
     auto const meta = event_instance.meta();
     event_weight->meta(meta);
 
-    larcv::VoxelSet surrounding_weight;
+    double surrounding_weight=1.;
+    larcv::VoxelSet surrounding_vs;
     larcv::Point3D pt;
     std::vector<VoxelID_t> neighbor_voxel_id;
 
-    std::vector<float> instance_count_v;
+    std::vector<size_t> instance_count_v;
+    std::vector<double> instance_weight_v;
     for(auto const& vox : event_instance.as_vector()) {
       // count per-instance voxels
       //if(vox.value() < 1.) continue;
@@ -71,48 +74,69 @@ namespace larcv {
           auto const& instance_vox = event_instance.find(neighbor_id);
           if(instance_vox.id() != kINVALID_VOXELID) continue;
           larcv::Voxel neighbor_vox(neighbor_id,1.);
-          surrounding_weight.emplace(std::move(neighbor_vox),false);
+          surrounding_vs.emplace(std::move(neighbor_vox),false);
         }
       }
     }
-    // normalize surrounding voxel weight
-    if(surrounding_weight.as_vector().size()) {
-      float weight_factor = ((float)(meta.size()) / (float)(surrounding_weight.as_vector().size()));
-      LARCV_INFO() << "Charge-surrounding pixel: " << surrounding_weight.as_vector().size()
-      << " weighting factor: " << weight_factor << std::endl;
-      surrounding_weight *= weight_factor;
+    // compute weights
+    double weight_max = 0;
+    if(surrounding_vs.as_vector().size()) {
+      surrounding_weight = ((double)(meta.size()) / (double)(surrounding_vs.as_vector().size()));
+      weight_max = surrounding_weight;
     }
+    instance_weight_v.resize(instance_count_v.size());
     for(size_t instance_id = 0; instance_id < instance_count_v.size(); ++instance_id) {
-      float weight_factor = 0.;
-      if(instance_count_v[instance_id]) weight_factor = (float)(meta.size()) / (float)(instance_count_v[instance_id]);
-      LARCV_INFO() << "Cluster id " << instance_id
-      << " pixel: " << instance_count_v[instance_id]
-      << " weighting factor: " << weight_factor
-      << std::endl;
-      instance_count_v[instance_id] = weight_factor;
+      double weight_factor = 0.;
+      if(instance_count_v[instance_id]) weight_factor = (double)(meta.size()) / (double)(instance_count_v[instance_id]);
+      if(weight_factor > weight_max) weight_max = weight_factor;
+      instance_weight_v[instance_id] = weight_factor;
     }
 
+    // Normalize via weight_max if weight_max > _weight_max
+    double weight_scale = std::min((double)1., _weight_max / weight_max);
+    if(surrounding_vs.as_vector().size()) {
+      double original_weight = surrounding_weight;
+      surrounding_vs *= ((float)(surrounding_weight * weight_scale));
+      LARCV_INFO() << "Charge-surrounding pixel: " << surrounding_vs.as_vector().size()
+		   << " weighting factor: " << original_weight
+		   << " ... after scaling: " << surrounding_vs.as_vector().front().value()
+		   << std::endl;
+
+    }
+
+    for(size_t instance_id = 0; instance_id < instance_count_v.size(); ++instance_id) {
+      double original_weight = instance_weight_v[instance_id];
+      instance_weight_v[instance_id] *= weight_scale;
+      LARCV_INFO() << "Cluster id " << instance_id
+		   << " pixel: " << instance_count_v[instance_id]
+		   << " weighting factor: " << original_weight
+		   << " ... after scaling: " << instance_weight_v[instance_id]
+		   << std::endl;
+    }
+    
     //
     // Combine weights
     //
     for(auto const& instance_vox : event_instance.as_vector()) {
       size_t instance_id = (size_t)(instance_vox.value());
-      larcv::Voxel vox(instance_vox.id(), instance_count_v[instance_id]);
+      larcv::Voxel vox(instance_vox.id(), (float)(instance_weight_v[instance_id]));
       ((VoxelSet*)event_weight)->emplace(std::move(vox),true);
     }
-    for(auto const& surrounding_vox : surrounding_weight.as_vector())
+    for(auto const& surrounding_vox : surrounding_vs.as_vector())
       event_weight->add(surrounding_vox);
     //
     // figure out keypoint weights
     //
+    size_t num_vertex = 0;
     for(auto const& keypoints : event_keypoint.as_vector()) {
       for(auto const& keyvox : keypoints.as_vector()) {
         auto vox = event_instance.find(keyvox.id());
         if(vox.id() == kINVALID_VOXELID) continue;
-        ((VoxelSet*)event_weight)->emplace(vox.id(),_weight_max,true);
+        ((VoxelSet*)event_weight)->emplace(vox.id(),_weight_vertex,false);
+	num_vertex +=1;
       }
     }
-
+    LARCV_INFO() << "Vertex pixel: " << num_vertex << " weighting factor: " << _weight_vertex << std::endl;
     return true;
   }
 

@@ -53,6 +53,7 @@ namespace larcv {
     std::string _keypoint_producer;
     std::string _weight_producer;
     float _weight_max;
+    float _weight_vertex;
     bool _weight_surrounding;
   };
 
