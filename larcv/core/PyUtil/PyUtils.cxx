@@ -154,7 +154,7 @@ VoxelSet as_tensor3d(PyObject* pyarray, float min_threshold) {
         val = (float)(carray[i][j][k]);
         if(val <= min_threshold) continue;
         id = i * dims[1] * dims[2] + j * dims[2] + k;
-        res.emplace(id,val);
+        res.emplace(id,val,true);
       }
     }
   }
