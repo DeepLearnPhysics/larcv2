@@ -36,7 +36,7 @@ namespace larcv {
     virtual ~EventClusterVoxel3D() {}
 
     /// EventBase::clear() override
-    inline void clear() {EventBase::clear(); ClusterVoxel3D::clear();}
+    inline void clear() {EventBase::clear(); ClusterVoxel3D::clear_data();}
     
   };
 
@@ -56,7 +56,7 @@ namespace larcv {
     virtual ~EventSparseTensor3D() {}
 
     /// EventBase::clear() override
-    inline void clear() {EventBase::clear(); SparseTensor3D::clear();}
+    inline void clear() {EventBase::clear(); SparseTensor3D::clear_data();}
     
   };
 

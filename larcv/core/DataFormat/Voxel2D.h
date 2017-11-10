@@ -48,7 +48,7 @@ namespace larcv {
     // Write-access
     //
     /// Clear everything
-    inline void clear() { VoxelSet::clear(); _meta = ImageMeta(); }
+    inline void clear_data() { VoxelSet::clear_data(); _meta = ImageMeta(); }
     /// Meta setter
     inline void meta(const larcv::ImageMeta& meta) { _meta = meta; }
 
@@ -87,7 +87,7 @@ namespace larcv {
     // Write-access
     //
     /// Clear everything
-    inline void clear() { VoxelSetArray::clear(); _meta = ImageMeta(); }
+    inline void clear_data() { VoxelSetArray::clear_data(); _meta = ImageMeta(); }
     /// Meta setter
     inline void meta(const larcv::ImageMeta& meta) { _meta = meta; }
 

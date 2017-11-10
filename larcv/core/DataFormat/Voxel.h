@@ -115,7 +115,7 @@ namespace larcv {
     // Write-access
     //    
     /// Clear everything
-    inline virtual void clear() { _voxel_v.clear(); }
+    inline virtual void clear_data() { _voxel_v.clear(); }
     /// Add a new voxel. If another voxel instance w/ same VoxelID exists, value is added
     void add(const Voxel& vox);
     /// Set a voxel. If another voxel instance w/ same VoxelID exists, value is set
@@ -173,7 +173,7 @@ namespace larcv {
     // Write-access
     //
     /// Clear everything
-    inline void clear() { _voxel_vv.clear(); }
+    inline void clear_data() { _voxel_vv.clear(); }
     /// Resize voxel array
     inline void resize(const size_t num)
     { _voxel_vv.resize(num); for(size_t i=0; i<num; ++i) _voxel_vv[i].id(i); }
