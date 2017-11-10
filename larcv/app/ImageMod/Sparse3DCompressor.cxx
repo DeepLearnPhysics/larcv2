@@ -37,24 +37,24 @@ namespace larcv {
              orig_meta.num_voxel_z() / _comp_factor,
              orig_meta.unit());
 
-    auto output_voxel = (larcv::EventSparseTensor3D*)(mgr.get_data("sparse3d", _output_producer));
-    output_voxel->meta(meta);
+    larcv::VoxelSet vs;
+
     for (auto const& in_vox : event_voxel.as_vector()) {
       auto id = meta.id(orig_meta.position(in_vox.id()));
 
       switch(_pool_type) {
 
         case kSumPool: {
-          ((VoxelSet*)output_voxel)->emplace(id,in_vox.value() * _scale_factor,true);
+          vs.emplace(id,in_vox.value() * _scale_factor,true);
           break;
         }
         case kMaxPool: {
-          auto const& out_vox = output_voxel->find(id);
+          auto const& out_vox = vs.find(id);
           if(out_vox.id() == kINVALID_VOXELID) {
-            ((VoxelSet*)output_voxel)->emplace(id,in_vox.value() * _scale_factor,true);
+            vs.emplace(id,in_vox.value() * _scale_factor,true);
             break;
           }else if(out_vox.value() < (in_vox.value() * _scale_factor)) {
-            ((VoxelSet*)output_voxel)->emplace(id,in_vox.value() * _scale_factor,false);
+            vs.emplace(id,in_vox.value() * _scale_factor,false);
             break;
           }
           break;
@@ -65,7 +65,8 @@ namespace larcv {
         }
       }
     }
-
+    auto& output_voxel = mgr.get_data<larcv::EventSparseTensor3D>(_output_producer);
+    output_voxel.emplace(std::move(vs),meta);
     return true;
   }
 

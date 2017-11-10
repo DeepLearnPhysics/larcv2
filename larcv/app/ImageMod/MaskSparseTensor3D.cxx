@@ -26,15 +26,19 @@ namespace larcv {
   {
     auto const& ev_ref    = mgr.get_data<larcv::EventSparseTensor3D>(_reference_producer);
     auto const& ev_target = mgr.get_data<larcv::EventSparseTensor3D>(_target_producer);
-    auto ev_output = (larcv::EventSparseTensor3D*)(mgr.get_data("sparse3d",_output_producer));
-    ev_output->meta(ev_target.meta());
+
+    larcv::VoxelSet vs;
 
     for(auto const& vox : ev_target.as_vector()) {
       auto const& ref_vox = ev_ref.find(vox.id());
       if(ref_vox.id() == kINVALID_VOXELID) continue;
       if(ref_vox.value() < _value_min) continue;
-      ((VoxelSet*)ev_output)->emplace(vox.id(), vox.value(), false);
+      vs.emplace(vox.id(), vox.value(), false);
     }
+
+    auto& ev_output = mgr.get_data<larcv::EventSparseTensor3D>(_output_producer);
+    ev_output.emplace(std::move(vs),ev_target.meta());
+
     return true;
   }
 

@@ -26,14 +26,16 @@ namespace larcv {
   bool ThresholdVoxel3D::process(IOManager& mgr)
   {
     auto const& ev_tensor3d = mgr.get_data<larcv::EventSparseTensor3D>(_target_producer);
-    auto ev_output = (larcv::EventSparseTensor3D*)(mgr.get_data("sparse3d",_output_producer));
 
-    ev_output->meta(ev_tensor3d.meta());
+    larcv::VoxelSet vs;
 
     for(auto const& vox : ev_tensor3d.as_vector()) {
       if(vox.value() < _voxel_value_min) continue;
-      ((VoxelSet*)ev_output)->emplace(vox.id(), std::min(vox.value(),_voxel_value_max), false);
+      vs.emplace(vox.id(), std::min(vox.value(),_voxel_value_max), false);
     }
+    auto& ev_output = mgr.get_data<larcv::EventSparseTensor3D>(_output_producer);
+    ev_output.emplace(std::move(vs),ev_tensor3d.meta());
+
     return true;
   }
 
