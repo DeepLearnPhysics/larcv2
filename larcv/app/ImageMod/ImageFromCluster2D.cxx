@@ -1,18 +1,18 @@
-#ifndef __IMAGEFROMCLUSTERPIXEL2D_CXX__
-#define __IMAGEFROMCLUSTERPIXEL2D_CXX__
+#ifndef __IMAGEFROMCluster2D_CXX__
+#define __IMAGEFROMCluster2D_CXX__
 
-#include "ImageFromClusterPixel2D.h"
+#include "ImageFromCluster2D.h"
 #include "larcv/core/DataFormat/EventVoxel2D.h"
 #include "larcv/core/DataFormat/EventImage2D.h"
 namespace larcv {
 
-  static ImageFromClusterPixel2DProcessFactory __global_ImageFromClusterPixel2DProcessFactory__;
+  static ImageFromCluster2DProcessFactory __global_ImageFromCluster2DProcessFactory__;
 
-  ImageFromClusterPixel2D::ImageFromClusterPixel2D(const std::string name)
+  ImageFromCluster2D::ImageFromCluster2D(const std::string name)
     : ProcessBase(name)
   {}
 
-  void ImageFromClusterPixel2D::configure(const PSet& cfg)
+  void ImageFromCluster2D::configure(const PSet& cfg)
   {
     _pixel2d_producer  = cfg.get<std::string>("Pixel2DProducer");
     _output_producer = cfg.get<std::string>("OutputProducer");
@@ -20,10 +20,10 @@ namespace larcv {
     _fixed_pi = cfg.get<float>("FixedPI", 100);
   }
 
-  void ImageFromClusterPixel2D::initialize()
+  void ImageFromCluster2D::initialize()
   {}
 
-  bool ImageFromClusterPixel2D::process(IOManager& mgr)
+  bool ImageFromCluster2D::process(IOManager& mgr)
   {
     auto const& ev_cluster2d = mgr.get_data<larcv::EventClusterPixel2D>(_pixel2d_producer);
     auto& ev_out_image = mgr.get_data<larcv::EventImage2D>(_output_producer);
@@ -86,7 +86,7 @@ namespace larcv {
     return true;
   }
 
-  void ImageFromClusterPixel2D::finalize()
+  void ImageFromCluster2D::finalize()
   {}
 
 }

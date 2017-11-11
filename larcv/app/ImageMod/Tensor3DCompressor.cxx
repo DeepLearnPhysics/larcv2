@@ -1,18 +1,18 @@
-#ifndef __Sparse3DCompressor_CXX__
-#define __Sparse3DCompressor_CXX__
+#ifndef __Tensor3DCompressor_CXX__
+#define __Tensor3DCompressor_CXX__
 
-#include "Sparse3DCompressor.h"
+#include "Tensor3DCompressor.h"
 #include "larcv/core/DataFormat/EventVoxel3D.h"
 
 namespace larcv {
 
-  static Sparse3DCompressorProcessFactory __global_Sparse3DCompressorProcessFactory__;
+  static Tensor3DCompressorProcessFactory __global_Tensor3DCompressorProcessFactory__;
 
-  Sparse3DCompressor::Sparse3DCompressor(const std::string name)
+  Tensor3DCompressor::Tensor3DCompressor(const std::string name)
     : ProcessBase(name)
   {}
 
-  void Sparse3DCompressor::configure(const PSet& cfg)
+  void Tensor3DCompressor::configure(const PSet& cfg)
   {
     _voxel_producer  = cfg.get<std::string>("TargetProducer");
     _output_producer = cfg.get<std::string>("OutputProducer");
@@ -21,10 +21,10 @@ namespace larcv {
     _pool_type       = (PoolType_t)(cfg.get<unsigned short>("PoolType",(unsigned short)kSumPool));
   }
 
-  void Sparse3DCompressor::initialize()
+  void Tensor3DCompressor::initialize()
   {}
 
-  bool Sparse3DCompressor::process(IOManager& mgr)
+  bool Tensor3DCompressor::process(IOManager& mgr)
   {
     auto const& event_voxel = mgr.get_data<larcv::EventSparseTensor3D>(_voxel_producer);
 
@@ -70,7 +70,7 @@ namespace larcv {
     return true;
   }
 
-  void Sparse3DCompressor::finalize()
+  void Tensor3DCompressor::finalize()
   {}
 
 }

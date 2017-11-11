@@ -1,26 +1,26 @@
-#ifndef __SPARSETENSORFROMCLUSTER3D_CXX__
-#define __SPARSETENSORFROMCLUSTER3D_CXX__
+#ifndef __Tensor3DFromCluster3D_CXX__
+#define __Tensor3DFromCluster3D_CXX__
 
-#include "SparseTensorFromCluster3D.h"
+#include "Tensor3DFromCluster3D.h"
 #include "larcv/core/DataFormat/EventVoxel3D.h"
 namespace larcv {
 
-  static SparseTensorFromCluster3DProcessFactory
-  __global_SparseTensorFromCluster3DProcessFactory__;
+  static Tensor3DFromCluster3DProcessFactory
+  __global_Tensor3DFromCluster3DProcessFactory__;
 
-  SparseTensorFromCluster3D::SparseTensorFromCluster3D(const std::string name)
+  Tensor3DFromCluster3D::Tensor3DFromCluster3D(const std::string name)
     : ProcessBase(name) {}
 
-  void SparseTensorFromCluster3D::configure(const PSet& cfg) {
+  void Tensor3DFromCluster3D::configure(const PSet& cfg) {
     _cluster3d_producer = cfg.get<std::string>("ClusterVoxel3DProducer");
     _output_producer = cfg.get<std::string>("OutputProducer", "");
     _fixed_pi = cfg.get<float>("FixedPI", 100.);
     _pi_type  = (PIType_t)(cfg.get<unsigned short>("PIType", (unsigned short)(PIType_t::kPITypeInputVoxel)));
   }
 
-  void SparseTensorFromCluster3D::initialize() {}
+  void Tensor3DFromCluster3D::initialize() {}
 
-  bool SparseTensorFromCluster3D::process(IOManager& mgr) {
+  bool Tensor3DFromCluster3D::process(IOManager& mgr) {
     std::vector<std::string> _producer_list;
     if (_cluster3d_producer == "")
       _producer_list = mgr.producer_list("cluster3d");
@@ -94,6 +94,6 @@ namespace larcv {
     return true;
   }
 
-  void SparseTensorFromCluster3D::finalize() {}
+  void Tensor3DFromCluster3D::finalize() {}
 }
 #endif

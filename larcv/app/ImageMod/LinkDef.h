@@ -37,21 +37,25 @@
 #pragma link C++ function larcv::cluster_to_image2d(const larcv::Pixel2DCluster&, size_t, size_t)+;
 //#pragma link C++ class larcv::LoadImageMod+;
 //#pragma link C++ class larcv::ROIMerger+;
-//#pragma link C++ class larcv::ImageFromClusterPixel2D+;
-//#pragma link C++ class larcv::ImageFromSparseTensor2D+;
+#pragma link C++ class larcv::ImageFromCluster2D+;
+#pragma link C++ class larcv::ImageFromTensor2D+;
 //#pragma link C++ class larcv::ROIPad+;
 
 //#pragma link C++ class larcv::UnionROI+;
 #pragma link C++ class larcv::VoxelCompressor+;
-#pragma link C++ class larcv::ImageFromClusterVoxel3D+;
-#pragma link C++ class larcv::SparseTensorFromCluster3D+;
-#pragma link C++ class larcv::ImageFromSparseTensor3D+;
+#pragma link C++ class larcv::Tensor3DFromCluster3D+;
 #pragma link C++ class larcv::SegWeightInstance3D+;
 #pragma link C++ class larcv::SegLabelFromCluster3D+;
 #pragma link C++ class larcv::MaskSparseTensor3D+;
 #pragma link C++ class larcv::ThresholdVoxel3D+;
+#pragma link C++ class larcv::ParticleROIFromCluster+;
+#pragma link C++ class larcv::Cluster2DFromCluster3D+;
+#pragma link C++ class larcv::Tensor2DFromTensor3D+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
+
 
 
 

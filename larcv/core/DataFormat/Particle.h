@@ -189,7 +189,7 @@ namespace larcv {
   class ParticleSet {
   public:
     ParticleSet() {}
-    ~ParticleSet() {}
+    virtual ~ParticleSet() {}
 
     void clear() { _part_v.clear(); }
 

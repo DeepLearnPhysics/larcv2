@@ -1,18 +1,18 @@
-#ifndef __IMAGEFROMSPARSETENSOR2D_CXX__
-#define __IMAGEFROMSPARSETENSOR2D_CXX__
+#ifndef __IMAGEFROMTensor2D_CXX__
+#define __IMAGEFROMTensor2D_CXX__
 
-#include "ImageFromSparseTensor2D.h"
+#include "ImageFromTensor2D.h"
 #include "larcv/core/DataFormat/EventVoxel2D.h"
 #include "larcv/core/DataFormat/EventImage2D.h"
 namespace larcv {
 
-  static ImageFromSparseTensor2DProcessFactory __global_ImageFromSparseTensor2DProcessFactory__;
+  static ImageFromTensor2DProcessFactory __global_ImageFromTensor2DProcessFactory__;
 
-  ImageFromSparseTensor2D::ImageFromSparseTensor2D(const std::string name)
+  ImageFromTensor2D::ImageFromTensor2D(const std::string name)
     : ProcessBase(name)
   {}
 
-  void ImageFromSparseTensor2D::configure(const PSet& cfg)
+  void ImageFromTensor2D::configure(const PSet& cfg)
   {
     _tensor2d_producer  = cfg.get<std::string>("Tensor2DProducer");
     _output_producer = cfg.get<std::string>("OutputProducer");
@@ -20,10 +20,10 @@ namespace larcv {
     _fixed_pi = cfg.get<float>("FixedPI", 100);
   }
 
-  void ImageFromSparseTensor2D::initialize()
+  void ImageFromTensor2D::initialize()
   {}
 
-  bool ImageFromSparseTensor2D::process(IOManager& mgr)
+  bool ImageFromTensor2D::process(IOManager& mgr)
   {
     auto const& ev_tensor2d = mgr.get_data<larcv::EventSparseTensor2D>(_tensor2d_producer);
     auto& ev_out_image = mgr.get_data<larcv::EventImage2D>(_output_producer);
@@ -64,7 +64,7 @@ namespace larcv {
     return true;
   }
 
-  void ImageFromSparseTensor2D::finalize()
+  void ImageFromTensor2D::finalize()
   {}
 
 }
