@@ -33,7 +33,7 @@ namespace larcv {
            ProjectionID_t id = kINVALID_PROJECTIONID);
 
     /// Default destructor
-    ~BBox2D() {}
+    virtual ~BBox2D() {}
 
     inline bool operator== (const BBox2D& rhs) const
     { return (_p1 == rhs._p1 && _p2 == rhs._p2); }
@@ -83,7 +83,7 @@ namespace larcv {
            double xmax = 0, double ymax = 0, double zmax = 0);
 
     /// Default destructor
-    ~BBox3D() {}
+    virtual ~BBox3D() {}
 
     inline bool operator== (const BBox3D& rhs) const
     { return (_p1 == rhs._p1 && _p2 == rhs._p2); }
