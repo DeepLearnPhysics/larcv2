@@ -36,12 +36,12 @@ namespace larcv {
     auto meta_3d = input_image->meta();
 
 
-    double x_min = 0.0;
-    double y_min = 0.0;
-    double z_min = 0.0;
-    double x_max = meta_3d.num_voxel_x() * meta_3d.size_voxel_x();
-    double y_max = meta_3d.num_voxel_y() * meta_3d.size_voxel_y();
-    double z_max = meta_3d.num_voxel_z() * meta_3d.size_voxel_z();
+    double x_min = meta_3d.min_x();
+    double y_min = meta_3d.min_y();
+    double z_min = meta_3d.min_z();
+    double x_max = meta_3d.max_x();
+    double y_max = meta_3d.max_y();
+    double z_max = meta_3d.max_z();
 
     double x_n_pixels = meta_3d.num_voxel_x();
     double y_n_pixels = meta_3d.num_voxel_y();
