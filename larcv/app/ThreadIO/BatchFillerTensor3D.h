@@ -60,6 +60,7 @@ namespace larcv {
     std::vector<float>  _entry_data;
     size_t _num_channel;
     float _voxel_base_value;
+    bool _allow_empty;
   };
 
   /**
