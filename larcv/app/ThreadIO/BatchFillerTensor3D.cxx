@@ -19,6 +19,7 @@ void BatchFillerTensor3D::configure(const PSet& cfg) {
   _tensor3d_producer = cfg.get<std::string>("Tensor3DProducer");
   _num_channel = cfg.get<size_t>("MakeHotLabel", 0);
   _voxel_base_value = cfg.get<float>("EmptyVoxelValue",0.);
+  _allow_empty = cfg.get<bool>("AllowEmpty",false);
   if (_num_channel == 1) {
     LARCV_CRITICAL() << "Cannot make hot label of length 1!" << std::endl;
     throw larbys();
@@ -64,7 +65,7 @@ bool BatchFillerTensor3D::process(IOManager& mgr) {
   LARCV_DEBUG() << "start" << std::endl;
   auto const& voxel_data =
       mgr.get_data<larcv::EventSparseTensor3D>(_tensor3d_producer);
-  if (voxel_data.as_vector().empty()) {
+  if (!_allow_empty && voxel_data.as_vector().empty()) {
     LARCV_CRITICAL()
         << "Could not locate non-empty voxel data w/ producer name "
         << _tensor3d_producer << std::endl;
