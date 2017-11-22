@@ -79,6 +79,8 @@ namespace larcv {
     inline bool operator!= (const ImageMeta& rhs) const
     { return !((*this) == rhs); }
 
+    /// size (#rows * #cols) accessor
+    inline size_t size         () const { return _row_count * _col_count; }
     /// # rows accessor
     inline size_t rows         () const { return _row_count; }
     /// # columns accessor

@@ -43,6 +43,8 @@ namespace larcv {
 
   private:
 
+    void configure_labels(const PSet& cfg);
+
     enum class PIType_t {
       kPITypeFixedPI,
       kPITypeInputVoxel,
@@ -50,10 +52,10 @@ namespace larcv {
       kPITypeUndefined
     };
 
-    std::string _cluster3d_producer;
-    std::string _output_producer;
-    PIType_t _pi_type;
-    float _fixed_pi;
+    std::vector<std::string> _cluster3d_producer_v;
+    std::vector<std::string> _output_producer_v;
+    std::vector<unsigned short> _pi_type_v;
+    std::vector<float> _fixed_pi_v;
   };
 
   /**

@@ -11,54 +11,115 @@ namespace larcv {
   Tensor3DFromCluster3D::Tensor3DFromCluster3D(const std::string name)
     : ProcessBase(name) {}
 
+  void Tensor3DFromCluster3D::configure_labels(const PSet& cfg)
+  {
+    _cluster3d_producer_v.clear();
+    _output_producer_v.clear();
+    _cluster3d_producer_v = cfg.get<std::vector<std::string> >("Cluster3DProducerList",_cluster3d_producer_v);
+    _output_producer_v    = cfg.get<std::vector<std::string> >("OutputProducerList",_output_producer_v);
+
+    if(_cluster3d_producer_v.empty()) {
+      auto cluster3d_producer = cfg.get<std::string>("Cluster3DProducer","");
+      auto output_producer    = cfg.get<std::string>("OutputProducer","");
+      if(!cluster3d_producer.empty()) {
+        _cluster3d_producer_v.push_back(cluster3d_producer);
+        _output_producer_v.push_back(output_producer);
+      }
+    }
+
+    if(_output_producer_v.empty()) {
+      _output_producer_v.resize(_cluster3d_producer_v.size(),"");
+    }
+    else if(_output_producer_v.size() != _cluster3d_producer_v.size()) {
+      LARCV_CRITICAL() << "Cluster3DProducer and OutputProducer must have the same array length!" << std::endl;
+      throw larbys();
+    }
+  }
+
   void Tensor3DFromCluster3D::configure(const PSet& cfg) {
-    _cluster3d_producer = cfg.get<std::string>("ClusterVoxel3DProducer");
-    _output_producer = cfg.get<std::string>("OutputProducer", "");
-    _fixed_pi = cfg.get<float>("FixedPI", 100.);
-    _pi_type  = (PIType_t)(cfg.get<unsigned short>("PIType", (unsigned short)(PIType_t::kPITypeInputVoxel)));
+    configure_labels(cfg);
+
+    _fixed_pi_v = cfg.get<std::vector<float> >("FixedPIList", _fixed_pi_v);
+    if (_fixed_pi_v.empty()) {
+      auto fixed_pi = cfg.get<float>("FixedPI", 100);
+      _fixed_pi_v.resize(_cluster3d_producer_v.size(), fixed_pi);
+    } else if (_fixed_pi_v.size() != _cluster3d_producer_v.size()) {
+      LARCV_CRITICAL() << "FixedPIList size mismatch with other input parameters!" << std::endl;
+      throw larbys();
+    }
+
+    _pi_type_v = cfg.get<std::vector<unsigned short> >("PITypeList", _pi_type_v);
+    if (_pi_type_v.empty()) {
+      auto pi_type = cfg.get<unsigned short>("PIType", 1);
+      _pi_type_v.resize(_cluster3d_producer_v.size(), pi_type);
+    } else if (_pi_type_v.size() != _cluster3d_producer_v.size()) {
+      LARCV_CRITICAL() << "PITypeList size mismatch with other input parameters!" << std::endl;
+      throw larbys();
+    }
   }
 
   void Tensor3DFromCluster3D::initialize() {}
 
   bool Tensor3DFromCluster3D::process(IOManager& mgr) {
-    std::vector<std::string> _producer_list;
-    if (_cluster3d_producer == "")
-      _producer_list = mgr.producer_list("cluster3d");
-    else
-      _producer_list.push_back(_cluster3d_producer);
+    std::vector<std::string> producer_list;
+    std::vector<std::string> output_list;
+    if (_cluster3d_producer_v.empty()) {
+      producer_list = mgr.producer_list("cluster3d");
+      output_list.resize(producer_list.size(),"");
+    }
+    else {
+      producer_list = _cluster3d_producer_v;
+      output_list   = _output_producer_v;
+    }
 
-    for (auto producer : _producer_list) {
+    for (size_t label_index=0; label_index < producer_list.size(); ++label_index) {
+      auto const& producer = producer_list[label_index];
+      auto output_producer = output_list[label_index];
+      if(output_producer.empty()) output_producer = producer + "_tensor3d";
+
       auto const& ev_cluster3d =
         mgr.get_data<larcv::EventClusterVoxel3D>(producer);
 
-      larcv::EventSparseTensor3D* ev_voxel3d = nullptr;
-      std::string output_producer = producer;
-      if (!_output_producer.empty()) {
-        if (_producer_list.size() == 1) output_producer = _output_producer;
-        else output_producer = producer + "_" + _output_producer;
+      auto& ev_voxel3d = mgr.get_data<larcv::EventSparseTensor3D>(output_producer);
+      // treat the case if this "output producer" already holds some data
+      if(ev_voxel3d.meta().valid()) {
+        static bool one_time_warning=true;
+        if(_cluster3d_producer_v.empty()) {
+          LARCV_CRITICAL() << "Over-writing existing EventSparseTensor3D data for label "
+          << output_producer << std::endl;
+          throw larbys();
+        }
+        else if(one_time_warning) {
+          LARCV_WARNING() << "Output EventSparseTensor3D producer " << output_producer
+          << " already holding valid data will be over-written!" << std::endl;
+          one_time_warning = false;
+        }
       }
-      ev_voxel3d = (larcv::EventSparseTensor3D*)(mgr.get_data("sparse3d", output_producer));
       auto const& meta = ev_cluster3d.meta();
-      ev_voxel3d->meta(meta);
+      ev_voxel3d.meta(meta);
+
+      larcv::VoxelSet vs;
+      auto pi_type  = (PIType_t)(_pi_type_v[label_index]);
+      auto const& fixed_pi = _fixed_pi_v[label_index];
 
       auto const& clusters = ev_cluster3d.as_vector();
       for (size_t cluster_index = 0; cluster_index < clusters.size(); ++cluster_index) {
 
         auto const& cluster = clusters[cluster_index];
 
-        switch (_pi_type) {
+        switch (pi_type) {
         case PIType_t::kPITypeFixedPI:
-          for (auto const& vox : cluster.as_vector()) {((VoxelSet*)ev_voxel3d)->emplace(vox.id(), _fixed_pi, false);}
+          for (auto const& vox : cluster.as_vector()) {vs.emplace(vox.id(), fixed_pi, false);}
           break;
         case PIType_t::kPITypeInputVoxel:
-          for (auto const& vox : cluster.as_vector()) {ev_voxel3d->add(vox);}
+          for (auto const& vox : cluster.as_vector()) {vs.add(vox);}
           break;
         case PIType_t::kPITypeClusterIndex:
           for (auto const& vox : cluster.as_vector()) {
             // check if this voxel already exists
-            auto const& prev_vox = ((VoxelSet*)ev_voxel3d)->find(vox.id());
+            auto const& prev_vox = vs.find(vox.id());
             if (prev_vox.id() == kINVALID_VOXELID) {
-              ((larcv::VoxelSet*)ev_voxel3d)->emplace(vox.id(), (float)(cluster_index + 1), false);
+              vs.emplace(vox.id(), (float)(cluster_index + 1), false);
               LARCV_DEBUG() << "Inserted voxel id " << vox.id() << " for cluster_index " << cluster_index << std::endl;
               continue;
             }
@@ -70,7 +131,7 @@ namespace larcv {
               throw larbys();
             }
             if (orig_vox.value() > vox.value()) continue;
-            ((larcv::VoxelSet*)ev_voxel3d)->emplace(vox.id(), (float)(cluster_index + 1), false);
+            vs.emplace(vox.id(), (float)(cluster_index + 1), false);
           }
           break;
         case PIType_t::kPITypeUndefined:
@@ -78,10 +139,12 @@ namespace larcv {
           break;
         }
       }
+      ev_voxel3d.emplace(std::move(vs),meta);
+
       if (this->logger().level() <= msg::Level_t::kINFO) {
         // report number of voxels per class
         std::vector<size_t> vox_count;
-        for (auto const& vox : ev_voxel3d->as_vector()) {
+        for (auto const& vox : vs.as_vector()) {
           size_t class_index = vox.value();
           if (vox_count.size() <= class_index) vox_count.resize(class_index + 1, 0);
           vox_count[class_index] += 1;

@@ -26,14 +26,11 @@ namespace larcv {
   public:
     /// Default ctor
     SparseTensor3D() {}
-    SparseTensor3D(VoxelSet&& vs, Voxel3DMeta meta)
-      : VoxelSet(std::move(vs))
-      , _meta(meta)
-    {}
+    SparseTensor3D(VoxelSet&& vs, Voxel3DMeta meta);
     /// Default dtor
     virtual ~SparseTensor3D() {}
     SparseTensor3D& operator= (const VoxelSet& rhs)
-    { *((VoxelSet*)this) = rhs; return *this;}
+    { *((VoxelSet*)this) = rhs; this->meta(this->meta()); return *this;}
 
     //
     // Read-access
@@ -48,14 +45,14 @@ namespace larcv {
     void emplace(const double x, const double y, const double z, const float val, const bool add=true);
     /// Emplace the whole voxel set w/ meta
     inline void emplace(VoxelSet&& vs, const Voxel3DMeta& meta)
-    {*((VoxelSet*)this) = std::move(vs); _meta = meta;}
+    {*((VoxelSet*)this) = std::move(vs); this->meta(meta);}
     /// Set the whole voxel set w/ meta
     inline void set(const VoxelSet& vs, const Voxel3DMeta& meta)
-    {*((VoxelSet*)this) = vs; _meta = meta;} 
+    {*((VoxelSet*)this) = vs; this->meta(meta);} 
     /// Clear everything
     inline void clear_data() { VoxelSet::clear_data(); _meta = Voxel3DMeta(); }
     /// Meta setter
-    inline void meta(const larcv::Voxel3DMeta& meta) { _meta = meta; }
+    void meta(const larcv::Voxel3DMeta& meta);
 
   private:
     larcv::Voxel3DMeta _meta;
@@ -85,7 +82,7 @@ namespace larcv {
     /// Clear everything
     inline void clear_data() { VoxelSetArray::clear_data(); _meta = Voxel3DMeta(); }
     /// Meta setter
-    inline void meta(const larcv::Voxel3DMeta& meta) { _meta = meta; }
+    void meta(const larcv::Voxel3DMeta& meta);
 
   private:
     larcv::Voxel3DMeta _meta;

@@ -33,10 +33,7 @@ namespace larcv {
       : VoxelSet(vs)
     {}
     /// move ctor
-    SparseTensor2D(larcv::VoxelSet&& vs, larcv::ImageMeta&& meta)
-      : VoxelSet(vs)
-      , _meta(meta)
-    {}
+    SparseTensor2D(larcv::VoxelSet&& vs, larcv::ImageMeta&& meta);
 
     //
     // Read-access
@@ -50,7 +47,7 @@ namespace larcv {
     /// Clear everything
     inline void clear_data() { VoxelSet::clear_data(); _meta = ImageMeta(); }
     /// Meta setter
-    inline void meta(const larcv::ImageMeta& meta) { _meta = meta; }
+    void meta(const larcv::ImageMeta& meta);
 
   private:
     larcv::ImageMeta _meta;
@@ -72,10 +69,7 @@ namespace larcv {
       : VoxelSetArray(vsa)
     {}
     /// move ctor
-    ClusterPixel2D(larcv::VoxelSetArray&& vsa, larcv::ImageMeta meta)
-      : VoxelSetArray(vsa)
-      , _meta(meta)
-    {}
+    ClusterPixel2D(larcv::VoxelSetArray&& vsa, larcv::ImageMeta meta);
 
     //
     // Read-access
@@ -89,7 +83,7 @@ namespace larcv {
     /// Clear everything
     inline void clear_data() { VoxelSetArray::clear_data(); _meta = ImageMeta(); }
     /// Meta setter
-    inline void meta(const larcv::ImageMeta& meta) { _meta = meta; }
+    void meta(const larcv::ImageMeta& meta);
 
   private:
     larcv::ImageMeta _meta;

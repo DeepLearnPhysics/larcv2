@@ -51,8 +51,16 @@
 #pragma link C++ class larcv::ParticleROIFromCluster+;
 #pragma link C++ class larcv::Cluster2DFromCluster3D+;
 #pragma link C++ class larcv::Tensor2DFromTensor3D+;
+#pragma link C++ class larcv::BlurTensor3D+;
+#pragma link C++ class larcv::NormalizeTensor3D+;
+#pragma link C++ class larcv::CombineTensor3D+;
+#pragma link C++ class larcv::VertexWeight3D+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
+
+
 
 
 
