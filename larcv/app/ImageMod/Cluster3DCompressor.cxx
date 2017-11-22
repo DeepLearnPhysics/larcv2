@@ -111,15 +111,14 @@ namespace larcv {
                orig_meta.num_voxel_z() / comp_factor,
                orig_meta.unit());
 
-      ev_output.meta(meta);
-      ev_output.resize(ev_cluster3d.as_vector().size());
+      VoxelSetArray vsa;
+      vsa.resize(ev_cluster3d.as_vector().size());
 
       for (auto const& cluster : ev_cluster3d.as_vector()) {
 
-        auto& out_cluster = ev_output.writeable_voxel_set(cluster.id());
+        auto& out_cluster = vsa.writeable_voxel_set(cluster.id());
 
         for (auto const& in_vox : cluster.as_vector()) {
-          std::cout << "Converting: " << in_vox.id() << " / " << orig_meta.size() << std::endl;
           auto id = meta.id(orig_meta.position(in_vox.id()));
 
           switch (pool_type) {
@@ -146,6 +145,10 @@ namespace larcv {
           }
         }
       }
+      LARCV_INFO() << "EventClusterVoxel3D " << cluster3d_producer << " compressed to " << output_producer << std::endl
+                   << "Original meta:" << std::endl << ev_cluster3d.meta().dump() << std::endl
+                   << "New meta:" << std::endl << meta.dump() << std::endl;
+      ev_output.emplace(std::move(vsa), meta);
     }
     return true;
   }

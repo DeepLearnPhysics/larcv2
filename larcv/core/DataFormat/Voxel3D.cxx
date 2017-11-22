@@ -14,7 +14,7 @@ namespace larcv {
 		for (auto const& vox : this->as_vector()) {
 			if (vox.id() < meta.size()) continue;
 			std::cerr << "VoxelSet contains ID " << vox.id()
-			          << " which cannot exists in ImageMeta with size " << meta.size()
+			          << " which cannot exists in Voxel3DMeta with size " << meta.size()
 			          << std::endl;
 			throw std::exception();
 		}
@@ -34,7 +34,7 @@ namespace larcv {
 			for (auto const& vox : vs.as_vector()) {
 				if (vox.id() < meta.size()) continue;
 				std::cerr << "VoxelSet contains ID " << vox.id()
-				          << " which cannot exists in ImageMeta with size " << meta.size()
+				          << " which cannot exists in Voxel3DMeta with size " << meta.size()
 				          << std::endl;
 				throw std::exception();
 			}

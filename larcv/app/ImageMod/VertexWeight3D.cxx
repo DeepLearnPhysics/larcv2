@@ -27,16 +27,16 @@ namespace larcv {
   void VertexWeight3D::initialize()
   {}
 
-  void VertexWeight3D::find_neighbors(const Voxel3DMeta& meta, 
-                                           const Voxel& vox,
-                                           std::vector<VoxelID_t>& result) const
+  void VertexWeight3D::find_neighbors(const Voxel3DMeta& meta,
+                                      const Voxel& vox,
+                                      std::vector<VoxelID_t>& result) const
   {
     result.resize(6);
-    result[0] = meta.shift(vox.id(),-1, 0, 0);
+    result[0] = meta.shift(vox.id(), -1, 0, 0);
     result[1] = meta.shift(vox.id(), 1, 0, 0);
-    result[2] = meta.shift(vox.id(), 0,-1, 0);
+    result[2] = meta.shift(vox.id(), 0, -1, 0);
     result[3] = meta.shift(vox.id(), 0, 1, 0);
-    result[4] = meta.shift(vox.id(), 0, 0,-1);
+    result[4] = meta.shift(vox.id(), 0, 0, -1);
     result[5] = meta.shift(vox.id(), 0, 0, 1);
   }
 
@@ -72,8 +72,10 @@ namespace larcv {
     //
     auto const& ev_secondary_tensor3d = mgr.get_data<larcv::EventSparseTensor3D>(_secondary_producer);
     if (ev_secondary_tensor3d.meta() != ev_tensor3d.meta()) {
-      LARCV_CRITICAL() << "Voxel3DMeta from " << _tensor3d_producer << " (EventSparseTensor3D) "
-                       << " differs from " << _secondary_producer << " (EventSparseTensor3D)" << std::endl;
+      LARCV_CRITICAL() << "Voxel3DMeta from " << _tensor3d_producer << " (EventSparseTensor3D)..." << std::endl
+                       << ev_tensor3d.meta().dump() << std::endl
+                       << " differs from " << _secondary_producer << " (EventSparseTensor3D)..." << std::endl
+                       << ev_secondary_tensor3d.meta().dump() << std::endl;
       throw larbys();
     }
     for (auto const& vox : ev_secondary_tensor3d.as_vector()) {
@@ -87,8 +89,10 @@ namespace larcv {
     //
     auto const& ev_primary_tensor3d = mgr.get_data<larcv::EventSparseTensor3D>(_primary_producer);
     if (ev_primary_tensor3d.meta() != ev_tensor3d.meta()) {
-      LARCV_CRITICAL() << "Voxel3DMeta from " << _tensor3d_producer << " (EventSparseTensor3D) "
-                       << " differs from " << _primary_producer << " (EventSparseTensor3D)" << std::endl;
+      LARCV_CRITICAL() << "Voxel3DMeta from " << _tensor3d_producer << " (EventSparseTensor3D)..." << std::endl
+                       << ev_tensor3d.meta().dump() << std::endl
+                       << " differs from " << _primary_producer << " (EventSparseTensor3D)..." << std::endl
+                       << ev_primary_tensor3d.meta().dump() << std::endl;
       throw larbys();
     }
     for (auto const& vox : ev_primary_tensor3d.as_vector()) {
