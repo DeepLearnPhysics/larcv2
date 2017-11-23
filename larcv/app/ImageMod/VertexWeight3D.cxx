@@ -31,13 +31,26 @@ namespace larcv {
                                       const Voxel& vox,
                                       std::vector<VoxelID_t>& result) const
   {
-    result.resize(6);
+    result.resize(26);
+    size_t ctr=0;
+    for(int xshift=-1; xshift<=1; ++xshift) {
+      for(int yshift=-1; yshift<=1; ++yshift) {
+        for(int zshift=-1; zshift<=1; ++zshift) {
+          if(xshift != 0 || yshift !=0 || zshift !=0 ) {
+            result[ctr] = meta.shift(vox.id(),xshift,yshift,zshift);
+            ++ctr;
+          }
+        }
+      }
+    }
+    /*
     result[0] = meta.shift(vox.id(), -1, 0, 0);
     result[1] = meta.shift(vox.id(), 1, 0, 0);
     result[2] = meta.shift(vox.id(), 0, -1, 0);
     result[3] = meta.shift(vox.id(), 0, 1, 0);
     result[4] = meta.shift(vox.id(), 0, 0, -1);
     result[5] = meta.shift(vox.id(), 0, 0, 1);
+    */
   }
 
   bool VertexWeight3D::process(IOManager& mgr)
@@ -61,8 +74,7 @@ namespace larcv {
           if (neighbor_id == kINVALID_VOXELID) continue;
           auto const& orig_vox = ev_tensor3d.find(neighbor_id);
           if (orig_vox.id() != kINVALID_VOXELID) continue;
-          larcv::Voxel neighbor_vox(neighbor_id, 1.);
-          result.emplace(vox.id(), _min_threshold / 2., false);
+          result.emplace(neighbor_id, _min_threshold / 2., false);
         }
       }
     }
