@@ -81,6 +81,7 @@ namespace larcv {
     yid += shift_y;
     if(yid < 0 || yid >= _ynum) return kINVALID_VOXELID;
 
+    xid += shift_x;
     if(xid < 0 || xid >= _xnum) return kINVALID_VOXELID;
 
     return (zid * (_xnum * _ynum) + yid * _xnum + xid);
