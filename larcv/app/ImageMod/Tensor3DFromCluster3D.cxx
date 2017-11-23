@@ -63,13 +63,19 @@ namespace larcv {
   bool Tensor3DFromCluster3D::process(IOManager& mgr) {
     std::vector<std::string> producer_list;
     std::vector<std::string> output_list;
+    std::vector<unsigned short> pi_type_v;
+    std::vector<float> fixed_pi_v;
     if (_cluster3d_producer_v.empty()) {
       producer_list = mgr.producer_list("cluster3d");
       output_list.resize(producer_list.size(), "");
+      fixed_pi_v.resize(producer_list.size(),100);
+      pi_type_v.resize(producer_list.size(),1);
     }
     else {
       producer_list = _cluster3d_producer_v;
       output_list   = _output_producer_v;
+      fixed_pi_v    = _fixed_pi_v;
+      pi_type_v     = _pi_type_v;
     }
 
     for (size_t label_index = 0; label_index < producer_list.size(); ++label_index) {
@@ -98,8 +104,8 @@ namespace larcv {
       auto const meta = ev_cluster3d.meta();
 
       larcv::VoxelSet vs;
-      auto pi_type  = (PIType_t)(_pi_type_v[label_index]);
-      auto const& fixed_pi = _fixed_pi_v[label_index];
+      auto pi_type  = (PIType_t)(pi_type_v[label_index]);
+      auto const& fixed_pi = fixed_pi_v[label_index];
 
       auto const& clusters = ev_cluster3d.as_vector();
       for (size_t cluster_index = 0; cluster_index < clusters.size(); ++cluster_index) {

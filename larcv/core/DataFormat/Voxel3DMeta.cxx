@@ -14,6 +14,9 @@ namespace larcv {
   {
     (BBox3D)(*this) = BBox3D();
     _valid = false;
+    _xnum = _ynum = _znum = 0;
+    _xlen = _ylen = _zlen = -1.;
+    _unit = kUnitUnknown;
   }
   
   void Voxel3DMeta::update(size_t xnum, size_t ynum, size_t znum) {

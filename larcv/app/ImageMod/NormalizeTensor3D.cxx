@@ -43,20 +43,20 @@ namespace larcv {
     _norm_v.clear();
     _norm_type_v.clear();
 
-    _norm_v = cfg.get<std::vector<float> >("NormalizationList",_norm_v);
-    if(_norm_v.empty()) {
-      auto norm = cfg.get<float>("Normalization",-1.);
-      _norm_v.resize(_tensor3d_producer_v.size(),norm);
-    }else if(_norm_v.size() != _tensor3d_producer_v.size()) {
+    _norm_v = cfg.get<std::vector<float> >("NormalizationList", _norm_v);
+    if (_norm_v.empty()) {
+      auto norm = cfg.get<float>("Normalization", -1.);
+      _norm_v.resize(_tensor3d_producer_v.size(), norm);
+    } else if (_norm_v.size() != _tensor3d_producer_v.size()) {
       LARCV_CRITICAL() << "NormalizationList size mismatch with other input parameters!" << std::endl;
       throw larbys();
     }
 
-    _norm_type_v = cfg.get<std::vector<unsigned short> >("NormTypeList",_norm_type_v);
-    if(_norm_type_v.empty()) {
-      auto norm_type = cfg.get<unsigned short>("NormType",(unsigned short)kNormalizeByArea);
-      _norm_type_v.resize(_tensor3d_producer_v.size(),norm_type);
-    }else if(_norm_type_v.size() != _tensor3d_producer_v.size()) {
+    _norm_type_v = cfg.get<std::vector<unsigned short> >("NormTypeList", _norm_type_v);
+    if (_norm_type_v.empty()) {
+      auto norm_type = cfg.get<unsigned short>("NormType", (unsigned short)kNormalizeByArea);
+      _norm_type_v.resize(_tensor3d_producer_v.size(), norm_type);
+    } else if (_norm_type_v.size() != _tensor3d_producer_v.size()) {
       LARCV_CRITICAL() << "NormTypeList size mismatch with other input parameters!" << std::endl;
       throw larbys();
     }
@@ -76,16 +76,16 @@ namespace larcv {
       auto const& ev_tensor3d = mgr.get_data<larcv::EventSparseTensor3D>(tensor3d_producer);
       auto& ev_output = mgr.get_data<larcv::EventSparseTensor3D>(output_producer);
 
-      if(ev_output.meta().valid()) {
-        static bool one_time_warning=true;
-        if(_output_producer_v[producer_index].empty()) {
+      if (ev_output.meta().valid()) {
+        static bool one_time_warning = true;
+        if (_output_producer_v[producer_index].empty()) {
           LARCV_CRITICAL() << "Over-writing existing EventSparseTensor3D data for label "
-          << output_producer << std::endl;
+                           << output_producer << std::endl;
           throw larbys();
         }
-        else if(one_time_warning) {
+        else if (one_time_warning) {
           LARCV_WARNING() << "Output EventSparseTensor3D producer " << output_producer
-          << " already holding valid data will be over-written!" << std::endl;
+                          << " already holding valid data will be over-written!" << std::endl;
           one_time_warning = false;
         }
       }
@@ -106,7 +106,13 @@ namespace larcv {
       for (auto const& vox : ev_tensor3d.as_vector())
         vs.emplace(vox.id(), vox.value() / norm, false);
 
-      ev_output.emplace(std::move(vs), ev_tensor3d.meta());
+      auto const meta = ev_tensor3d.meta();
+      ev_output.emplace(std::move(vs), meta);
+
+      LARCV_INFO() << "EventSparseTensor3D " << tensor3d_producer << " thresholded to " << output_producer << std::endl
+                   << "Original meta:" << std::endl << meta.dump() << std::endl
+                   << "New meta:" << std::endl << ev_output.meta().dump() << std::endl;
+
     }
     return true;
   }
