@@ -1,38 +1,43 @@
-#ifndef __PYTensor3DMAKER_CXX__
-#define __PYTensor3DMAKER_CXX__
+#ifndef __PYCluster3DMAKER_CXX__
+#define __PYCluster3DMAKER_CXX__
 
-#include "PyTensor3DMaker.h"
+#include "PyCluster3DMaker.h"
 #include "larcv/core/DataFormat/EventVoxel3D.h"
 
 namespace larcv {
 
-	static PyTensor3DMakerProcessFactory __global_PyTensor3DMakerProcessFactory__;
+	static PyCluster3DMakerProcessFactory __global_PyCluster3DMakerProcessFactory__;
 
-	PyTensor3DMaker::PyTensor3DMaker(const std::string name)
+	PyCluster3DMaker::PyCluster3DMaker(const std::string name)
 		: ProcessBase(name)
 	{}
 
-	void PyTensor3DMaker::configure(const PSet& cfg)
-	{ _producer_name = cfg.get<std::string>("Tensor3DProducer"); }
+	void PyCluster3DMaker::configure(const PSet& cfg)
+	{ _producer_name = cfg.get<std::string>("Cluster3DProducer"); }
 
-	void PyTensor3DMaker::initialize()
+	void PyCluster3DMaker::initialize()
 	{
 		_run = _subrun = _event = kINVALID_SIZE;
-		_tensor3d_v.clear();
+		_cluster3d_v.clear_data();
+		_meta.clear();
 	}
 
-	void PyTensor3DMaker::append_ndarray(PyObject* img, const Voxel3DMeta& meta)
+        void PyCluster3DMaker::append_ndarray(PyObject* img)
 	{
-		LARCV_INFO() << "Appending an Tensor3D (current size=" << _tensor3d_v.size() << ")" << std::endl;
-		_tensor3d_v.emplace_back(std::move(as_tensor3d(img)));
+		LARCV_INFO() << "Appending an Cluster3D (current size=" << _cluster3d_v.size() << ")" << std::endl;
+		_cluster3d_v.emplace(std::move(as_tensor3d(img)));
 	}
 
-	bool PyTensor3DMaker::process(IOManager& mgr)
+	bool PyCluster3DMaker::process(IOManager& mgr)
 	{
+	        auto& ev_output = mgr.get_data<larcv::EventClusterVoxel3D>(_producer_name);
+		ev_output.emplace(std::move(_cluster3d_v),_meta);
+		_cluster3d_v.clear_data();
+		_meta.clear();
 		return true;
 	}
 
-	void PyTensor3DMaker::finalize()
+	void PyCluster3DMaker::finalize()
 	{}
 
 }
