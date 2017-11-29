@@ -42,13 +42,14 @@
 //#pragma link C++ class larcv::ROIPad+;
 
 //#pragma link C++ class larcv::UnionROI+;
-#pragma link C++ class larcv::VoxelCompressor+;
+#pragma link C++ class larcv::Tensor3DCompressor+;
+#pragma link C++ class larcv::Cluster3DCompressor+;
 #pragma link C++ class larcv::Tensor3DFromCluster3D+;
 #pragma link C++ class larcv::SegWeightInstance3D+;
 #pragma link C++ class larcv::SegLabelFromCluster3D+;
-#pragma link C++ class larcv::MaskSparseTensor3D+;
-#pragma link C++ class larcv::ThresholdVoxel3D+;
-#pragma link C++ class larcv::ParticleROIFromCluster+;
+#pragma link C++ class larcv::MaskTensor3D+;
+#pragma link C++ class larcv::ThresholdTensor3D+;
+//#pragma link C++ class larcv::ParticleROIFromCluster+;
 #pragma link C++ class larcv::Cluster2DFromCluster3D+;
 #pragma link C++ class larcv::Tensor2DFromTensor3D+;
 #pragma link C++ class larcv::BlurTensor3D+;
