@@ -98,7 +98,7 @@ bool BatchFillerTensor3D::process(IOManager& mgr) {
     int ch = 0;
     for (auto const& voxel : voxel_data.as_vector()) {
       ch = (int)(voxel.value());
-      if (ch < 0 || ch >= _num_channel) {
+      if (ch < 0 || ch >= (int)_num_channel) {
         LARCV_CRITICAL() << "Voxel ID " << voxel.id() << " has value "
                          << voxel.value()
                          << " ... cannt map to hot label array of length "

@@ -46,11 +46,11 @@ namespace larcv {
       LARCV_INFO() << "Assining to class " << class_index << " ... " << std::flush;
       for(auto pdg : pdg_list[class_index]) {
         if(pdg>0) {
-          if(_particle_to_class.size() <= pdg) _particle_to_class.resize(pdg+1,_undefined_label);
+          if(_particle_to_class.size() <= (size_t)pdg) _particle_to_class.resize(pdg+1,_undefined_label);
           _particle_to_class[pdg] = class_index;
         }else{
           pdg = std::abs(pdg);
-          if(_anti_particle_to_class.size() <= pdg) _anti_particle_to_class.resize(pdg+1,_undefined_label);
+          if(_anti_particle_to_class.size() <= (size_t)pdg) _anti_particle_to_class.resize(pdg+1,_undefined_label);
           _anti_particle_to_class[pdg] = class_index;
         }
         LARCV_INFO() << pdg << " ";
@@ -87,11 +87,11 @@ namespace larcv {
         auto const& particle = particle_v[cindex];
         auto pdg = particle.pdg_code();
         if(pdg > 0) {
-          if(pdg >= _particle_to_class.size()) class_def = _undefined_label;
+          if((size_t)pdg >= _particle_to_class.size()) class_def = _undefined_label;
           else class_def = _particle_to_class[pdg];
         }else{
           pdg = std::abs(pdg);
-          if(pdg >= _anti_particle_to_class.size()) class_def = _undefined_label;
+          if((size_t)pdg >= _anti_particle_to_class.size()) class_def = _undefined_label;
           else class_def = _anti_particle_to_class[pdg];
         }
       }
