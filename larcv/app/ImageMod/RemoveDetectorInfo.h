@@ -43,7 +43,7 @@ namespace larcv {
 
   private:
 
-    std::string _cluster3d_producer;
+    std::string _cluster3d_producer, _particle_producer;
     
   };
 
