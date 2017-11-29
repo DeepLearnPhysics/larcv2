@@ -98,43 +98,32 @@ namespace larcv {
                        << ") != # of input dir (" << _in_dir_v.size() << ")!" << std::endl;
       throw larbys();
     }
-    /*
-    _store_only_name = cfg.get<std::vector<std::string> >("StoreOnlyName",_store_only_name);
-    std::vector<unsigned short> store_only_type;
-    for(auto const& ptype : _store_only_type) store_only_type.push_back((unsigned short)ptype);
-    store_only_type = cfg.get<std::vector<unsigned short> >("StoreOnlyType",store_only_type);
-    _store_only_type.clear();
-    for(auto const& ptype : store_only_type) {
-      if(ptype >= (unsigned short)kProductUnknown) {
-    LARCV_CRITICAL() << "StoreOnlyType contains invalid type: "
-       << ptype << " (>=" << kProductUnknown << ")" << std::endl;
-    throw larbys();
-      }
-      _store_only_type.push_back((ProductType_t)(ptype));
-    }
-    if(_store_only_name.size() != _store_only_type.size()) {
+
+    std::vector<std::string> store_only_name;
+    std::vector<std::string> store_only_type;
+    store_only_name = cfg.get<std::vector<std::string> >("StoreOnlyName", store_only_name);
+    store_only_type = cfg.get<std::vector<std::string> >("StoreOnlyType", store_only_type);
+    if (store_only_name.size() != store_only_type.size()) {
       LARCV_CRITICAL() << "StoreOnlyName and StoreOnlyType has different lengths!" << std::endl;
       throw larbys();
     }
+    for (size_t i = 0; i < store_only_name.size(); ++i) {
+      auto& val = _store_only[store_only_type[i]];
+      val.insert(store_only_name[i]);
+    }
 
-    _read_only_name = cfg.get<std::vector<std::string> >("ReadOnlyName",_read_only_name);
-    std::vector<unsigned short> read_only_type;
-    for(auto const& ptype : _read_only_type) read_only_type.push_back((unsigned short)ptype);
-    read_only_type = cfg.get<std::vector<unsigned short> >("ReadOnlyType",read_only_type);
-    _read_only_type.clear();
-    for(auto const& ptype : read_only_type) {
-      if(ptype >= (unsigned short)kProductUnknown) {
-    LARCV_CRITICAL() << "ReadOnlyType contains invalid type: "
-       << ptype << " (>=" << kProductUnknown << ")" << std::endl;
-    throw larbys();
-    }
-      _read_only_type.push_back((ProductType_t)(ptype));
-    }
-    if(_read_only_name.size() != _read_only_type.size()) {
+    std::vector<std::string> read_only_name;
+    std::vector<std::string> read_only_type;
+    read_only_name = cfg.get<std::vector<std::string> >("ReadOnlyName", read_only_name);
+    read_only_type = cfg.get<std::vector<std::string> >("ReadOnlyType", read_only_type);
+    if (read_only_name.size() != read_only_type.size()) {
       LARCV_CRITICAL() << "ReadOnlyName and ReadOnlyType has different lengths!" << std::endl;
       throw larbys();
     }
-    */
+    for (size_t i = 0; i < read_only_name.size(); ++i) {
+      auto& val = _read_only[read_only_type[i]];
+      val.insert(read_only_name[i]);
+    }
   }
 
   bool IOManager::initialize()
@@ -162,15 +151,19 @@ namespace larcv {
 
 
     // Now handle "store-only" configuration
-    _store_only_bool.clear();
-    if (_io_mode != kREAD && _store_only_type.size()) {
+    _store_id_bool.clear();
+    if (_io_mode != kREAD && _store_only.size()) {
       std::vector<size_t> store_only_id;
-      for (size_t i = 0; i < _store_only_type.size(); ++i)
-        store_only_id.push_back(register_producer(ProducerName_t(_store_only_type[i], _store_only_name[i])));
-      _store_only_bool.resize(_product_ctr, false);
+      for (auto const& type_name_s: _store_only) {
+        auto const& type = type_name_s.first;
+        auto const& name_s = type_name_s.second;
+        for (auto const& name : name_s)
+          store_only_id.push_back(register_producer(ProducerName_t(type, name)));
+      }
+      _store_id_bool.resize(_product_ctr, false);
       if ( _product_ctr > _read_id_bool.size() ) // append to read-in counters
         _read_id_bool.resize(_product_ctr, false);
-      for (auto const& id : store_only_id) _store_only_bool.at(id) = true;
+      for (auto const& id : store_only_id) _store_id_bool.at(id) = true;
     }
 
     _in_tree_index = 0;
@@ -307,25 +300,21 @@ namespace larcv {
         }
 
         // If read-only is specified and not in a list, skip
-        /*
-        if(_read_only_name.size()) {
-          bool skip=true;
-          for(auto const& read_type : _read_only_type) {
-            if(read_type != type) continue;
-            for(auto const& read_name : _read_only_name) {
-              if(read_name == producer_name) {
-          skip=false;
-          break;
-              }
-            }
+        if (_read_only.size()) {
+          bool skip = true;
+          auto const& type_name_iter = _read_only.find(type_name);
+          if(type_name_iter != _read_only.end()) {
+            auto const& type_name_s = (*type_name_iter).second;
+            auto const& name_iter = type_name_s.find(producer_name);
+            if(name_iter != type_name_s.end()) skip = false;
           }
-          if(skip) {
+          if (skip) {
             LARCV_NORMAL() << "Skipping: producer=" << producer_name << " type= " << type_name << std::endl;
             continue;
           }
           LARCV_INFO() << "Not skipping: producer=" << producer_name << " type= " << type_name << std::endl;
         }
-        */
+
         auto id = register_producer(ProducerName_t(type_name, producer_name));
         LARCV_INFO() << "Registered: producer=" << producer_name << " Key=" << id << std::endl;
         _in_tree_v[id]->AddFile(fname.c_str());
@@ -397,7 +386,7 @@ namespace larcv {
     // in kBOTH mode make sure all TTree entries are read-in
     if (_io_mode == kBOTH) {
       for (size_t id = 0; id < _in_tree_index_v.size(); ++id) {
-        if (_store_only_bool.size() && (id >= _store_only_bool.size() || !_store_only_bool[id])) continue;
+        if (_store_id_bool.size() && (id >= _store_id_bool.size() || !_store_id_bool[id])) continue;
         if (_in_tree_index_v[id] == _in_tree_index) continue;
         get_data(id);
       }
@@ -407,7 +396,7 @@ namespace larcv {
 
     set_id();
 
-    if (_store_only_bool.empty()) {
+    if (_store_id_bool.empty()) {
 
       for (auto& p : _product_ptr_v)  {
         if (!p) break;
@@ -430,9 +419,9 @@ namespace larcv {
 
     } else {
 
-      for (size_t i = 0; i < _store_only_bool.size(); ++i) {
+      for (size_t i = 0; i < _store_id_bool.size(); ++i) {
         auto const& p = _product_ptr_v[i];
-        if (!_store_only_bool[i]) {
+        if (!_store_id_bool[i]) {
           p->clear();
           continue;
         }
@@ -442,8 +431,8 @@ namespace larcv {
         }
       }
 
-      for (size_t i = 0; i < _store_only_bool.size(); ++i) {
-        if (!_store_only_bool[i]) continue;
+      for (size_t i = 0; i < _store_id_bool.size(); ++i) {
+        if (!_store_id_bool[i]) continue;
         auto& t = _out_tree_v[i];
         auto& p = _product_ptr_v[i];
         LARCV_DEBUG() << "Saving " << t->GetName() << " entry " << t->GetEntries() << std::endl;
@@ -627,15 +616,15 @@ namespace larcv {
 
     if (_io_mode != kREAD) {
       _out_file->cd();
-      if (_store_only_bool.empty()) {
+      if (_store_id_bool.empty()) {
         for (auto& t : _out_tree_v) {
           if (!t) break;
           LARCV_NORMAL() << "Writing " << t->GetName() << " with " << t->GetEntries() << " entries" << std::endl;
           t->Write();
         }
       } else {
-        for (size_t i = 0; i < _store_only_bool.size(); ++i) {
-          if (!_store_only_bool[i]) continue;
+        for (size_t i = 0; i < _store_id_bool.size(); ++i) {
+          if (!_store_id_bool[i]) continue;
           auto& t = _out_tree_v[i];
           LARCV_NORMAL() << "Writing " << t->GetName() << " with " << t->GetEntries() << " entries" << std::endl;
           t->Write();
@@ -677,6 +666,10 @@ namespace larcv {
     _in_file_v.clear();
     _in_dir_v.clear();
     _key_list.clear();
+    _read_only.clear();
+    _store_only.clear();
+    _read_id_bool.clear();
+    _store_id_bool.clear();
   }
 
 }

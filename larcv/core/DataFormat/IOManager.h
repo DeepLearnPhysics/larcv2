@@ -144,11 +144,9 @@ namespace larcv {
     size_t _product_ctr;
     std::vector<larcv::EventBase*> _product_ptr_v;
     std::vector<std::string>       _product_type_v;
-    std::vector<std::string> _store_only_name;
-    std::vector<std::string> _store_only_type;
-    std::vector<std::string> _read_only_name;
-    std::vector<std::string> _read_only_type;
-    std::vector<bool> _store_only_bool;
+    std::map<std::string,std::set<std::string> > _store_only;
+    std::map<std::string,std::set<std::string> > _read_only;
+    std::vector<bool> _store_id_bool;
     std::vector<bool> _read_id_bool;
   };
 
