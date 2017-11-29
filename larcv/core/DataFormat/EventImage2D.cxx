@@ -29,7 +29,7 @@ namespace larcv {
 
   void EventImage2D::emplace(Image2D&& img)
   {
-    _image_v.emplace_back(img);
+    _image_v.emplace_back(std::move(img));
     _image_v.back().index((ImageIndex_t)(_image_v.size()-1));
   }
 

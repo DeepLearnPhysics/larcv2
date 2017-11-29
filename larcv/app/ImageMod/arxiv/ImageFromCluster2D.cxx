@@ -14,7 +14,7 @@ namespace larcv {
 
   void ImageFromCluster2D::configure(const PSet& cfg)
   {
-    _pixel2d_producer  = cfg.get<std::string>("Pixel2DProducer");
+    _cluster2d_producer  = cfg.get<std::string>("Cluster2DProducer");
     _output_producer = cfg.get<std::string>("OutputProducer");
     _type_pi  = (PIType_t)(cfg.get<unsigned short>("PIType", (unsigned short)(PIType_t::kPITypeFixedPI)));
     _fixed_pi = cfg.get<float>("FixedPI", 100);
@@ -25,14 +25,14 @@ namespace larcv {
 
   bool ImageFromCluster2D::process(IOManager& mgr)
   {
-    auto const& ev_cluster2d = mgr.get_data<larcv::EventClusterPixel2D>(_pixel2d_producer);
+    auto const& ev_cluster2d = mgr.get_data<larcv::EventClusterPixel2D>(_cluster2d_producer);
     auto& ev_out_image = mgr.get_data<larcv::EventImage2D>(_output_producer);
 
     std::vector<larcv::Image2D> image_v;
     static std::vector<float> voxel_value_v;
 
     LARCV_INFO() << "processing " << ev_cluster2d.as_vector().size()
-		 << " clusters from " << _pixel2d_producer << std::endl;
+		 << " clusters from " << _cluster2d_producer << std::endl;
 
     for(auto const& cluster2d_v : ev_cluster2d.as_vector()) {
 

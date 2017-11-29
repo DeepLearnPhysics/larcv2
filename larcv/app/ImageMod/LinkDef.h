@@ -37,7 +37,7 @@
 #pragma link C++ function larcv::cluster_to_image2d(const larcv::Pixel2DCluster&, size_t, size_t)+;
 //#pragma link C++ class larcv::LoadImageMod+;
 //#pragma link C++ class larcv::ROIMerger+;
-#pragma link C++ class larcv::ImageFromCluster2D+;
+//#pragma link C++ class larcv::ImageFromCluster2D+;
 #pragma link C++ class larcv::ImageFromTensor2D+;
 //#pragma link C++ class larcv::ROIPad+;
 

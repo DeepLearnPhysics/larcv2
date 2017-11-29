@@ -42,18 +42,16 @@ namespace larcv {
     void finalize();
 
   private:
-
-    enum class PIType_t {
+    void configure_labels(const PSet& cfg);
+    enum PIType_t {
       kPITypeFixedPI,
       kPITypeInputVoxel,
-      kPITypeClusterIndex,
       kPITypeUndefined
     };
-    float _fixed_pi;
-    PIType_t _type_pi;
-    std::string _tensor2d_producer;
-    std::string _image_producer;
-    std::string _output_producer;
+    std::vector<float> _fixed_pi_v;
+    std::vector<unsigned short> _type_pi_v;
+    std::vector<std::string> _tensor2d_producer_v;
+    std::vector<std::string> _output_producer_v;
 
   };
 

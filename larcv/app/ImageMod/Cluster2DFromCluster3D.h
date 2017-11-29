@@ -42,9 +42,10 @@ namespace larcv {
     void finalize();
 
   private:
-    std::string _cluster3d_producer;
-    std::string _output_producer;
-    int _xy, _yz, _zx;
+    void configure_labels(const PSet& cfg);
+    std::vector<std::string> _cluster3d_producer_v;
+    std::vector<std::string> _output_producer_v;
+    std::vector<bool> _xy_v, _yz_v, _zx_v;
   };
 
   /**
