@@ -95,7 +95,7 @@ namespace larcv {
       auto const& ev_tensor3d =
         mgr.get_data<larcv::EventSparseTensor3D>(tensor3d_producer);
 
-      if (ev_tensor3d.as_vector().size() == 0) {
+      if (!ev_tensor3d.meta().valid()) {
         LARCV_CRITICAL() << "Can not find sparse3d from producer "
                          << tensor3d_producer << std::endl;
         throw larbys();

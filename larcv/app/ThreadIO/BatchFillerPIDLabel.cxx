@@ -72,14 +72,17 @@ namespace larcv {
     }
     // class
     size_t label = kINVALID_SIZE;
+    int pdg = 0;
     for(auto const& part : part_v) {
       for(size_t class_idx=0; class_idx < _pdg_list.size(); ++class_idx) {
-        if(part.pdg_code() != _pdg_list[class_idx]) continue;
+	pdg = part.pdg_code();
+        if(pdg != _pdg_list[class_idx]) continue;
         label = class_idx;
         break;
       }
       if(label!=kINVALID_SIZE) break;
     }
+    LARCV_DEBUG() << "Found PDG code " << pdg << " (class=" << label << ")" << std::endl;    
     _entry_data.resize(_num_class, 0);
     for (auto& v : _entry_data) v = 0;
     _entry_data.at(label) = 1.;
