@@ -73,16 +73,16 @@ namespace larcv {
     int zid = id / (_xnum * _ynum);
     id -= zid * (_xnum * _ynum);
     zid += shift_z;
-    if(zid < 0 || zid >= _znum) return kINVALID_VOXELID;
+    if(zid < 0 || zid >= (int)_znum) return kINVALID_VOXELID;
 
     int yid = id / _xnum;
     int xid = id - yid * _xnum;
 
     yid += shift_y;
-    if(yid < 0 || yid >= _ynum) return kINVALID_VOXELID;
+    if(yid < 0 || yid >= (int)_ynum) return kINVALID_VOXELID;
 
     xid += shift_x;
-    if(xid < 0 || xid >= _xnum) return kINVALID_VOXELID;
+    if(xid < 0 || xid >= (int)_xnum) return kINVALID_VOXELID;
 
     return (zid * (_xnum * _ynum) + yid * _xnum + xid);
   }
