@@ -111,7 +111,6 @@ namespace larcv {
 
     if(_min_num_voxel<1) return true;
 
-    size_t voxel_count=0;
     if(event_tensor3d->as_vector().size() < _min_num_voxel) {
       LARCV_NORMAL() << "Skipping event " << event_tensor3d->event_key() 
 		     << " due to voxel count (" << event_tensor3d->as_vector().size() 
