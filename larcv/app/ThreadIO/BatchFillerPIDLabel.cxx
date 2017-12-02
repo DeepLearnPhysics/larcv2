@@ -36,16 +36,19 @@ namespace larcv {
   {
     if (logger().level() <= msg::kINFO) {
       LARCV_INFO() << "Total data size: " << batch_data().data_size() << std::endl;
-
-      std::vector<size_t> ctr_v;
-      for (auto const& v : batch_data().data()) {
-        if (v >= ctr_v.size()) ctr_v.resize(v + 1, 0);
-        ctr_v[v] += 1;
+      
+      std::vector<size_t> ctr_v(_num_class,0);
+      auto const& data = batch_data().data();
+      for(size_t i=0; i<data.size(); ++i) {
+	if(data[i] < 1.) continue;
+	ctr_v[i%_num_class] += 1;
       }
       std::stringstream ss;
-      ss << "Used: ";
-      for (size_t i = 0; i < ctr_v.size(); ++i)
-        ss << ctr_v[i] << " of class " << i << " ... ";
+      ss << "Class fractions (0";
+      for (size_t i = 1; i<_num_class; ++i) ss << "," << i;
+      ss << ") ... (" << ctr_v[0];
+      for (size_t i = 1; i<_num_class; ++i) ss << "," << ctr_v[i];
+      ss << ")";
       LARCV_INFO() << ss.str() << std::endl;
     }
   }
