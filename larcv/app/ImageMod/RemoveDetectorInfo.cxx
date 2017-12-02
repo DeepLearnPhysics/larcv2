@@ -100,14 +100,30 @@ namespace larcv {
       auto const& ev_cluster_input =
         mgr.get_data<larcv::EventClusterVoxel3D>(cluster_producer);
 
-      auto _this_meta = ev_cluster_input.meta();
-      _this_meta.set(0.0, 0.0, 0.0, _this_meta.max_x() - origin.x,
-                     _this_meta.max_y() - origin.y, _this_meta.max_z() - origin.z,
-                     _this_meta.num_voxel_x(), _this_meta.num_voxel_y(),
-                     _this_meta.num_voxel_z());
+      auto this_meta = ev_cluster_input.meta();
+      if(!this_meta.valid()) {
+        LARCV_INFO() << "Skipping invalid Voxel3DMeta by producer " 
+        << cluster_producer << std::endl;
+        continue;
+      }
+      LARCV_INFO() << "Updating from old Voxel3DMeta:" << std::endl
+      << this_meta.dump() << std::endl
+      << "... shifting with (x,y,z) => (" 
+      << origin.x << "," << origin.y << "," << origin.z << ")" << std::endl;
+
+      this_meta.set(this_meta.min_x() - origin.x,
+                     this_meta.min_y() - origin.y, 
+                     this_meta.min_z() - origin.z,
+                     this_meta.max_x() - origin.x,
+                     this_meta.max_y() - origin.y, 
+                     this_meta.max_z() - origin.z,
+                     this_meta.num_voxel_x(), 
+                     this_meta.num_voxel_y(),
+                     this_meta.num_voxel_z(),
+                     this_meta.unit());
 
       auto& ev_cluster_output = mgr.get_data<larcv::EventClusterVoxel3D>(cluster_producer);
-      ev_cluster_output.meta(_this_meta);
+      ev_cluster_output.meta(this_meta);
     }
 
     // Tensors
@@ -119,14 +135,31 @@ namespace larcv {
       auto const& ev_tensor3d_input =
         mgr.get_data<larcv::EventSparseTensor3D>(tensor3d_producer);
 
-      auto _this_meta = ev_tensor3d_input.meta();
-      _this_meta.set(0.0, 0.0, 0.0, _this_meta.max_x() - origin.x,
-                     _this_meta.max_y() - origin.y, _this_meta.max_z() - origin.z,
-                     _this_meta.num_voxel_x(), _this_meta.num_voxel_y(),
-                     _this_meta.num_voxel_z());
+      auto this_meta = ev_tensor3d_input.meta();
+      if(!this_meta.valid()) {
+        LARCV_INFO() << "Skipping invalid Voxel3DMeta by producer " 
+        << tensor3d_producer << std::endl;
+        continue;
+      }
+      LARCV_INFO() << "Updating from old Voxel3DMeta:" << std::endl
+      << this_meta.dump() << std::endl
+      << "... shifting with (x,y,z) => (" 
+      << origin.x << "," << origin.y << "," << origin.z << ")" << std::endl;
+
+
+      this_meta.set(this_meta.min_x() - origin.x,
+                     this_meta.min_y() - origin.y, 
+                     this_meta.min_z() - origin.z,
+                     this_meta.max_x() - origin.x,
+                     this_meta.max_y() - origin.y, 
+                     this_meta.max_z() - origin.z,
+                     this_meta.num_voxel_x(), 
+                     this_meta.num_voxel_y(),
+                     this_meta.num_voxel_z(),
+                     this_meta.unit());
 
       auto& ev_tensor3d_output = mgr.get_data<larcv::EventSparseTensor3D>(tensor3d_producer);
-      ev_tensor3d_output.meta(_this_meta);
+      ev_tensor3d_output.meta(this_meta);
     }
 
     return true;

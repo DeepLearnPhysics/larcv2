@@ -68,13 +68,10 @@ namespace larcv {
     }
   }
 
-  void ImageFromTensor2D::initialize()
-  { LARCV_INFO() << _tensor2d_producer_v.size() << std::endl;}
-  //{}
+  void ImageFromTensor2D::initialize() {}
 
   bool ImageFromTensor2D::process(IOManager& mgr)
   {
-    LARCV_INFO() << _tensor2d_producer_v.size() << std::endl;
     for (size_t producer_index = 0; producer_index < _tensor2d_producer_v.size(); ++producer_index) {
       auto const& tensor2d_producer = _tensor2d_producer_v[producer_index];
       auto const& output_producer = _output_producer_v[producer_index];
