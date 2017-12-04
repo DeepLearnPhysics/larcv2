@@ -48,6 +48,7 @@ namespace larcv {
       kPITypeInputVoxel,
       kPITypeUndefined
     };
+    std::vector<float> _base_pi_v;
     std::vector<float> _fixed_pi_v;
     std::vector<unsigned short> _type_pi_v;
     std::vector<std::string> _tensor2d_producer_v;

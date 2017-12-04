@@ -66,6 +66,15 @@ namespace larcv {
       LARCV_CRITICAL() << "FixedPIList size mismatch with other input parameters!" << std::endl;
       throw larbys();
     }
+
+    _base_pi_v = cfg.get<std::vector<float> >("BasePIList", _base_pi_v);
+    if (_base_pi_v.empty()) {
+      auto base_pi = cfg.get<float>("BasePI", 0.);
+      _base_pi_v.resize(_tensor2d_producer_v.size(), base_pi);
+    } else if (_base_pi_v.size() != _tensor2d_producer_v.size()) {
+      LARCV_CRITICAL() << "BasePIList size mismatch with other input parameters!" << std::endl;
+      throw larbys();
+    }
   }
 
   void ImageFromTensor2D::initialize() {}
@@ -76,25 +85,21 @@ namespace larcv {
       auto const& tensor2d_producer = _tensor2d_producer_v[producer_index];
       auto const& output_producer = _output_producer_v[producer_index];
       auto const& fixed_pi = _fixed_pi_v[producer_index];
+      auto const& base_pi  = _base_pi_v[producer_index];
       auto const type_pi = (PIType_t)(_type_pi_v[producer_index]);
+
 
       auto const& ev_tensor2d = mgr.get_data<larcv::EventSparseTensor2D>(tensor2d_producer);
       auto& ev_out_image = mgr.get_data<larcv::EventImage2D>(output_producer);
 
       std::vector<larcv::Image2D> image_v;
-      static std::vector<float> voxel_value_v;
       for (auto const& tensor2d_v : ev_tensor2d.as_vector()) {
 
         auto const& meta = tensor2d_v.meta();
 
         if (image_v.size() <= meta.id()) image_v.resize(meta.id() + 1);
 
-        std::vector<float> img_data(meta.rows() * meta.cols());
-
-        if (voxel_value_v.size() < img_data.size())
-          voxel_value_v.resize(img_data.size());
-
-        for (size_t i = 0; i < voxel_value_v.size(); ++i) voxel_value_v[i] = 0.;
+        std::vector<float> img_data(meta.rows() * meta.cols(),base_pi);
 
         for (auto const& vox : tensor2d_v.as_vector()) {
           float val = fixed_pi;
