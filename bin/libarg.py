@@ -20,7 +20,7 @@ else:
     libs+= commands.getoutput('root-config --libs').split()
 
 if 'PYTHON_LIB' in os.environ:
-    libs+= [" -L{%s} -lpython{%i}.{%i}".format(os.environ["PYTHON_LIB"].strip(), 
+    libs+= [" -L{} -lpython{}.{}".format(os.environ["PYTHON_LIB"].strip(), 
         sys.version_info.major, 
         sys.version_info.minor)]
 
