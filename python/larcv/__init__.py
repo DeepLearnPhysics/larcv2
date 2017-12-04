@@ -1,6 +1,6 @@
 import ROOT,os
 if not 'LARCV_BASEDIR' in os.environ:
-    print '$LARCV_BASEDIR shell env. var. not found (run configure.sh)'
+    print('$LARCV_BASEDIR shell env. var. not found (run configure.sh)')
     raise ImportError
 #force loading larlite libs FIRST because auto-loading in ROOT6 does not properly work
 if 'LARLITE_BASEDIR' in os.environ:
