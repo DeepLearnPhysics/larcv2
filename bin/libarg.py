@@ -1,14 +1,28 @@
 
-import sys,os,subprocess
+import sys,os
 
-dirs=[]
-for d in os.listdir(os.environ['LARCV_BUILDDIR']):
-    if not len([x for x in os.listdir('%s/%s' % (os.environ['LARCV_BUILDDIR'],d)) if x.endswith('.o')]): continue
-    dirs.append(d)
-libs=[x for x in subprocess.getoutput('larcv-config --libs').split() if not x.startswith('-llarcv')]
-libs+= subprocess.getoutput('root-config --libs').split()
+if sys.version_info.major == 3:
+    import subprocess
+    dirs=[]
+    for d in os.listdir(os.environ['LARCV_BUILDDIR']):
+        if not len([x for x in os.listdir('%s/%s' % (os.environ['LARCV_BUILDDIR'],d)) if x.endswith('.o')]): continue
+        dirs.append(d)
+    libs=[x for x in subprocess.getoutput('larcv-config --libs').split() if not x.startswith('-llarcv')]
+    libs+= subprocess.getoutput('root-config --libs').split()
+
+else:
+    import commands
+    dirs=[]
+    for d in os.listdir(os.environ['LARCV_BUILDDIR']):
+        if not len([x for x in os.listdir('%s/%s' % (os.environ['LARCV_BUILDDIR'],d)) if x.endswith('.o')]): continue
+        dirs.append(d)
+    libs=[x for x in commands.getoutput('larcv-config --libs').split() if not x.startswith('-llarcv')]
+    libs+= commands.getoutput('root-config --libs').split()
+
 if 'PYTHON_LIB' in os.environ:
-    libs+= [" -L%s -lpython2.7"%(os.environ["PYTHON_LIB"].strip())]
+    libs+= [" -L{%s} -lpython{%i}.{%i}".format(os.environ["PYTHON_LIB"].strip(), 
+        sys.version_info.major, 
+        sys.version_info.minor)]
 
 objs_list=[]
 dict_list=[]
