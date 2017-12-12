@@ -346,7 +346,6 @@ namespace larcv {
 
       LARCV_INFO() << "Constructing Processor config: " << proc_name << std::endl;      
       PSet proc_cfg(proc_name);
-      proc_cfg.add_value("EnableFilter", (_enable_filter ? "true" : "false"));
       for (auto const& value_key : orig_cfg.value_keys()) {
 	if(value_key == "ProcessName") {
 	  std::stringstream ss_tmp2;
