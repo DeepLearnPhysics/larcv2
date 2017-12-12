@@ -38,6 +38,9 @@ namespace larcv {
     void clear();
 
     /// Const reference getter to an array of larcv::Image2D
+    const std::vector<larcv::Image2D>& as_vector() const { return _image_v; }
+
+    /// Deprecated (use as_vector): const reference getter to an array of larcv::Image2D 
     const std::vector<larcv::Image2D>& image2d_array() const { return _image_v; }
 
     /// larcv::Image2D const reference getter for a specified index number

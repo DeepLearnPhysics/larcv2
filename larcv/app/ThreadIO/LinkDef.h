@@ -40,33 +40,3 @@
 //#pragma link C++ class larcv::BatchFillerImage2D+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

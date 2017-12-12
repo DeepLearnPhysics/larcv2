@@ -303,7 +303,7 @@ namespace larcv {
     */
     std::cout<<"\033[93m setting verbosity \033[00m" << orig_cfg.get<unsigned short>("Verbosity", 2) << std::endl;
     set_verbosity( (msg::Level_t)(orig_cfg.get<unsigned short>("Verbosity", 2)) );
-    _enable_filter = orig_cfg.get<bool>("EnableFilter");
+    _enable_filter = orig_cfg.get<bool>("EnableFilter",false);
     //_use_threading = orig_cfg.get<bool>("UseThread", true);
     _num_threads   = orig_cfg.get<size_t>("NumThreads",1);
     _input_fname_v = orig_cfg.get<std::vector<std::string> >("InputFiles");
@@ -346,6 +346,7 @@ namespace larcv {
 
       LARCV_INFO() << "Constructing Processor config: " << proc_name << std::endl;      
       PSet proc_cfg(proc_name);
+      proc_cfg.add_value("EnableFilter", (_enable_filter ? "true" : "false"));
       for (auto const& value_key : orig_cfg.value_keys()) {
 	if(value_key == "ProcessName") {
 	  std::stringstream ss_tmp2;

@@ -128,7 +128,7 @@ namespace larcv {
     inline void energy_deposit  (double e)           { _energy_deposit = e; }
     inline void creation_process (const std::string& proc) { _process = proc; }
     inline void boundingbox_2d(const std::vector<larcv::BBox2D>& bb_v) { _bb2d_v = bb_v; }
-    inline void boundingbox_2d(const BBox2D& bb, ProjectionID_t id=0) { _bb2d_v.resize(id+1); _bb2d_v[id] = bb; }
+    inline void boundingbox_2d(const BBox2D& bb, ProjectionID_t id) { _bb2d_v.resize(id+1); _bb2d_v[id] = bb; }
     inline void boundingbox_3d(const BBox3D& bb) { _bb3d = bb; }
     //inline void type_score (const std::vector<float>& score_v) { _type_score_v = score_v; }
     // parent info setter
