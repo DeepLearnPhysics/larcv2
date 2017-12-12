@@ -20,7 +20,7 @@ namespace larcv {
   void BatchFillerImage2D::configure(const PSet& cfg)
   {
     LARCV_DEBUG() << "start" << std::endl;
-    _caffe_mode = cfg.get<bool>("CaffeMode");
+    _caffe_mode = cfg.get<bool>("CaffeMode",false);
     _image_producer = cfg.get<std::string>("ImageProducer");
 
     _slice_v = cfg.get<std::vector<size_t> >("Channels", _slice_v);

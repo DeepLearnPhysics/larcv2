@@ -150,7 +150,7 @@ namespace larcv {
     LARCV_INFO() << "Retrieving self (ProcessDriver) config" << std::endl;
     set_verbosity((msg::Level_t)(cfg.get<unsigned short>("Verbosity",logger().level())));
     larcv::logger::get_shared().set(logger().level());
-    _enable_filter = cfg.get<bool>("EnableFilter");
+    _enable_filter = cfg.get<bool>("EnableFilter",false);
     auto random_access_bool = cfg.get<bool>("RandomAccess");
     if(!random_access_bool) _random_access = 0;
     else _random_access = -1;

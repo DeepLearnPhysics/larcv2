@@ -46,6 +46,7 @@ namespace larcv {
 
     std::string _image_producer;
     std::string _output_producer;
+    std::string _input_type;
     
   };
 

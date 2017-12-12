@@ -48,9 +48,12 @@ namespace larcv {
       // Get the set of voxels matched to this particle, and find the
       // min/max in each coordinate.
       auto const& voxel_v = ev_voxel3d.as_vector().at(i_part);
+      LARCV_INFO() << "Particle " << i_part << " corresponding ClusterVoxel3D contains " << voxel_v.as_vector().size() << " voxels..." << std::endl;
       // BBox3D _3d_box;
-      float x_min = 99999, y_min = 99999, z_min = 99999;
-      float x_max = -99999, y_max = -99999, z_max = -99999;
+      double x_min, y_min, z_min;
+      double x_max, y_max, z_max;
+      x_min = y_min = z_min = std::numeric_limits<double>::max();
+      x_max = y_max = z_max = std::numeric_limits<double>::min();
       for (auto const& vox : voxel_v.as_vector()) {
         if (vox.value() > _voxel_threshold) {
           auto const pos = meta3d.position(vox.id());
@@ -65,24 +68,30 @@ namespace larcv {
       // Check to make sure values were actually filled:
       if (x_max < x_min || y_max < y_min || z_max < z_min) {
         particle_v.emplace_back(std::move(new_particle));
+        LARCV_INFO() << "Particle " << i_part << " no bounding box found... " << std::endl;
         continue;
       }
 
       // Now create the 3D and 2D bounding boxes:
       new_particle.boundingbox_3d(BBox3D(x_min, y_min, z_min, x_max, y_max, z_max));
+      LARCV_INFO() << "Particle " << i_part << " 3D BBox: " << new_particle.boundingbox_3d().dump();
 
       // XY projection:
       if (_xy) {
         new_particle.boundingbox_2d(BBox2D(x_min, y_min, x_max, y_max), 0);
+        LARCV_INFO() << "Particle " << i_part << " Projection 0 BBox: " << new_particle.boundingbox_2d((ProjectionID_t)0).dump();
       }
       // YZ projection:
       if (_yz) {
         new_particle.boundingbox_2d(BBox2D(y_min, z_min, y_max, z_max), 1);
+        LARCV_INFO() << "Particle " << i_part << " Projection 1 BBox: " << new_particle.boundingbox_2d((ProjectionID_t)1).dump();
       }
       // ZX projection:
       if (_zx) {
         new_particle.boundingbox_2d(BBox2D(z_min, x_min, z_max, x_max), 2);
+        LARCV_INFO() << "Particle " << i_part << " Projection 2 BBox: " << new_particle.boundingbox_2d((ProjectionID_t)2).dump();
       }
+      LARCV_INFO() << std::endl;
 
       particle_v.emplace_back(std::move(new_particle));
     }

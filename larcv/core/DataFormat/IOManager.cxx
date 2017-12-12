@@ -332,6 +332,7 @@ namespace larcv {
       auto& t = _in_tree_v[id];
       if (!t) break;
       size_t tmp_entries = t->GetEntries();
+      t->GetEntry(0);
       LARCV_INFO() << "TTree " << t->GetName() << " has " << tmp_entries << " entries" << std::endl;
       if (_in_tree_entries == kINVALID_SIZE) _in_tree_entries = tmp_entries;
       else _in_tree_entries = (_in_tree_entries < tmp_entries ? _in_tree_entries : tmp_entries);
