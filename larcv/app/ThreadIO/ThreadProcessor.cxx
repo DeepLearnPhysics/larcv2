@@ -35,7 +35,7 @@ namespace larcv {
       if (th.joinable()) th.join();
     for(auto& driver : _driver_v) {
       if (driver->processing()) 
-	driver->finalize();
+      	driver->finalize();
       delete driver;
     }    
   }
@@ -291,6 +291,12 @@ namespace larcv {
     }
     _batch_state_v[storage_id] = BatchDataState_t::kBatchStateReleased;
     LARCV_INFO() << "Storage data (id=" << storage_id <<") released" << std::endl;
+  }
+
+  void ThreadProcessor::release_data()
+  {
+    for(size_t id=0; id<_batch_state_v.size(); ++id)
+      this->release_data(id);
   }
 
   void ThreadProcessor::configure(const PSet& orig_cfg)

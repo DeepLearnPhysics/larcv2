@@ -157,6 +157,24 @@ class larcv_threadio (object):
       self._proc.start_manager(batch_size)
       self._next_storage_id=0
 
+   def stop_manager(self):
+      if not self._proc or not self._proc.configured():
+         sys.stderr.write('must call configure(cfg) before start_manager()!\n')
+         return
+
+      self._batch=None
+      self._proc.stop_manager(batch_size)
+
+   def release_data(self):
+      if not self._proc or not self._proc.configured():
+         sys.stderr.write('must call configure(cfg) before start_manager()!\n')
+         return
+      self.stop_manager()
+      self._proc.release_data()
+      self._next_storage_id=0
+      self._tree_entries = None
+      self._event_ids = None
+
    def is_reading(self):
       return (not self._proc.storage_status_array()[self._next_storage_id] == 3)
 
@@ -208,6 +226,8 @@ class larcv_threadio (object):
 
    def fetch_n_entries(self):
       return self._proc.get_n_entries()
+
+   def set_
 
 def sig_kill(signal,frame):
    print('\033[95mSIGINT detected.\033[00m Finishing the program gracefully.')

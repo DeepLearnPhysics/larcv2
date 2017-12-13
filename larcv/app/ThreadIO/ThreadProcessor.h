@@ -52,6 +52,8 @@ namespace larcv {
 
     void release_data(size_t storage_id);
 
+    void release_data();
+
     inline const std::vector<larcv::BatchDataState_t>& storage_status_array() const
     { return _batch_state_v; }
 
