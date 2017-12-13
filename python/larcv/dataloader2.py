@@ -206,6 +206,9 @@ class larcv_threadio (object):
    def fetch_entries(self):
       return self._tree_entries
 
+   def fetch_n_entries(self):
+      return self._proc.get_n_entries()
+
 def sig_kill(signal,frame):
    print('\033[95mSIGINT detected.\033[00m Finishing the program gracefully.')
    for name,ptr in larcv_threadio._instance_m.iteritems():
