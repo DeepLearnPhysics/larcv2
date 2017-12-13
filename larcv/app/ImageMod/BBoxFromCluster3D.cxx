@@ -1,18 +1,18 @@
-#ifndef __BBOXFROMCLUSTERVOXEL3D_CXX__
-#define __BBOXFROMCLUSTERVOXEL3D_CXX__
+#ifndef __BBoxFromCluster3D_CXX__
+#define __BBoxFromCluster3D_CXX__
 
-#include "BBoxFromClusterVoxel3D.h"
+#include "BBoxFromCluster3D.h"
 #include "larcv/core/DataFormat/EventParticle.h"
 #include "larcv/core/DataFormat/EventVoxel3D.h"
 namespace larcv {
 
-  static BBoxFromClusterVoxel3DProcessFactory
-  __global_BBoxFromClusterVoxel3DProcessFactory__;
+  static BBoxFromCluster3DProcessFactory
+  __global_BBoxFromCluster3DProcessFactory__;
 
-  BBoxFromClusterVoxel3D::BBoxFromClusterVoxel3D(const std::string name)
+  BBoxFromCluster3D::BBoxFromCluster3D(const std::string name)
     : ProcessBase(name) {}
 
-  void BBoxFromClusterVoxel3D::configure(const PSet& cfg) {
+  void BBoxFromCluster3D::configure(const PSet& cfg) {
     _voxel3d_producer = cfg.get<std::string>("ClusterVoxel3DProducer");
     _particle_producer = cfg.get<std::string>("ParticleProducer");
     _output_producer = _particle_producer + "_bbox";
@@ -23,9 +23,9 @@ namespace larcv {
     _zx = cfg.get<int>("ZX", 1);
   }
 
-  void BBoxFromClusterVoxel3D::initialize() {}
+  void BBoxFromCluster3D::initialize() {}
 
-  bool BBoxFromClusterVoxel3D::process(IOManager& mgr) {
+  bool BBoxFromCluster3D::process(IOManager& mgr) {
     auto const& ev_voxel3d =
       mgr.get_data<larcv::EventClusterVoxel3D>(_voxel3d_producer);
     auto const& meta3d = ev_voxel3d.meta();
@@ -102,6 +102,6 @@ namespace larcv {
     return true;
   }
 
-  void BBoxFromClusterVoxel3D::finalize() {}
+  void BBoxFromCluster3D::finalize() {}
 }
 #endif
