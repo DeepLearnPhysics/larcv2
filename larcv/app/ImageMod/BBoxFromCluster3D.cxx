@@ -13,7 +13,7 @@ namespace larcv {
     : ProcessBase(name) {}
 
   void BBoxFromCluster3D::configure(const PSet& cfg) {
-    _voxel3d_producer = cfg.get<std::string>("ClusterVoxel3DProducer");
+    _voxel3d_producer = cfg.get<std::string>("Cluster3DProducer");
     _particle_producer = cfg.get<std::string>("ParticleProducer");
     _output_producer = _particle_producer + "_bbox";
     _output_producer = cfg.get<std::string>("OutputProducer", _output_producer);
