@@ -28,7 +28,13 @@ void BatchFillerMultiLabel::configure(const PSet& cfg) {
 
 void BatchFillerMultiLabel::initialize() {}
 
-void BatchFillerMultiLabel::_batch_begin_() {}
+void BatchFillerMultiLabel::_batch_begin_() {
+    if(!batch_data().dim().empty() && batch_size() != batch_data().dim().front()) {
+    auto dim = batch_data().dim();
+    dim[0] = batch_size();
+    this->set_dim(dim);
+  }
+}
 
 void BatchFillerMultiLabel::_batch_end_() {
   if (logger().level() <= msg::kINFO) {

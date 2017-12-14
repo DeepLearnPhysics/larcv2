@@ -2,7 +2,7 @@
  * \file BatchFillerTemplate.h
  *
  * \ingroup ThreadIO
- * 
+ *
  * \brief Class def header for a class BatchFillerTemplate
  *
  * @author kazuhiro
@@ -24,33 +24,33 @@ namespace larcv {
      doxygen documentation!
   */
   template <class T>
-  class BatchFillerTemplate : public BatchHolder{
+  class BatchFillerTemplate : public BatchHolder {
     friend ThreadProcessor;
   public:
-    
+
     /// Default constructor
-    BatchFillerTemplate(const std::string name="BatchFillerTemplate")
+    BatchFillerTemplate(const std::string name = "BatchFillerTemplate")
       : BatchHolder(name)
     {}
-    
+
     /// Default destructor
-    virtual ~BatchFillerTemplate(){}
-    
+    virtual ~BatchFillerTemplate() {}
+
     inline void batch_begin() {
       _batch_data_ptr->reset_data();
       _batch_begin_();
     }
-    
+
     inline void batch_end()
-    { 
-      if(!_batch_data_ptr->is_filled()) {
-	LARCV_CRITICAL() << "Batch data is not filled @ end-of-batch (" << _batch_data_ptr->current_data_size()
-			 << "/" << _batch_data_ptr->data_size() << ")!" << std::endl;
-	throw larbys();
+    {
+      if (!_batch_data_ptr->is_filled()) {
+        LARCV_CRITICAL() << "Batch data is not filled @ end-of-batch (" << _batch_data_ptr->current_data_size()
+                         << "/" << _batch_data_ptr->data_size() << ")!" << std::endl;
+        throw larbys();
       }
       _batch_end_();
     }
-    
+
     inline const BatchData<T>& batch_data() const { return *(_batch_data_ptr); }
 
     BatchDataType_t data_type() const;
@@ -63,17 +63,17 @@ namespace larcv {
     inline void set_entry_data(const std::vector<T>& data)
     { _batch_data_ptr->set_entry_data(data); }
 
-    virtual void _batch_begin_() {}
-    virtual void _batch_end_()   {}
+    virtual void _batch_begin_() =0;
+    virtual void _batch_end_()   =0;
 
   private:
 
     BatchData<T>* _batch_data_ptr;
-    
+
   };
 
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

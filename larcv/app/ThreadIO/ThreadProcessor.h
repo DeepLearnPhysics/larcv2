@@ -101,6 +101,8 @@ namespace larcv {
     inline size_t num_batch_storage() const
     { return _num_batch_storage; }
 
+    void wait(std::chrono::microseconds duration);
+
   private:
 
     void terminate_threads();

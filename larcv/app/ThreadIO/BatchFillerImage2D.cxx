@@ -41,6 +41,13 @@ namespace larcv {
   {
     _mirrored.clear();
     _mirrored.reserve(batch_size());
+
+    if (!batch_data().dim().empty() && batch_size() != batch_data().dim().front()) {
+      auto dim = batch_data().dim();
+      dim[0] = batch_size();
+      this->set_dim(dim);
+    }
+
   }
 
   void BatchFillerImage2D::_batch_end_()

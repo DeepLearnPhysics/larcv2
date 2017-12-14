@@ -2,7 +2,7 @@
  * \file BatchData.h
  *
  * \ingroup ThreadIO
- * 
+ *
  * \brief Class def header for a class BatchData
  *
  * @author kazuhiro
@@ -25,10 +25,10 @@ namespace larcv {
      doxygen documentation!
   */
   template <class T>
-  class BatchData{
-    
+  class BatchData {
+
   public:
-    
+
     /// Default constructor
     BatchData()
       : _current_size(0)
@@ -36,13 +36,13 @@ namespace larcv {
     {}
 
     /// Default destructor
-    ~BatchData(){}
+    ~BatchData() {}
 
     const std::vector<T>& data() const;
 
     inline const std::vector<int>& dim() const { return _dim; }
 
-    size_t data_size() const;
+    size_t data_size(bool calculate=false) const;
 
     inline size_t current_data_size() const { return _current_size; }
 
@@ -68,5 +68,5 @@ namespace larcv {
   };
 }
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

@@ -53,7 +53,9 @@ namespace larcv {
     void reset_batch(size_t batch_id, std::vector<int> dim);
 
     void reset_batch(size_t batch_id);
-    
+
+    void reset_batch();
+
   private:
     std::vector<larcv::BatchData<T> > _data_v;
   };

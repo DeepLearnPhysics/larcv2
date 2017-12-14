@@ -30,7 +30,14 @@ void BatchFillerTensor3D::configure(const PSet& cfg) {
 
 void BatchFillerTensor3D::initialize() {}
 
-void BatchFillerTensor3D::_batch_begin_() {}
+void BatchFillerTensor3D::_batch_begin_() {
+  if(!batch_data().dim().empty() && batch_size() != batch_data().dim().front()) {
+    LARCV_INFO() << "Batch size changed " << batch_data().dim().front() << "=>" << batch_size() << std::endl;
+    auto dim = batch_data().dim();
+    dim[0] = batch_size();
+    this->set_dim(dim);
+  }
+}
 
 void BatchFillerTensor3D::_batch_end_() {
   if (logger().level() <= msg::kINFO)

@@ -92,6 +92,10 @@ namespace larcv {
     data.reset_data();
   }
 
+  template <class T>
+  void BatchDataStorage<T>::reset_batch()
+  { for(size_t id=0; id<num_batch(); ++id) reset_batch(id); }
+
 }
 
 template class larcv::BatchDataStorage<char>;
