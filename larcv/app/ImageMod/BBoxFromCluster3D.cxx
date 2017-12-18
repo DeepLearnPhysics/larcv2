@@ -52,8 +52,12 @@ namespace larcv {
       // BBox3D _3d_box;
       double x_min, y_min, z_min;
       double x_max, y_max, z_max;
-      x_min = y_min = z_min = std::numeric_limits<double>::max();
-      x_max = y_max = z_max = std::numeric_limits<double>::min();
+      x_min = meta3d.max_x();
+      y_min = meta3d.max_y();
+      z_min = meta3d.max_z();
+      x_max = meta3d.min_x();
+      y_max = meta3d.min_y();
+      z_max = meta3d.min_z();
       for (auto const& vox : voxel_v.as_vector()) {
         if (vox.value() > _voxel_threshold) {
           auto const pos = meta3d.position(vox.id());
