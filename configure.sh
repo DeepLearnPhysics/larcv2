@@ -94,6 +94,5 @@ fi
 
 echo
 echo "Finish configuration. To build, type:"
-echo "> cd \$LARCV_BUILDDIR"
 echo "> make "
 echo
