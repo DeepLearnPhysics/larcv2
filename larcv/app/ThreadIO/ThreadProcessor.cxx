@@ -9,8 +9,9 @@
 #include "BatchDataStorageFactory.h"
 //#include <stdlib.h>
 #include <mutex>
+#include <chrono>
 
-std::mutex __thproc_starter_mt;
+std::mutex __thproc_random_mt;
 
 namespace larcv {
   ThreadProcessor::ThreadProcessor(std::string name)
@@ -23,6 +24,7 @@ namespace larcv {
     , _num_batch_storage(0)
     , _optional_next_index(kINVALID_SIZE)
     , _batch_global_counter(0)
+    , _random_access_mode(kTPRandomNo)
   {}
 
   ThreadProcessor::~ThreadProcessor()
@@ -32,7 +34,7 @@ namespace larcv {
   {
     auto t_start = std::chrono::high_resolution_clock::now();
     auto wait = t_start + duration;
-    while(std::chrono::high_resolution_clock::now() < wait) {}
+    while (std::chrono::high_resolution_clock::now() < wait) {}
     return;
   }
 
@@ -98,16 +100,16 @@ namespace larcv {
       t_start = std::chrono::high_resolution_clock::now();
       auto state   = batch_process(batch_size);
       t_end   = std::chrono::high_resolution_clock::now();
-      LARCV_INFO() << "Returned from batch_process: " 
-      << (long long)(std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_start).count()) 
-      << " [us]" << std::endl;
+      LARCV_INFO() << "Returned from batch_process: "
+                   << (long long)(std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_start).count())
+                   << " [us]" << std::endl;
 
       t_start = std::chrono::high_resolution_clock::now();
       this->wait( std::chrono::microseconds(state ? 10000 : 100000) );
       t_end   = std::chrono::high_resolution_clock::now();
       LARCV_INFO() << "... slept: "
-      << (long long)(std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_start).count())
-      << " [us]" << std::endl;
+                   << (long long)(std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_start).count())
+                   << " [us]" << std::endl;
     }
   }
 
@@ -359,6 +361,27 @@ namespace larcv {
     _input_fname_v = orig_cfg.get<std::vector<std::string> >("InputFiles");
     _num_batch_storage = orig_cfg.get<size_t>("NumBatchStorage", _num_threads);
 
+    auto seed = orig_cfg.get<unsigned int>("RandomSeed", 0);
+    if (seed == 0)
+      seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    _random_generator = std::mt19937(seed);
+
+
+    auto random_access_bool = orig_cfg.get<bool>("RandomAccess");
+    if (!random_access_bool) _random_access_mode = kTPRandomNo;
+    else {
+      try {
+        auto mode = orig_cfg.get<unsigned short>("RandomAccess", 0);
+        if (mode >= (unsigned int)kTPRandomUnknown)
+          mode = (unsigned int)kTPRandomUnknown;
+        _random_access_mode = (TPRandomAccessMode_t)(mode);
+      }catch(...){
+        _random_access_mode = kTPRandomEntry;
+      }
+    }
+    if (_random_access_mode == kTPRandomUnknown)
+      LARCV_CRITICAL() << "RandomAccess mode " << orig_cfg.get<std::string>("RandomAccess") << " is invalid..." << std::endl;
+
     LARCV_INFO() << "Number of threads: " << _num_threads << " ... Number of batch storage: " << _num_batch_storage << std::endl;
 
     // Initialize NumStorages related variables
@@ -411,9 +434,12 @@ namespace larcv {
           ss_tmp2 << "]";
           proc_cfg.add_value(value_key, ss_tmp2.str());
         }
+        else if (value_key == "RandomAccess")
+          continue;
         else
           proc_cfg.add_value(value_key, orig_cfg.get<std::string>(value_key));
       }
+      proc_cfg.add_value("RandomAccess", "False");
 
       // Brew read-only configuration
       PSet io_cfg(io_cfg_name);
@@ -511,6 +537,14 @@ namespace larcv {
     _configured = true;
   }
 
+  int ThreadProcessor::random_number(int range_min, int range_max)
+  {
+    __thproc_random_mt.lock();
+    std::uniform_int_distribution<int> dist(range_min, range_max);
+    return dist(_random_generator);
+    __thproc_random_mt.unlock();
+  }
+
   bool ThreadProcessor::batch_process(size_t nentries) {
 
     LARCV_DEBUG() << " start" << std::endl;
@@ -576,6 +610,8 @@ namespace larcv {
     if (_optional_next_index != kINVALID_SIZE) {
       start_entry = _optional_next_index;
       _optional_next_index = kINVALID_SIZE;
+    } else if (_random_access_mode != kTPRandomNo) {
+      start_entry = random_number(0, _driver_v[thread_id]->io().get_n_entries() - 1);
     }
     if (start_entry == kINVALID_SIZE)
       start_entry = 0;
@@ -713,13 +749,23 @@ namespace larcv {
     auto& valid_ctr = _valid_counter_v[thread_id];
     auto& lifetime_valid_ctr = _lifetime_valid_counter_v[thread_id];
     size_t next_entry = start_entry;
+    size_t total_entries = driver->io().get_n_entries();
 
     LARCV_INFO() << "Entering process loop" << std::endl;
     while (valid_ctr < nentries) {
       size_t entry = next_entry;
       if (_optional_next_index_v.empty()) {
-        entry = entry % driver->io().get_n_entries();
-        next_entry = entry + 1;
+        switch (_random_access_mode) {
+        case TPRandomAccessMode_t::kTPRandomNo:
+        case TPRandomAccessMode_t::kTPRandomBatch:
+        case TPRandomAccessMode_t::kTPRandomUnknown:
+          entry = entry % total_entries;
+          next_entry = entry + 1;
+          break;
+        case TPRandomAccessMode_t::kTPRandomEntry:
+          next_entry = random_number(0, total_entries - 1);
+          break;
+        }
       }
       else {
         entry = entry % _optional_next_index_v.size();

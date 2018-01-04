@@ -78,6 +78,13 @@
 
 #pragma link C++ class larcv::Meta+;
 #pragma link C++ class larcv::EventMeta+;
+
+#pragma link C++ function larcv::as_image2d(const SparseTensor2D&)+;
+#pragma link C++ function larcv::as_image2d(const VoxelSet&, const ImageMeta&)+;
+#pragma link C++ function larcv::as_sparse_tensor2d(const ClusterPixel2D&)+;
+#pragma link C++ function larcv::as_image2d(const ClusterPixel2D&)+;
+#pragma link C++ function larcv::as_sparse_tensor3d(const ClusterVoxel3D&)+;
+
 //ADD_NEW_CLASS ... do not change this line
 
 #endif

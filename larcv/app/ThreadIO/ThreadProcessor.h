@@ -17,6 +17,7 @@
 #include "larcv/core/Processor/ProcessDriver.h"
 #include "ThreadIOTypes.h"
 #include <thread>
+#include <random>
 
 namespace larcv {
   /**
@@ -105,6 +106,10 @@ namespace larcv {
 
   private:
 
+    enum TPRandomAccessMode_t { kTPRandomNo, kTPRandomEntry, kTPRandomBatch, kTPRandomUnknown};
+
+    int random_number(int range_min, int range_max);
+
     void terminate_threads();
 
     void manager_batch_process(size_t nentries);
@@ -130,6 +135,8 @@ namespace larcv {
 
     // main thread
     std::thread _manager_thread;
+    std::mt19937 _random_generator;
+    TPRandomAccessMode_t _random_access_mode;
     // thread-wise variables
     std::vector<larcv::ProcessDriver*> _driver_v;
     std::vector<std::thread> _thread_v;

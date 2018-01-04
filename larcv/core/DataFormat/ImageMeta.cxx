@@ -59,9 +59,8 @@ namespace larcv {
   {
     std::stringstream ss;
     ss << "ProjectionID " << id() << " (rows,cols) = (" << _row_count << "," << _col_count
-       << ") ... Left Bottom (" << min_x() << "," << min_y()
-       << ") ... Right Top (" << max_x() << "," << max_y()
-       << ")" << std::endl;
+       << ") ... Distance Unit: " << (int)(this-> unit())
+       << " ... Left Bottom => Right Top " << ((BBox2D*)(this))->dump();
     return ss.str();
   }
 }
