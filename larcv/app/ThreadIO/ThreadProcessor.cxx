@@ -366,21 +366,21 @@ namespace larcv {
       seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     _random_generator = std::mt19937(seed);
 
-
-    auto random_access_bool = orig_cfg.get<bool>("RandomAccess");
-    if (!random_access_bool) _random_access_mode = kTPRandomNo;
-    else {
-      try {
-        auto mode = orig_cfg.get<unsigned short>("RandomAccess", 0);
-        if (mode >= (unsigned int)kTPRandomUnknown)
-          mode = (unsigned int)kTPRandomUnknown;
-        _random_access_mode = (TPRandomAccessMode_t)(mode);
-      }catch(...){
-        _random_access_mode = kTPRandomEntry;
+    auto random_access = orig_cfg.get<std::string>("RandomAccess");
+    if(random_access == "true") {
+      _random_access_mode = kTPRandomEntry;
+    }else if(random_access == "false") {
+      _random_access_mode = kTPRandomNo;
+    }else if(std::all_of(random_access.begin(), random_access.end(), ::isdigit)) {
+      auto mode = orig_cfg.get<unsigned short>("RandomAccess");
+      if (mode >= (unsigned int)kTPRandomUnknown) {
+        LARCV_CRITICAL() << "RandomAccess mode " << mode << " is invalid..." << std::endl;
+        throw larbys();
       }
+      _random_access_mode = (TPRandomAccessMode_t)(mode);      
+    }else{
+      LARCV_CRITICAL() << "RandomAccess mode " << random_access << " is invalid..." << std::endl;      
     }
-    if (_random_access_mode == kTPRandomUnknown)
-      LARCV_CRITICAL() << "RandomAccess mode " << orig_cfg.get<std::string>("RandomAccess") << " is invalid..." << std::endl;
 
     LARCV_INFO() << "Number of threads: " << _num_threads << " ... Number of batch storage: " << _num_batch_storage << std::endl;
 
@@ -439,7 +439,7 @@ namespace larcv {
         else
           proc_cfg.add_value(value_key, orig_cfg.get<std::string>(value_key));
       }
-      proc_cfg.add_value("RandomAccess", "False");
+      proc_cfg.add_value("RandomAccess", "false");
 
       // Brew read-only configuration
       PSet io_cfg(io_cfg_name);
@@ -539,10 +539,10 @@ namespace larcv {
 
   int ThreadProcessor::random_number(int range_min, int range_max)
   {
-    __thproc_random_mt.lock();
+//    __thproc_random_mt.lock();
     std::uniform_int_distribution<int> dist(range_min, range_max);
     return dist(_random_generator);
-    __thproc_random_mt.unlock();
+//    __thproc_random_mt.unlock();
   }
 
   bool ThreadProcessor::batch_process(size_t nentries) {
@@ -600,9 +600,9 @@ namespace larcv {
     _batch_global_counter += 1;
 
     if (_thread_v.size() > thread_id && _thread_v[thread_id].joinable()) {
-      LARCV_INFO() << "Thread has finished running but not joined. "
-                   << "You might want to retrieve data?" << std::endl;
+      LARCV_INFO() << "Thread ID " << thread_id << " has finished running but not joined...." << std::endl;
       _thread_v[thread_id].join();
+      LARCV_INFO() << "joined!";
     }
 
     // figure out "start entry"

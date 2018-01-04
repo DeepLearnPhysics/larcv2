@@ -1,3 +1,4 @@
+from __future__ import print_function
 from larcv import larcv
 import sys, time
 
@@ -13,7 +14,8 @@ start_time=time.time()
 proc.start_manager(batch_size)
 
 ctr=1
-while 1:
+while ctr<100:
+    
     if ctr % (int(report_cycle/sleep_time)) == 0:
         proc.status_dump()
         event_rate = proc.process_counter() / (time.time() - start_time)
@@ -25,13 +27,15 @@ while 1:
         if status == 3:
             entries = proc.processed_entries(storage_id)
             batch_id = proc.batch_id(storage_id)
+            msg = 'Batch {:02d} done contains entries: '.format(batch_id)
             print( 'Batch',batch_id,'done, contains entries:',)
             for entry in range(entries.size()):
-                print(entries[entry],)
-            print()
+                msg += '{:d} '.format(entries[entry])
+            print(msg)
             print('Releasing storage data',storage_id)
             proc.release_data(storage_id)
 
     time.sleep(sleep_time)
     ctr+=1
-
+proc.stop_manager()
+proc.reset()
