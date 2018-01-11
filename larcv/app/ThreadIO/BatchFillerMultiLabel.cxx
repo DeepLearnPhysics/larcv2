@@ -29,9 +29,9 @@ void BatchFillerMultiLabel::configure(const PSet& cfg) {
 void BatchFillerMultiLabel::initialize() {}
 
 void BatchFillerMultiLabel::_batch_begin_() {
-    if(!batch_data().dim().empty() && batch_size() != batch_data().dim().front()) {
+  if(!batch_data().dim().empty() && (int)(batch_size()) != batch_data().dim().front()) {
     auto dim = batch_data().dim();
-    dim[0] = batch_size();
+    dim[0] = (int)(batch_size());
     this->set_dim(dim);
   }
 }
@@ -43,7 +43,7 @@ void BatchFillerMultiLabel::_batch_end_() {
 
     std::vector<size_t> ctr_v;
     for (auto const& v : batch_data().data()) {
-      if (v >= ctr_v.size()) ctr_v.resize(v + 1, 0);
+      if (v >= (int)(ctr_v.size())) ctr_v.resize(v + 1, 0);
       ctr_v[v] += 1;
     }
     std::stringstream ss;
