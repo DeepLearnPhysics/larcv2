@@ -12,34 +12,13 @@ while test $# -gt 0; do
 	  out="${LARCV_INCDIR} "
 	  ;;
       --includes)
-	  out="-I${LARCV_INCDIR} "
-	  if [ $LARCV_OPENCV -eq 1 ]; then
-	      out+="-I${OPENCV_INCDIR} "
-	  fi
-	  out+=`python-config --includes`
-	  out+=" "
-	  if [ $LARCV_NUMPY -eq 1 ]; then
-	      out+="-I"
-	      out+=`python -c "import numpy; print(numpy.get_include())"`
-	      out+=" "
-	  fi
+	  out="${LARCV_INCLUDES} "
 	  ;;
       --libdir)
-	  out="{$LARCV_LIBDIR} "
+	  out="${LARCV_LIBDIR} "
 	  ;;
       --libs)
-	  out=""
-	  if [ $LARCV_NUMPY -eq 1 ]; then
-	      out+=" -L"
-	      out+=`python-config --prefix`
-	      out+="/lib/ "
-	      out+=`python-config --ldflags`
-	      out+=" "
-	  fi
-	  if [ $LARCV_OPENCV -eq 1 ]; then
-	      out+=" -L${OPENCV_LIBDIR} -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs "
-	  fi
-	  out+=" -L${LARCV_LIBDIR} -llarcv "
+	  out="${LARCV_LIBS}"
 	  ;;
       --help)
 	  ### Print a help message

@@ -19,6 +19,8 @@ export LARCV_APPDIR=$LARCV_BASEDIR/larcv/app
 export LARCV_LIBDIR=$LARCV_BUILDDIR/lib
 export LARCV_INCDIR=$LARCV_BUILDDIR/include
 export LARCV_BINDIR=$LARCV_BUILDDIR/bin
+export LARCV_INCLUDES="-I${LARCV_INCDIR} `python-config --includes` "
+export LARCV_LIBS="-L${LARCV_LIBDIR} -llarcv "
 
 # Abort if ROOT not installed. Let's check rootcint for this.
 if [ `command -v rootcling` ]; then
@@ -38,9 +40,11 @@ fi
 export LARCV_OPENCV=1
 if [[ -z $OPENCV_INCDIR ]]; then
     export LARCV_OPENCV=0
+    export LARCV_INCLUDES="${LARCV_INCLUDES} -I${OPENCV_INCDIR}"
 fi
 if [[ -z $OPENCV_LIBDIR ]]; then
     export LARCV_OPENCV=0
+    export LARCV_LIBS="-L${OPENCV_LIBDIR} -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs ${LARCV_LIBS}"
 fi
 
 # Check Numpy
@@ -53,6 +57,9 @@ if [ $LARCV_OPENCV -eq 0 ]; then
 fi
 if [ $LARCV_NUMPY -eq 0 ]; then
     missing+=" Numpy"
+else
+    LARCV_INCLUDES="${LARCV_INCLUDES} -I`python -c\"import numpy; print(numpy.get_include())\"`"
+    LARCV_LIBS="-L`python-config --prefix`/lib/ `python-config --ldflags` ${LARCV_LIBS}"
 fi
 if [[ $missing ]]; then
     printf "\033[93mWarning\033[00m ... missing$missing support. Build without them.\n";
