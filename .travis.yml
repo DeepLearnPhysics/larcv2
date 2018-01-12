@@ -7,7 +7,7 @@ services:
 - docker
 install:
 - git clone https://github.com/DeepLearnPhysics/ubuntu14.04_larcv2
-- cd ubuntu14.04_larcv2/Dockerfile && docker build -t deeplearnphysics/ubuntu14.04_larcv2 .
+- cd ubuntu14.04_larcv2 && docker build -t deeplearnphysics/ubuntu14.04_larcv2 .
 script:
 - docker run --name build_test deeplearnphysics/ubuntu14.04_larcv2 python -c "import larcv"
 notifications:
