@@ -1,0 +1,21 @@
+sudo: required
+language: python
+branches:
+  only:
+    - develop
+services:
+- docker
+install:
+- git clone https://github.com/DeepLearnPhysics/ubuntu14.04_larcv2
+- cd ubuntu14.04_larcv2/Dockerfile && docker build -t deeplearnphysics/ubuntu14.04_larcv2 .
+script:
+- docker run --name build_test deeplearnphysics/ubuntu14.04_larcv2 python -c "import larcv"
+notifications:
+# Emails are sent to the committer's git-configured email address by default,
+# but only if they have access to the repository.  To enable Travis on your
+# public fork of Caffe, just go to travis-ci.org and flip the switch on for
+# your Caffe fork.  To configure your git email address, use:
+#     git config --global user.email me@example.com
+  email:
+    on_success: always
+    on_failure: always
