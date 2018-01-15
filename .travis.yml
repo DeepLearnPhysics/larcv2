@@ -6,8 +6,6 @@ branches:
 services:
 - docker
 install:
-- git clone https://github.com/DeepLearnPhysics/ubuntu16.04_larcv2
-- cd ubuntu16.04_larcv2
 - git checkout docker_ubuntu16.04 
 - docker build -t larcv2_image .
 script:
