@@ -11,13 +11,15 @@ Software framework for image(2D)/volumetric(3D) data processing with APIs to int
 * ROOT6
 * Python (optional)
 * OpenCV 3 (optional)
+* Numpy (optional)
 
 ### Setup
 
-0. Dependencies to build with are determined through the presence of environment variables or executables in your PATH:
+0. Dependencies to build with are determined automatically through the following conditions.
 
   * ROOT: determined through the ability to run rootcling
-  * OPENCV: the presence of OPENCV_INCDIR and OPENCV_LIBDIR
+  * OpenCV: the presence of OPENCV_INCDIR and OPENCV_LIBDIR environment variables
+  * Numpy: being able to import `numpy`
 
 1. Clone & build
 ```
