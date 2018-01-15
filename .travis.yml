@@ -8,7 +8,7 @@ services:
 install:
 - docker build -t larcv2_image -f .Dockerfile .
 script:
-- docker run --name test_build larcv_image python -c "import larcv"
+- docker run --name test_build larcv2_image python -c "import larcv"
 notifications:
 # Emails are sent to the committer's git-configured email address by default,
 # but only if they have access to the repository.  To enable Travis on your
