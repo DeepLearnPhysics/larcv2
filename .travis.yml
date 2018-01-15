@@ -7,9 +7,11 @@ services:
 - docker
 install:
 - git clone https://github.com/DeepLearnPhysics/ubuntu16.04_larcv2
-- cd ubuntu16.04_larcv2 && docker build -t deeplearnphysics/ubuntu16.04_larcv2 .
+- cd ubuntu16.04_larcv2
+- git checkout docker_ubuntu16.04 
+- docker build -t larcv2_image .
 script:
-- docker run --name build_test deeplearnphysics/ubuntu16.04_larcv2 python -c "import larcv"
+- docker run --name test_build larcv_image python -c "import larcv"
 notifications:
 # Emails are sent to the committer's git-configured email address by default,
 # but only if they have access to the repository.  To enable Travis on your
