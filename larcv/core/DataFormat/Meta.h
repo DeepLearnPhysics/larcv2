@@ -1,7 +1,7 @@
 /**
  * \file Meta.h
  *
- * \ingroup DataFormat
+ * \ingroup core_DataFormat
  * 
  * \brief Class def header for Meta
  *

@@ -1,14 +1,14 @@
 /**
  * \file EventParticle.h
  *
- * \ingroup DataFormat
+ * \ingroup core_DataFormat
  * 
  * \brief Class def header for a class EventParticle
  *
  * @author kazuhiro
  */
 
-/** \addtogroup DataFormat
+/** \addtogroup core_DataFormat
 
     @{*/
 #ifndef EVENTPARTICLE_H

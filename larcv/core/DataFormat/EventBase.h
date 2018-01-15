@@ -1,14 +1,14 @@
 /**
  * \file EventBase.h
  *
- * \ingroup DataFormat
+ * \ingroup core_DataFormat
  * 
  * \brief Class def header for a class EventBase
  *
  * @author kazuhiro
  */
 
-/** \addtogroup DataFormat
+/** \addtogroup core_DataFormat
 
     @{*/
 #ifndef EVENTBASE_H

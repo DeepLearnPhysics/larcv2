@@ -1,14 +1,14 @@
 /**
  * \file PyImageMaker.h
  *
- * \ingroup Package_Name
+ * \ingroup core_PyUtil
  * 
  * \brief Class def header for a class PyImageMaker
  *
  * @author drinkingkazu
  */
 
-/** \addtogroup Package_Name
+/** \addtogroup core_PyUtil
 
     @{*/
 #ifndef __PYIMAGEMAKER_H__

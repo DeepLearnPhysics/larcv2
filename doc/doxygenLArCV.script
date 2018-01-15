@@ -341,7 +341,7 @@ HIDE_FRIEND_COMPOUNDS  = NO
 # If set to NO (the default) these blocks will be appended to the
 # function's detailed documentation block.
 
-HIDE_IN_BODY_DOCS      = NO
+HIDE_IN_BODY_DOCS      = YES
 
 # The INTERNAL_DOCS tag determines if documentation
 # that is typed after a \internal command is included. If the tag is set
@@ -548,7 +548,8 @@ WARN_LOGFILE           =
 
 INPUT                  = $(LARCV_COREDIR)/Base \
 		         $(LARCV_COREDIR)/DataFormat \
-		         $(LARCV_COREDIR)/Processor
+		         $(LARCV_COREDIR)/Processor \
+			 $(LARCV_COREDIR)/PyUtil
 #		       	 $(LARCV_APPDIR)
 
 # This tag can be used to specify the character encoding of the source files
@@ -597,7 +598,7 @@ EXCLUDE                = dOxygenLArCV \
 			 bin \
 			 tmp \
 			 Play \
-			 arxiv
+			 $(LARCV_COREDIR)/DataFormat/arxiv
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or
 # directories that are symbolic links (a Unix filesystem feature) are excluded

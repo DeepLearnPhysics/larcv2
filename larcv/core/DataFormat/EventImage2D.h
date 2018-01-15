@@ -1,14 +1,14 @@
 /**
  * \file EventImage2D.h
  *
- * \ingroup DataFormat
+ * \ingroup core_DataFormat
  * 
  * \brief Class def header for a class EventImage2D
  *
  * @author kazuhiro
  */
 
-/** \addtogroup DataFormat
+/** \addtogroup core_DataFormat
 
     @{*/
 #ifndef EVENTIMAGE2D_H

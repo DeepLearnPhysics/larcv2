@@ -1,14 +1,14 @@
 /**
  * \file load_pyutil.h
  *
- * \ingroup PyUtil
+ * \ingroup core_PyUtil
  * 
  * \brief Class def header for a class load_pyutil
  *
  * @author kazuhiro
  */
 
-/** \addtogroup PyUtil
+/** \addtogroup core_PyUtil
 
     @{*/
 #ifndef LOAD_PYUTIL_H

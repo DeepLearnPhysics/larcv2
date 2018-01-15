@@ -1,14 +1,14 @@
 /**
  * \file DataProductFactory.h
  *
- * \ingroup DataFormat
+ * \ingroup core_DataFormat
  * 
  * \brief Class def header for a class DataProductFactory
  *
  * @author kazuhiro
  */
 
-/** \addtogroup DataFormat
+/** \addtogroup core_DataFormat
 
     @{*/
 #ifndef __DATAPRODUCTFACTORY_H__
@@ -39,7 +39,7 @@ namespace larcv {
   };
 
   /**
-     \class ClusterAlgoFactory
+     \class DataProductFactory
      \brief Factory class for instantiating event product instance by larcv::IOManager
      This factory class can instantiate a specified product instance w/ provided producer name. \n
      The actual factory core (to which each product class must register creation factory instance) is \n

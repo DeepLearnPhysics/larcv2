@@ -1,14 +1,14 @@
 /**
  * \file EventMeta.h
  *
- * \ingroup DataFormat
+ * \ingroup core_DataFormat
  * 
  * \brief Class def header for a class EventMeta
  *
  * @author kazuhiro
  */
 
-/** \addtogroup DataFormat
+/** \addtogroup core_DataFormat
 
     @{*/
 #ifndef LARCV_EVENTMETA_H

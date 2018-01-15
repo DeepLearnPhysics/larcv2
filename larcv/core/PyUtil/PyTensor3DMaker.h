@@ -1,14 +1,14 @@
 /**
  * \file PyTensor3DMaker.h
  *
- * \ingroup Package_Name
+ * \ingroup core_PyUtil
  * 
  * \brief Class def header for a class PyTensor3DMaker
  *
  * @author drinkingkazu
  */
 
-/** \addtogroup Package_Name
+/** \addtogroup core_PyUtil
 
     @{*/
 #ifndef __PYTensor3DMAKER_H__

@@ -1,14 +1,14 @@
 /**
  * \file PyImageStitcher.h
  *
- * \ingroup Package_Name
+ * \ingroup core_PyUtil
  * 
  * \brief Class def header for a class PyImageStitcher
  *
  * @author drinkingkazu
  */
 
-/** \addtogroup Package_Name
+/** \addtogroup core_PyUtil
 
     @{*/
 #ifndef __PYIMAGESTITCHER_H__
