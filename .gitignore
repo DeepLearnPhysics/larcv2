@@ -1,3 +1,5 @@
+doc/*
+!doc/doxygenLArCV.script
 *.out
 *.depend
 *.png
