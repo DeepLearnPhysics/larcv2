@@ -6,8 +6,7 @@ branches:
 services:
 - docker
 install:
-- git checkout docker_ubuntu16.04 
-- docker build -t larcv2_image .
+- docker build -t larcv2_image -f .Dockerfile .
 script:
 - docker run --name test_build larcv_image python -c "import larcv"
 notifications:
