@@ -40,10 +40,12 @@ fi
 export LARCV_OPENCV=1
 if [[ -z $OPENCV_INCDIR ]]; then
     export LARCV_OPENCV=0
+else
     export LARCV_INCLUDES="${LARCV_INCLUDES} -I${OPENCV_INCDIR}"
 fi
 if [[ -z $OPENCV_LIBDIR ]]; then
     export LARCV_OPENCV=0
+else
     export LARCV_LIBS="-L${OPENCV_LIBDIR} -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs ${LARCV_LIBS}"
 fi
 
