@@ -40,12 +40,12 @@ fi
 export LARCV_OPENCV=1
 if [[ -z $OPENCV_INCDIR ]]; then
     export LARCV_OPENCV=0
-else
-    export LARCV_INCLUDES="${LARCV_INCLUDES} -I${OPENCV_INCDIR}"
 fi
 if [[ -z $OPENCV_LIBDIR ]]; then
     export LARCV_OPENCV=0
-else
+fi
+if [ $LARCV_OPENCV -eq 1 ]; then
+    export LARCV_INCLUDES="${LARCV_INCLUDES} -I${OPENCV_INCDIR}"
     export LARCV_LIBS="-L${OPENCV_LIBDIR} -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs ${LARCV_LIBS}"
 fi
 
@@ -77,7 +77,7 @@ export PATH=$LARCV_BASEDIR/bin:$LARCV_BINDIR:$PATH
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LARCV_LIBDIR
 export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$LARCV_LIBDIR
 
-if [[ -z $NO_OPENCV ]]; then
+if [ $LARCV_OPENCV -eq 1 ]; then
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$OPENCV_LIBDIR
     export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$OPENCV_LIBDIR
 fi
