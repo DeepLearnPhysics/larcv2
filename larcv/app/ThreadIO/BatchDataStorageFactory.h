@@ -36,18 +36,22 @@ namespace larcv {
 
     ~BatchDataStorageFactory()
     {}
-
+    /*
     inline static const BatchDataStorageFactory<T>& get() {
       if (!_me) _me = new BatchDataStorageFactory<T>();
       return (*_me);
     }
+    */
+    static const BatchDataStorageFactory<T>& get();
 
     inline bool exist_storage(std::string name) const
     {
       auto iter = _storage_m.find(name);
       return iter != _storage_m.end();
     }
-
+    
+    const BatchDataStorage<T>& get_storage(std::string name) const;
+    /*
     inline const BatchDataStorage<T>& get_storage(std::string name) const
     {
       if (!_me) _me = new BatchDataStorageFactory<T>();
@@ -58,7 +62,7 @@ namespace larcv {
       }
       return iter->second;
     }
-
+    */
     inline bool make_storage(std::string name, size_t num_batch = 1)
     {
       if (exist_storage(name)) {
@@ -69,6 +73,8 @@ namespace larcv {
       return true;
     }
 
+    BatchDataStorage<T>& get_storage_writeable(std::string name);
+    /*
     inline BatchDataStorage<T>& get_storage_writeable(std::string name) {
       if (!_me) _me = new BatchDataStorageFactory<T>();
       auto iter = _storage_m.find(name);
@@ -78,13 +84,15 @@ namespace larcv {
       }
       return iter->second;
     }
-
+    */
   private:
+    static BatchDataStorageFactory<T>& get_writeable();
+    /*
     inline static BatchDataStorageFactory<T>& get_writeable() {
       if (!_me) _me = new BatchDataStorageFactory<T>();
       return (*_me);
     }
-
+    */
   private:
     static BatchDataStorageFactory<T>* _me;
     std::map<std::string, BatchDataStorage<T> > _storage_m;
