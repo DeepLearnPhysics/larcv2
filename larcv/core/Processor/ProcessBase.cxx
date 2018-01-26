@@ -15,7 +15,7 @@ namespace larcv {
   {}
 
   bool ProcessBase::is(const std::string question) const
-  { return !(question.empty()); }
+  { return false; }
 
   void ProcessBase::_configure_(const PSet& cfg)
   {
