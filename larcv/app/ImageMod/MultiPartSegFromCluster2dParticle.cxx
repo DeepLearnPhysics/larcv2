@@ -52,7 +52,7 @@ bool MultiPartSegFromCluster2dParticle::process(IOManager& mgr) {
 
   // The output is an instance of image2D, so prepare that:
   auto& ev_image2d_output = mgr.get_data<larcv::EventImage2D>(_output_producer);
-
+  ev_image2d_output.clear();
   // Next, loop over the particles and clusters per projection_ID
   // and set the values in the output image to the label specified by
   // the pdg
