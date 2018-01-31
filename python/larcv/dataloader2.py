@@ -52,14 +52,12 @@ class batch_pydata(object):
       # copy data into numpy array
       ctime = time.time()
       if self._npy_data is None:
-         self._npy_data = np.array(larcv_batchdata.data())
-      else:
-         self._npy_data = self._npy_data.reshape(self.batch_data_size())
-         larcv.copy_array(self._npy_data,larcv_batchdata.data())
+         self._npy_data = larcv.as_ndarray(larcv_batchdata.data())
+         #self._npy_data = self._npy_data.reshape(self.batch_data_size())
       self._time_copy = time.time() - ctime
 
       ctime = time.time()
-      self._npy_data = self._npy_data.reshape(self._dim_data[0], self.batch_data_size()/self._dim_data[0]).astype(np.float32)
+      self._npy_data = self._npy_data.reshape(self._dim_data[0], self.batch_data_size()/self._dim_data[0])
       self.time_data_conv = time.time() - ctime
 
       return
@@ -84,7 +82,7 @@ class larcv_threadio (object):
       self._read_start_time = None
       self._read_end_time = None
       self._cfg_file = None
-      self._next_storage_id = 0
+      self._current_storage_id = -1
       self._storage = {}
       self._tree_entries = None
       self._event_ids = None
@@ -155,7 +153,7 @@ class larcv_threadio (object):
 
       self._batch=batch_size
       self._proc.start_manager(batch_size)
-      self._next_storage_id=0
+      self._current_storage_id=-1
 
    def stop_manager(self):
       if not self._proc or not self._proc.configured():
@@ -171,7 +169,7 @@ class larcv_threadio (object):
          return
       self.stop_manager()
       self._proc.release_data()
-      self._next_storage_id=0
+      self._current_storage_id=-1
       self._tree_entries = None
       self._event_ids = None
 
@@ -181,8 +179,10 @@ class larcv_threadio (object):
          return
       self._proc.set_next_index(index)
 
-   def is_reading(self):
-      return (not self._proc.storage_status_array()[self._next_storage_id] == 3)
+   def is_reading(self,storage_id=None):
+      if storage_id is None:
+         storage_id = self._current_storage_id
+      return (not self._proc.storage_status_array()[storage_id] == 3)
 
    def next(self,store_entries=False,store_event_ids=False):
       if not self._proc or not self._proc.manager_started():
@@ -191,8 +191,9 @@ class larcv_threadio (object):
 
       self._read_start_time = time.time()
       sleep_ctr=0
-      while self.is_reading():
-         time.sleep(0.01)
+      next_storage_id = self._current_storage_id + 1
+      while self.is_reading(next_storage_id):
+         time.sleep(0.0001)
          sleep_ctr+=1
          #if sleep_ctr%100 ==0:
          #   print
@@ -201,19 +202,20 @@ class larcv_threadio (object):
 
       for name,storage in self._storage.iteritems():
          dtype = storage.dtype()
-         batch_data = larcv.BatchDataStorageFactory(dtype).get().get_storage(name).get_batch(self._next_storage_id)
-         storage.set_data(self._next_storage_id, batch_data)
+         batch_data = larcv.BatchDataStorageFactory(dtype).get().get_storage(name).get_batch(next_storage_id)
+         storage.set_data(next_storage_id, batch_data)
 
       if not store_entries: self._tree_entries = None
-      else: self._tree_entries = rt.std.vector('size_t')(self._proc.processed_entries(self._next_storage_id))
+      else: self._tree_entries = rt.std.vector('size_t')(self._proc.processed_entries(next_storage_id))
 
       if not store_event_ids: self._event_ids = None
-      else: self._event_ids = rt.std.vector('larcv::EventBase')(self._proc.processed_events(self._next_storage_id))
+      else: self._event_ids = rt.std.vector('larcv::EventBase')(self._proc.processed_events(next_storage_id))
 
-      self._proc.release_data(self._next_storage_id)
-      self._next_storage_id += 1
-      if self._next_storage_id == self._proc.num_batch_storage():
-         self._next_storage_id = 0
+      self._proc.release_data(self._current_storage_id)
+
+      self._current_storage_id = next_storage_id
+      if self._current_storage_id == self._proc.num_batch_storage():
+         self._current_storage_id = 0
 
       return 
 
