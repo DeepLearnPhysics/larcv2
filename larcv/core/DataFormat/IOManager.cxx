@@ -506,7 +506,7 @@ namespace larcv {
       if (_io_mode == kREAD) {
         LARCV_NORMAL() << type << " created w/ producer name " << producer << " but won't be stored in file (kREAD mode)" << std::endl;
       } else {
-        for (size_t i = 0; i < _in_tree_index; ++i) _out_tree_v[id]->Fill();
+        //for (size_t i = 0; i < _in_tree_index; ++i) _out_tree_v[id]->Fill();
         LARCV_NORMAL() << "Created TTree " << _out_tree_v[id]->GetName() << " (id=" << id << ") w/ " << _in_tree_index << " entries..." << std::endl;
       }
     }
