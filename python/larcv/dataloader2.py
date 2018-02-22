@@ -51,9 +51,8 @@ class batch_pydata(object):
 
       # copy data into numpy array
       ctime = time.time()
-      if self._npy_data is None:
-         self._npy_data = larcv.as_ndarray(larcv_batchdata.data())
-         #self._npy_data = self._npy_data.reshape(self.batch_data_size())
+      self._npy_data = larcv.as_ndarray(larcv_batchdata.data())
+      #self._npy_data = self._npy_data.reshape(self.batch_data_size())
       self._time_copy = time.time() - ctime
 
       ctime = time.time()
@@ -192,6 +191,9 @@ class larcv_threadio (object):
       self._read_start_time = time.time()
       sleep_ctr=0
       next_storage_id = self._current_storage_id + 1
+      if next_storage_id == self._proc.num_batch_storage():
+         next_storage_id = 0
+
       while self.is_reading(next_storage_id):
          time.sleep(0.0001)
          sleep_ctr+=1
@@ -211,11 +213,10 @@ class larcv_threadio (object):
       if not store_event_ids: self._event_ids = None
       else: self._event_ids = rt.std.vector('larcv::EventBase')(self._proc.processed_events(next_storage_id))
 
-      self._proc.release_data(self._current_storage_id)
+      if self._current_storage_id >= 0:
+         self._proc.release_data(self._current_storage_id)
 
       self._current_storage_id = next_storage_id
-      if self._current_storage_id == self._proc.num_batch_storage():
-         self._current_storage_id = 0
 
       return 
 
