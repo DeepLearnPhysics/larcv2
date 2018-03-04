@@ -21,13 +21,20 @@ namespace larcv {
 /// have to call)
 void SetPyUtil();
 ///
-//PyObject *as_ndarray(const std::vector<float> &data);
 template <class T>
-PyObject *as_ndarray(const std::vector<T> &data);
+PyObject* as_ndarray(const std::vector<T>& data);
+PyObject* as_ndarray(const std::vector< short              > &data);
+PyObject* as_ndarray(const std::vector< unsigned short     > &data);
+PyObject* as_ndarray(const std::vector< int                > &data);
+PyObject* as_ndarray(const std::vector< unsigned int       > &data);
+PyObject* as_ndarray(const std::vector< long long          > &data);
+PyObject* as_ndarray(const std::vector< unsigned long long > &data);
+PyObject* as_ndarray(const std::vector< float              > &data);
+PyObject* as_ndarray(const std::vector< double             > &data);
 /// larcv::Image2D to numpy array converter
-PyObject *as_ndarray(const Image2D &img);
+PyObject* as_ndarray(const Image2D &img);
 /// larcv::Image2D to numpy array converter
-PyObject *as_caffe_ndarray(const Image2D &img);
+PyObject* as_caffe_ndarray(const Image2D &img);
 /// copy array
 template <class T> 
 void copy_array(PyObject *arrayin, const std::vector<T> &cvec);

@@ -216,7 +216,7 @@ PyObject *as_ndarray(const std::vector<float> &vec) {
 */
 
 template <class T>
-PyObject *as_ndarray(const std::vector<T> &vec) {
+PyObject *_as_ndarray(const std::vector<T> &vec) {
   SetPyUtil();
 
   if (vec.size() >= INT_MAX) {
@@ -233,14 +233,23 @@ PyObject *as_ndarray(const std::vector<T> &vec) {
   return PyArray_Return(array);
 }
 
-template PyObject* as_ndarray< short              > (const std::vector< short              >& vec);
-template PyObject* as_ndarray< unsigned short     > (const std::vector< unsigned short     >& vec);
-template PyObject* as_ndarray< int                > (const std::vector< int                >& vec);
-template PyObject* as_ndarray< unsigned int       > (const std::vector< unsigned int       >& vec);
-template PyObject* as_ndarray< long long          > (const std::vector< long long          >& vec);
-template PyObject* as_ndarray< unsigned long long > (const std::vector< unsigned long long >& vec);
-template PyObject* as_ndarray< float              > (const std::vector< float              >& vec);
-template PyObject* as_ndarray< double             > (const std::vector< double             >& vec);
+template PyObject* _as_ndarray< short              > (const std::vector< short              >& vec);
+template PyObject* _as_ndarray< unsigned short     > (const std::vector< unsigned short     >& vec);
+template PyObject* _as_ndarray< int                > (const std::vector< int                >& vec);
+template PyObject* _as_ndarray< unsigned int       > (const std::vector< unsigned int       >& vec);
+template PyObject* _as_ndarray< long long          > (const std::vector< long long          >& vec);
+template PyObject* _as_ndarray< unsigned long long > (const std::vector< unsigned long long >& vec);
+template PyObject* _as_ndarray< float              > (const std::vector< float              >& vec);
+template PyObject* _as_ndarray< double             > (const std::vector< double             >& vec);
+
+PyObject* as_ndarray(const std::vector< short              >& vec) { return _as_ndarray< short              >(vec); }
+PyObject* as_ndarray(const std::vector< unsigned short     >& vec) { return _as_ndarray< unsigned short     >(vec); }
+PyObject* as_ndarray(const std::vector< int                >& vec) { return _as_ndarray< int                >(vec); }
+PyObject* as_ndarray(const std::vector< unsigned int       >& vec) { return _as_ndarray< unsigned int       >(vec); }
+PyObject* as_ndarray(const std::vector< long long          >& vec) { return _as_ndarray< long long          >(vec); }
+PyObject* as_ndarray(const std::vector< unsigned long long >& vec) { return _as_ndarray< unsigned long long >(vec); }
+PyObject* as_ndarray(const std::vector< float              >& vec) { return _as_ndarray< float              >(vec); }
+PyObject* as_ndarray(const std::vector< double             >& vec) { return _as_ndarray< double             >(vec); }
 
 template<class T>
 PyObject* numpy_array(std::vector<size_t> dims)
