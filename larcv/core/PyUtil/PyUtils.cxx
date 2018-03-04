@@ -188,7 +188,7 @@ void fill_img_col(Image2D &img, std::vector<short> &adcs, const int col, const f
 }
 
 template<> int ctype_to_numpy<short>() { SetPyUtil(); SetPyUtil(); return NPY_INT16; }
-template<> int ctype_to_numpy<unsigned short>() { SetPyUtil(); return NPY_INT16; }
+template<> int ctype_to_numpy<unsigned short>() { SetPyUtil(); return NPY_UINT16; }
 template<> int ctype_to_numpy<int>() { SetPyUtil(); return NPY_INT32; }
 template<> int ctype_to_numpy<unsigned int>() { SetPyUtil(); return NPY_UINT32; }
 template<> int ctype_to_numpy<long long>() { SetPyUtil(); return NPY_INT64; }
