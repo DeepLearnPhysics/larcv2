@@ -8,14 +8,14 @@ import threading
 def threadio_func(storage, proc):
    storage._threaded = True
    while storage._threaded:
-      time.sleep(0.000001)
+      time.sleep(0.000005)
       if storage._filled: continue
       storage._read_start_time = time.time()
       while 1:
          if proc.storage_status_array()[storage._storage_id] == 3:
             storage._read_end_time=time.time()
             break
-         time.sleep(0.00001)
+         time.sleep(0.000005)
          continue
       storage.next()
       storage._event_ids     = proc.processed_entries(storage._storage_id)
@@ -259,7 +259,7 @@ class larcv_threadio (object):
 
    def next(self):
       while self.is_reading():
-         time.sleep(0.0001)
+         time.sleep(0.000002)
       self._proc.release_data(self._target_storage_id)
       self._storage_v[self._target_storage_id].release()
       self._target_storage_id += 1

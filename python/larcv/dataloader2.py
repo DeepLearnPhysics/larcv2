@@ -89,11 +89,15 @@ class larcv_threadio (object):
       self._read_end_time = None
       self._cfg_file = None
       self._current_storage_id = -1
+      self._current_storage_state = -1
       self._storage = {}
       self._tree_entries = None
       self._event_ids = None
 
    def reset(self):
+      ctrs = self._proc.thread_exec_counters()
+      for i in xrange(ctrs.size()):
+         print(ctrs[i])
       if self._proc: self._proc.reset()
 
    def __del__(self):
@@ -162,6 +166,7 @@ class larcv_threadio (object):
       self._batch=batch_size
       self._proc.start_manager(batch_size)
       self._current_storage_id=-1
+      self._current_storage_state = -1
 
    def stop_manager(self):
       if not self._proc or not self._proc.configured():
@@ -178,6 +183,7 @@ class larcv_threadio (object):
       self.stop_manager()
       self._proc.release_data()
       self._current_storage_id=-1
+      self._current_storage_state = -1
       self._tree_entries = None
       self._event_ids = None
 
@@ -188,14 +194,28 @@ class larcv_threadio (object):
       self._proc.set_next_index(index)
 
    def is_reading(self,storage_id=None):
+      status_v = self._proc.storage_status_array()
       if storage_id is None:
-         storage_id = self._current_storage_id
-      return (not self._proc.storage_status_array()[storage_id] == 3)
+         storage_id = self._current_storage_id+1
+         if storage_id >= status_v.size():
+            storage_id = 0
+      return (not status_v[storage_id] == 3)
+
+   def release(self):
+      if not self._current_storage_state == 1:
+         return
+      self._proc.release_data(self._current_storage_id)
+      self._current_storage_state = 0
+
+   def ready(self):
+      return self._current_storage_state == 1
 
    def next(self,store_entries=False,store_event_ids=False):
       if not self._proc or not self._proc.manager_started():
          sys.stderr.write('must call start_manager(batch_size) before next()!\n')
          return
+
+      self.release()
 
       self._read_start_time = time.time()
       sleep_ctr=0
@@ -204,11 +224,10 @@ class larcv_threadio (object):
          next_storage_id = 0
 
       while self.is_reading(next_storage_id):
-         time.sleep(0.0001)
-         sleep_ctr+=1
+         time.sleep(0.00005)
+         #sleep_ctr+=1
          #if sleep_ctr%1000 ==0:
-         #   print
-         #   print 'queueing... (%d sec)' % (0.01*sleep_ctr)
+         #   print 'queueing storage %d ... (%f sec)' % (next_storage_id,0.05*sleep_ctr)
       self._read_end_time = time.time()
 
       for name,storage in self._storage.iteritems():
@@ -222,11 +241,8 @@ class larcv_threadio (object):
       if not store_event_ids: self._event_ids = None
       else: self._event_ids = rt.std.vector('larcv::EventBase')(self._proc.processed_events(next_storage_id))
 
-      if self._current_storage_id >= 0:
-         self._proc.release_data(self._current_storage_id)
-
       self._current_storage_id = next_storage_id
-
+      self._current_storage_state = 1
       return 
 
    def fetch_data(self,key):
