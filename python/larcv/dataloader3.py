@@ -3,9 +3,68 @@ from larcv import larcv
 import ROOT as rt
 import sys,time,os,signal
 import numpy as np
+import threading
 
-class batch_pydata(object):
+def threadio_func(storage, proc):
+   storage._threaded = True
+   while storage._threaded:
+      time.sleep(0.000005)
+      if storage._filled: continue
+      storage._read_start_time = time.time()
+      while 1:
+         if proc.storage_status_array()[storage._storage_id] == 3:
+            storage._read_end_time=time.time()
+            break
+         time.sleep(0.000005)
+         continue
+      storage.next()
+      storage._event_ids     = proc.processed_entries(storage._storage_id)
+      storage._ttree_entries = proc.processed_entries(storage._storage_id)
+   return
 
+class threadio_storage(object):
+
+   def __init__(self,storage_id):
+      self._storage_id = int(storage_id)
+      self._storage_m  = {}
+      self._filled     = False
+      self._threaded   = False
+      self._empty      = False
+      self._read_start_time = self._read_end_time = -1
+      self._copy_start_time = self._copy_end_time = -1
+      self._event_ids       = None
+      self._ttree_entries   = None
+      assert self._storage_id >= 0
+
+   def register(self, key, dtype, make_copy=False):
+      assert (not key in self._storage_m.keys())
+      self._storage_m[key] = threadio_pydata(key,dtype)
+      self._storage_m[key]._storage_id = self._storage_id
+      self._storage_m[key]._make_copy  = make_copy
+
+   def fetch_data(self,key):
+      try:
+         return self._storage_m[key]
+      except KeyError:
+         sys.stderr.write('Cannot fetch data w/ key %s (unknown)\n' % key)
+         return
+
+   def next(self):
+      self._filled=False
+      self._copy_start_time = time.time()
+      for name, storage in self._storage_m.iteritems():
+         dtype = storage.dtype()
+         batch_data = larcv.BatchDataStorageFactory(dtype).get().get_storage(name).get_batch(self._storage_id)
+         storage.set_data(self._storage_id, batch_data)
+      self._copy_end_time = time.time()
+      self._filled=True
+
+   def release(self):
+      self._filled = False
+      return 
+
+class threadio_pydata(object):
+   _name       = None
    _storage_id = -1
    _dtype      = None
    _npy_data   = None
@@ -14,13 +73,15 @@ class batch_pydata(object):
    _time_reshape = 0
    _make_copy  = False
 
-   def __init__(self,dtype):
+   def __init__(self,name,dtype):
+      self._name = str(name)
       self._storage_id = -1
       self._dtype = dtype
       self._npy_data = None
       self._dim_data = None
       self._time_copy = None
       self._time_reshape = None
+      self._make_copy = False
       
    def batch_data_size(self):
       dsize=1
@@ -65,7 +126,7 @@ class batch_pydata(object):
       ctime = time.time()
       self._npy_data = self._npy_data.reshape(self._dim_data[0], self.batch_data_size()/self._dim_data[0])
       self.time_data_conv = time.time() - ctime
-
+      
       return
 
 class larcv_threadio (object):
@@ -85,19 +146,13 @@ class larcv_threadio (object):
       self._proc = None
       self._name = ''
       self._verbose = False
-      self._read_start_time = None
-      self._read_end_time = None
       self._cfg_file = None
-      self._current_storage_id = -1
-      self._current_storage_state = -1
-      self._storage = {}
-      self._tree_entries = None
-      self._event_ids = None
+      self._target_storage_id = 0
+      self._storage_v = []
+      self._thread_v = []
 
    def reset(self):
-      ctrs = self._proc.thread_exec_counters()
-      for i in xrange(ctrs.size()):
-         print(ctrs[i])
+      self.stop_manager()
       if self._proc: self._proc.reset()
 
    def __del__(self):
@@ -135,16 +190,17 @@ class larcv_threadio (object):
       self._proc = larcv.ThreadProcessor(self._name)
 
       self._proc.configure(self._cfg_file)
-
+      self._storage_v = []
+      for storage_id in range(self._proc.storage_status_array().size()):
+         self._storage_v.append(threadio_storage(storage_id))
       # fetch batch filler info
-      self._storage = {}
+      make_copy = bool('make_copy' in cfg and cfg['make_copy'])
       for i in xrange(self._proc.batch_fillers().size()):
          pid = self._proc.batch_fillers()[i]
          name = self._proc.storage_name(pid)
          dtype = larcv.BatchDataTypeName(self._proc.batch_types()[i])
-         self._storage[name]=batch_pydata(dtype)
-         if 'make_copy' in cfg and cfg['make_copy']:
-            self._storage[name]._make_copy = True
+         for storage_id in range(self._proc.storage_status_array().size()):
+            self._storage_v[storage_id].register(name,dtype,make_copy=make_copy)
 
       # all success?
       # register *this* instance
@@ -165,16 +221,22 @@ class larcv_threadio (object):
 
       self._batch=batch_size
       self._proc.start_manager(batch_size)
-      self._current_storage_id=-1
-      self._current_storage_state = -1
+      for storage in self._storage_v:
+         self._thread_v.append(threading.Thread(target = threadio_func, args=[storage,self._proc]))
+         self._thread_v[-1].daemon = True
+         self._thread_v[-1].start()
+      self._target_storage_id=0
 
    def stop_manager(self):
       if not self._proc or not self._proc.configured():
          sys.stderr.write('must call configure(cfg) before start_manager()!\n')
          return
-
       self._batch=None
       self._proc.stop_manager()
+      for storage in self._storage_v:
+         storage._threaded = False
+      time.sleep(0.1)
+      self._thread_v = []
 
    def purge_storage(self):
       if not self._proc or not self._proc.configured():
@@ -182,10 +244,7 @@ class larcv_threadio (object):
          return
       self.stop_manager()
       self._proc.release_data()
-      self._current_storage_id=-1
-      self._current_storage_state = -1
-      self._tree_entries = None
-      self._event_ids = None
+      self._target_storage_id=0
 
    def set_next_index(self,index):
       if not self._proc or not self._proc.configured():
@@ -194,69 +253,38 @@ class larcv_threadio (object):
       self._proc.set_next_index(index)
 
    def is_reading(self,storage_id=None):
-      status_v = self._proc.storage_status_array()
       if storage_id is None:
-         storage_id = self._current_storage_id+1
-         if storage_id >= status_v.size():
-            storage_id = 0
-      return (not status_v[storage_id] == 3)
+         storage_id = self._target_storage_id
+      return not self._storage_v[storage_id]._filled
 
-   def release(self):
-      if not self._current_storage_state == 1:
-         return
-      self._proc.release_data(self._current_storage_id)
-      self._current_storage_state = 0
-
-   def ready(self):
-      return self._current_storage_state == 1
-
-   def next(self,store_entries=False,store_event_ids=False):
-      if not self._proc or not self._proc.manager_started():
-         sys.stderr.write('must call start_manager(batch_size) before next()!\n')
-         return
-
-      self.release()
-
-      self._read_start_time = time.time()
-      sleep_ctr=0
-      next_storage_id = self._current_storage_id + 1
-      if next_storage_id == self._proc.num_batch_storage():
-         next_storage_id = 0
-
-      while self.is_reading(next_storage_id):
-         time.sleep(0.00005)
-         #sleep_ctr+=1
-         #if sleep_ctr%1000 ==0:
-         #   print 'queueing storage %d ... (%f sec)' % (next_storage_id,0.05*sleep_ctr)
-      self._read_end_time = time.time()
-
-      for name,storage in self._storage.iteritems():
-         dtype = storage.dtype()
-         batch_data = larcv.BatchDataStorageFactory(dtype).get().get_storage(name).get_batch(next_storage_id)
-         storage.set_data(next_storage_id, batch_data)
-
-      if not store_entries: self._tree_entries = None
-      else: self._tree_entries = rt.std.vector('size_t')(self._proc.processed_entries(next_storage_id))
-
-      if not store_event_ids: self._event_ids = None
-      else: self._event_ids = rt.std.vector('larcv::EventBase')(self._proc.processed_events(next_storage_id))
-
-      self._current_storage_id = next_storage_id
-      self._current_storage_state = 1
+   def next(self):
+      while self.is_reading():
+         time.sleep(0.000002)
+      self._proc.release_data(self._target_storage_id)
+      self._storage_v[self._target_storage_id].release()
+      self._target_storage_id += 1
+      if self._target_storage_id == self._proc.num_batch_storage():
+         self._target_storage_id = 0
       return 
 
-   def fetch_data(self,key):
+   def fetch_data(self,key,storage_id=None):
+      if storage_id is None:
+         storage_id = self._target_storage_id
       try:
-         return self._storage[key]
-      except KeyError:
-         sys.stderr.write('Cannot fetch data w/ key %s (unknown)\n' % key)
+         return self._storage_v[storage_id].fetch_data(key)
+      except IndexError:
+         sys.stderr.write('Cannot fetch data w/ storage id {:d} (unknown)\n'.format(storage_id))
          return
 
-   def fetch_event_ids(self):
-      return self._event_ids
+   def fetch_event_ids(self,storage_id=None):
+      if storage_id is None:
+         storage_id = self._target_storage_id
+      return self._storage_v[storage_id]._event_ids
 
-   def fetch_entries(self):
-      return self._tree_entries
+   def fetch_entries(self,storage_id=None):
+      if storage_id is None:
+         storage_id = self._target_storage_id
+      return self._storage_v[storage_id]._ttree_entries
 
    def fetch_n_entries(self):
       return self._proc.get_n_entries()

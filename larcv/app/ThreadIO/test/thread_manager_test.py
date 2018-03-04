@@ -2,10 +2,10 @@ from __future__ import print_function
 from larcv import larcv
 import sys, time
 
-batch_size=50
+batch_size=100
 report_cycle=1
-sleep_time=0.002
-stop_time=120
+sleep_time=0.0001
+stop_time=10
 record=True
 
 proc=larcv.ThreadProcessor("ThreadProcessor")
@@ -55,6 +55,12 @@ while 1:
 
     time.sleep(sleep_time)
     ctr+=1
+
+ctrs=proc.thread_exec_counters()
+for i in xrange(ctrs.size()):
+    print(ctrs[i])
+
+
 proc.stop_manager()
 proc.reset()
 fout.close()
