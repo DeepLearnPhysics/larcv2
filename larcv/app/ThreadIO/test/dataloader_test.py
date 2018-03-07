@@ -4,6 +4,7 @@ from larcv import larcv
 from larcv.dataloader2 import larcv_threadio
 import numpy, time
 import matplotlib.pyplot as plt
+import numpy as np
 
 # instantiate dataloader2
 proc = larcv_threadio()
@@ -71,7 +72,7 @@ while 1:
     if proc.ready():
         for name in ['main_data','main_label']:
             data = proc.fetch_data(name).data()
-            data_read += data.size * np.dtype(data.dtype).itemsize
+            data_read += (data.size * np.dtype(data.dtype).itemsize)
         proc.next()
     if (elapsed_time - last_time) > report_cycle:
         proc._proc.status_dump()
