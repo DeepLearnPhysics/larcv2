@@ -95,9 +95,6 @@ class larcv_threadio (object):
       self._event_ids = None
 
    def reset(self):
-      ctrs = self._proc.thread_exec_counters()
-      for i in xrange(ctrs.size()):
-         print(ctrs[i])
       if self._proc: self._proc.reset()
 
    def __del__(self):

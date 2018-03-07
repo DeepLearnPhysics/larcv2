@@ -15,7 +15,7 @@ Verbosity:    2
 EnableFilter: false
 RandomAccess: 2
 RandomSeed:   123
-InputFiles:   ["copy01.root"]
+InputFiles:   ["test_10k.root"]
 ProcessType:  ["BatchFillerImage2D","BatchFillerImage2D"]
 ProcessName:  ["main_data","main_label"]
 NumThreads: 5
@@ -52,7 +52,7 @@ proc.configure(filler_cfg)
 batch_size=100
 report_cycle=1
 sleep_time=0.000005
-stop_time=120
+stop_time=20
 record=True
 
 if record:
@@ -70,7 +70,8 @@ while 1:
     elapsed_time = time.time() - start_time
     if proc.ready():
         for name in ['main_data','main_label']:
-            data_read += proc.fetch_data(name).data().size
+            data = proc.fetch_data(name).data()
+            data_read += data.size * np.dtype(data.dtype).itemsize
         proc.next()
     if (elapsed_time - last_time) > report_cycle:
         proc._proc.status_dump()
