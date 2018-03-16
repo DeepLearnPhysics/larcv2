@@ -12,6 +12,7 @@ class batch_pydata(object):
    _dim_data   = None
    _time_copy  = 0
    _time_reshape = 0
+   _make_copy  = False
 
    def __init__(self,dtype):
       self._storage_id = -1
@@ -51,15 +52,18 @@ class batch_pydata(object):
 
       # copy data into numpy array
       ctime = time.time()
-      if self._npy_data is None:
-         self._npy_data = np.array(larcv_batchdata.data())
+      if self._make_copy:
+         if self._npy_data is None:
+            self._npy_data = np.array(larcv_batchdata.data())
+         else:
+            self._npy_data = self._npy_data.reshape(self.batch_data_size())
+            larcv.copy_array(self._npy_data,larcv_batchdata.data())
       else:
-         self._npy_data = self._npy_data.reshape(self.batch_data_size())
-         larcv.copy_array(self._npy_data,larcv_batchdata.data())
+         self._npy_data = larcv.as_ndarray(larcv_batchdata.data())
       self._time_copy = time.time() - ctime
 
       ctime = time.time()
-      self._npy_data = self._npy_data.reshape(self._dim_data[0], self.batch_data_size()/self._dim_data[0]).astype(np.float32)
+      self._npy_data = self._npy_data.reshape(self._dim_data[0], self.batch_data_size()/self._dim_data[0])
       self.time_data_conv = time.time() - ctime
 
       return
@@ -84,7 +88,8 @@ class larcv_threadio (object):
       self._read_start_time = None
       self._read_end_time = None
       self._cfg_file = None
-      self._next_storage_id = 0
+      self._current_storage_id = -1
+      self._current_storage_state = -1
       self._storage = {}
       self._tree_entries = None
       self._event_ids = None
@@ -135,6 +140,8 @@ class larcv_threadio (object):
          name = self._proc.storage_name(pid)
          dtype = larcv.BatchDataTypeName(self._proc.batch_types()[i])
          self._storage[name]=batch_pydata(dtype)
+         if 'make_copy' in cfg and cfg['make_copy']:
+            self._storage[name]._make_copy = True
 
       # all success?
       # register *this* instance
@@ -155,7 +162,8 @@ class larcv_threadio (object):
 
       self._batch=batch_size
       self._proc.start_manager(batch_size)
-      self._next_storage_id=0
+      self._current_storage_id=-1
+      self._current_storage_state = -1
 
    def stop_manager(self):
       if not self._proc or not self._proc.configured():
@@ -171,7 +179,8 @@ class larcv_threadio (object):
          return
       self.stop_manager()
       self._proc.release_data()
-      self._next_storage_id=0
+      self._current_storage_id=-1
+      self._current_storage_state = -1
       self._tree_entries = None
       self._event_ids = None
 
@@ -181,40 +190,56 @@ class larcv_threadio (object):
          return
       self._proc.set_next_index(index)
 
-   def is_reading(self):
-      return (not self._proc.storage_status_array()[self._next_storage_id] == 3)
+   def is_reading(self,storage_id=None):
+      status_v = self._proc.storage_status_array()
+      if storage_id is None:
+         storage_id = self._current_storage_id+1
+         if storage_id >= status_v.size():
+            storage_id = 0
+      return (not status_v[storage_id] == 3)
+
+   def release(self):
+      if not self._current_storage_state == 1:
+         return
+      self._proc.release_data(self._current_storage_id)
+      self._current_storage_state = 0
+
+   def ready(self):
+      return self._current_storage_state == 1
 
    def next(self,store_entries=False,store_event_ids=False):
       if not self._proc or not self._proc.manager_started():
          sys.stderr.write('must call start_manager(batch_size) before next()!\n')
          return
 
+      self.release()
+
       self._read_start_time = time.time()
       sleep_ctr=0
-      while self.is_reading():
-         time.sleep(0.01)
-         sleep_ctr+=1
-         #if sleep_ctr%100 ==0:
-         #   print
-         #   print 'queueing... (%d sec)' % (0.01*sleep_ctr)
+      next_storage_id = self._current_storage_id + 1
+      if next_storage_id == self._proc.num_batch_storage():
+         next_storage_id = 0
+
+      while self.is_reading(next_storage_id):
+         time.sleep(0.00005)
+         #sleep_ctr+=1
+         #if sleep_ctr%1000 ==0:
+         #   print 'queueing storage %d ... (%f sec)' % (next_storage_id,0.05*sleep_ctr)
       self._read_end_time = time.time()
 
       for name,storage in self._storage.iteritems():
          dtype = storage.dtype()
-         batch_data = larcv.BatchDataStorageFactory(dtype).get().get_storage(name).get_batch(self._next_storage_id)
-         storage.set_data(self._next_storage_id, batch_data)
+         batch_data = larcv.BatchDataStorageFactory(dtype).get().get_storage(name).get_batch(next_storage_id)
+         storage.set_data(next_storage_id, batch_data)
 
       if not store_entries: self._tree_entries = None
-      else: self._tree_entries = rt.std.vector('size_t')(self._proc.processed_entries(self._next_storage_id))
+      else: self._tree_entries = rt.std.vector('size_t')(self._proc.processed_entries(next_storage_id))
 
       if not store_event_ids: self._event_ids = None
-      else: self._event_ids = rt.std.vector('larcv::EventBase')(self._proc.processed_events(self._next_storage_id))
+      else: self._event_ids = rt.std.vector('larcv::EventBase')(self._proc.processed_events(next_storage_id))
 
-      self._proc.release_data(self._next_storage_id)
-      self._next_storage_id += 1
-      if self._next_storage_id == self._proc.num_batch_storage():
-         self._next_storage_id = 0
-
+      self._current_storage_id = next_storage_id
+      self._current_storage_state = 1
       return 
 
    def fetch_data(self,key):
