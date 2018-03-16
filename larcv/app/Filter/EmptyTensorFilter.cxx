@@ -39,7 +39,7 @@ namespace larcv {
   {
     configure_labels(cfg);
 
-    _min_voxel2d_count_v = cfg.get<std::vector<size_t> >("MinVoxel2DCount", _min_voxel2d_count_v);
+    _min_voxel2d_count_v = cfg.get<std::vector<size_t> >("MinVoxel2DCountList", _min_voxel2d_count_v);
     if (_min_voxel2d_count_v.empty()) {
       auto min_voxel2d_count = cfg.get<size_t>("MinVoxel2DCount", 0);
       _min_voxel2d_count_v.resize(_tensor2d_producer_v.size(), min_voxel2d_count);
@@ -48,7 +48,7 @@ namespace larcv {
       throw larbys();
     }
 
-    _min_voxel2d_value_v = cfg.get<std::vector<float> >("MinVoxel2DValue", _min_voxel2d_value_v);
+    _min_voxel2d_value_v = cfg.get<std::vector<float> >("MinVoxel2DValueList", _min_voxel2d_value_v);
     if (_min_voxel2d_value_v.empty()) {
       auto min_voxel2d_value = cfg.get<float>("MinVoxel2DValue", 0.);
       _min_voxel2d_value_v.resize(_tensor2d_producer_v.size(), min_voxel2d_value);
@@ -57,7 +57,7 @@ namespace larcv {
       throw larbys();
     }
 
-    _min_voxel3d_count_v = cfg.get<std::vector<size_t> >("MinVoxel3DCount", _min_voxel3d_count_v);
+     _min_voxel3d_count_v = cfg.get<std::vector<size_t> >("MinVoxel3DCountList", _min_voxel3d_count_v); 
     if (_min_voxel3d_count_v.empty()) {
       auto min_voxel3d_count = cfg.get<size_t>("MinVoxel3DCount", 0);
       _min_voxel3d_count_v.resize(_tensor3d_producer_v.size(), min_voxel3d_count);
@@ -66,7 +66,7 @@ namespace larcv {
       throw larbys();
     }
 
-    _min_voxel3d_value_v = cfg.get<std::vector<float> >("MinVoxel3DValue", _min_voxel3d_value_v);
+    _min_voxel3d_value_v = cfg.get<std::vector<float> >("MinVoxel3DValueList", _min_voxel3d_value_v);
     if (_min_voxel3d_value_v.empty()) {
       auto min_voxel3d_value = cfg.get<float>("MinVoxel3DValue", 0.);
       _min_voxel3d_value_v.resize(_tensor3d_producer_v.size(), min_voxel3d_value);

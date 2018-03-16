@@ -109,8 +109,8 @@ namespace larcv {
     inline void mcst_index      (MCSTIndex_t id )    { _mcst_index = id;    }
     inline void mct_index       (MCTIndex_t id )     { _mct_index = id;     }
     inline void shape           (ShapeType_t shape ) { _shape = shape;      }
-    inline void nu_current_type (short curr) { curr = -1; _current_type = curr; }
-    inline void nu_interaction_type (short itype) { itype = -1; _interaction_type = itype; }
+    inline void nu_current_type (short curr) {_current_type = curr; }
+    inline void nu_interaction_type (short itype) {_interaction_type = itype; }
     // particle's info setter
     inline void track_id        (unsigned int id )   { _trackid = id;       }
     inline void pdg_code        (int code)           { _pdg = code;         }

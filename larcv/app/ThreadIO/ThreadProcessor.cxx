@@ -105,7 +105,8 @@ namespace larcv {
                    << " [us]" << std::endl;
 
       t_start = std::chrono::high_resolution_clock::now();
-      this->wait( std::chrono::microseconds(state ? 10000 : 100000) );
+      //this->wait( std::chrono::microseconds(state ? 100 : 1000) );
+      this->wait( std::chrono::microseconds(100) );
       t_end   = std::chrono::high_resolution_clock::now();
       LARCV_INFO() << "... slept: "
                    << (long long)(std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_start).count())
@@ -617,11 +618,11 @@ namespace larcv {
       start_entry = 0;
 
     LARCV_INFO() << "Instantiating thread ID " << thread_id
-                 << " (exec counter " << _thread_exec_ctr_v[thread_id] << ")"
-                 << " for storage id " << storage_id
-                 << " (from entry " << start_entry
-                 << ", for " << nentries << " entries)" << std::endl;
-
+		 << " (exec counter " << _thread_exec_ctr_v[thread_id] << ")"
+		 << " for storage id " << storage_id
+		 << " (from entry " << start_entry
+		 << ", for " << nentries << " entries)" << std::endl;
+    
     _next_entry = start_entry + nentries;
 
     //
@@ -693,8 +694,8 @@ namespace larcv {
     if (_thread_v.size() <= thread_id) _thread_v.resize(thread_id + 1);
     //_thread_v[thread_id] = std::move(t);
     std::swap(_thread_v[thread_id], t);
-    this->wait(std::chrono::microseconds(1000));
-    while (_thread_state_v[thread_id] == kThreadStateStarting) this->wait(std::chrono::microseconds(500));
+    this->wait(std::chrono::microseconds(100));
+    while (_thread_state_v[thread_id] == kThreadStateStarting) this->wait(std::chrono::microseconds(100));
 
     return true;
   }
@@ -818,6 +819,8 @@ namespace larcv {
     _batch_state_v[storage_id] = BatchDataState_t::kBatchStateFilled;
     _optional_next_index = kINVALID_SIZE;
     LARCV_DEBUG() << " end" << std::endl;
+
+    //LARCV_NORMAL() << "Thread " << thread_id << " finished filling storage " << storage_id << std::endl;
     return true;
   }
 }

@@ -83,6 +83,9 @@ namespace larcv {
 
     size_t batch_id(size_t storage_id) const;
 
+    inline const std::vector<size_t>& thread_exec_counters() const
+    { return _thread_exec_ctr_v; }
+    
     const std::vector<size_t>& processed_entries(size_t storage_id=0) const;
 
     const std::vector<larcv::EventBase>& processed_events(size_t storage_id) const;
