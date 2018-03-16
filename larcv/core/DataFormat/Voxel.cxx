@@ -27,7 +27,7 @@ namespace larcv {
        id < _voxel_v.front().id() ||
        id > _voxel_v.back().id())
       return kINVALID_VOXEL;
-    
+
     Voxel vox(id,0.);
     // Else do log(N) search
     auto iter = std::lower_bound(_voxel_v.begin(), _voxel_v.end(), vox);
@@ -98,14 +98,14 @@ namespace larcv {
   }
 
   void VoxelSetArray::emplace(std::vector<larcv::VoxelSet>&& voxel_vv)
-  { 
-    _voxel_vv = std::move(voxel_vv); 
+  {
+    _voxel_vv = std::move(voxel_vv);
     for(size_t id=0; id<_voxel_vv.size(); ++id)
       _voxel_vv[id].id(id);
   }
 
   inline void VoxelSetArray::insert(const std::vector<larcv::VoxelSet>& voxel_vv)
-  { 
+  {
     _voxel_vv = voxel_vv;
     for(size_t id=0; id<_voxel_vv.size(); ++id)
       _voxel_vv[id].id(id);
@@ -128,9 +128,9 @@ namespace larcv {
       size_t orig_size = _voxel_vv.size();
       _voxel_vv.resize(voxel_v.id()+1);
       for(size_t id=orig_size; id<_voxel_vv.size(); ++id)
-        _voxel_vv[id].id(id);
+        _voxel_vv.at(id).id(id);
     }
-    _voxel_vv[voxel_v.id()] = voxel_v;
+    _voxel_vv.at(voxel_v.id()) = voxel_v;
   }
 
   larcv::VoxelSet& VoxelSetArray::writeable_voxel_set(const InstanceID_t id)

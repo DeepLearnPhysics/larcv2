@@ -13,7 +13,7 @@ namespace larcv {
   {
 
   }
-    
+
   void Binarize::configure(const PSet& cfg)
   {
     fChannelThresholds   = cfg.get<std::vector<float> >( "ChannelThresholds" );
@@ -51,7 +51,7 @@ namespace larcv {
       input_imgs.emplace(std::move(image_v));
       throw larbys();
     }
-    
+
     for(size_t i=0; i<image_v.size(); ++i) {
 
       auto const& thres = fChannelThresholds[i];

@@ -126,7 +126,7 @@ bool Cluster2DThreshold::process(IOManager& mgr) {
       }
 
       // Add the ClusterPixel2D to the event data:
-      ev_cluster2d_output.emplace(std::move(thresholded_cluster_pixel_2d));\
+      ev_cluster2d_output.emplace(std::move(thresholded_cluster_pixel_2d));
 
     }
 

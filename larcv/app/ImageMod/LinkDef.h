@@ -56,6 +56,7 @@
 #pragma link C++ class larcv::NormalizeTensor3D+;
 #pragma link C++ class larcv::CombineTensor3D+;
 #pragma link C++ class larcv::VertexWeight3D+;
+#pragma link C++ class larcv::Cluster2DThreshold+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
