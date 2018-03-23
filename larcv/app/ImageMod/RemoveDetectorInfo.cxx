@@ -78,10 +78,14 @@ namespace larcv {
                              part.parent_position().y() - origin.y,
                              part.parent_position().z() - origin.z, part.parent_position().t());
 
+	part.last_step(part.last_step().x() - origin.x,
+			     part.last_step().y() - origin.y,
+			     part.last_step().z() - origin.z, part.last_step().t());
+
         //
         // Remove last_step and distance_travel as those are detector geometry specific
         //
-        part.last_step(kINVALID_DOUBLE,kINVALID_DOUBLE,kINVALID_DOUBLE,kINVALID_DOUBLE);
+        //part.last_step(kINVALID_DOUBLE,kINVALID_DOUBLE,kINVALID_DOUBLE,kINVALID_DOUBLE);
         part.distance_travel(-1.);
 
         if(correct_energy_deposited)
