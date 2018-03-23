@@ -44,8 +44,6 @@ bool CosmicNeutrinoSegLabel::process(IOManager& mgr) {
   // the pdg
 
   auto const& particles = ev_particle.as_vector();
-  std::cout << "number of particles: " << particles.size() << std::endl;
-  std::cout << "cluster2d size: " << ev_cluster2d.size() << std::endl;
   for (size_t projection_index = 0;
        projection_index < ev_cluster2d.size(); ++projection_index) {
     // For each projection index, get the list of clusters
@@ -67,8 +65,6 @@ Image2D CosmicNeutrinoSegLabel::seg_image_creator(
     const ClusterPixel2D & clusters, const ImageMeta & meta) {
   // Prepare an output image2d:
   Image2D out_image(meta);
-
-  std::cout << "Number of particles, again: " << particles.size() << std::endl;
 
   std::set<std::string> processes;
   std::set<int> interaction_types;
@@ -102,9 +98,9 @@ Image2D CosmicNeutrinoSegLabel::seg_image_creator(
   // for (auto & process : processes){
   //   std::cout << "Process: " << process << std::endl;
   // }
-  for (auto & type : interaction_types){
-    std::cout << "type: " << type << std::endl;
-  }
+  // for (auto & type : interaction_types){
+  //   std::cout << "type: " << type << std::endl;
+  // }
 
 
   return out_image;
