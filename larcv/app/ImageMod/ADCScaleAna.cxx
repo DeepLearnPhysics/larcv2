@@ -27,7 +27,7 @@ namespace larcv {
   {
     static ProducerID_t id = kINVALID_SIZE;
     if (id == kINVALID_SIZE) {
-      ProducerName_t name_id("image2D", _image_producer);
+      ProducerName_t name_id("image2d", _image_producer);
       id = mgr.producer_id(name_id);
     }
 

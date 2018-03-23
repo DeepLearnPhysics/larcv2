@@ -226,7 +226,8 @@ namespace larcv {
     size_t max_row = _meta.row(crop_meta.max_y() - _meta.pixel_height() / 2. );
     /*
     std::cout<<"Cropping! Requested:" << std::endl
-       << crop_meta.dump() << std::endl
+       << crop_meta.dump() << std::overlay
+
        <<"Original:"<<std::endl
        <<_meta.dump()<<std::endl;
 
@@ -315,10 +316,10 @@ namespace larcv {
     double y_max = std::min(_meta.max_y(), rhs_meta.max_y());
     if (y_min >= y_max) return;
 
-    size_t row_min1 = _meta.row(y_max);
+    size_t row_min1 = _meta.row(y_min);
     size_t col_min1 = _meta.col(x_min);
 
-    size_t row_min2 = rhs_meta.row(y_max);
+    size_t row_min2 = rhs_meta.row(y_min);
     size_t col_min2 = rhs_meta.col(x_min);
 
     size_t nrows = (y_max - y_min) / _meta.pixel_height();
@@ -337,7 +338,8 @@ namespace larcv {
 
         for (size_t row_index = 0; row_index < nrows; ++row_index)
 
-          _img[index1 + row_index] += img2[index2 + row_index];
+          _img.at(index1 + row_index) += img2.at(index2 + row_index);
+          //_img[index1 + row_index] += img2[index2 + row_index];
 
         break;
 

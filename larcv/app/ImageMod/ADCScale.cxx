@@ -49,7 +49,7 @@ namespace larcv {
   bool ADCScale::process(IOManager& mgr)
   {
     if (_image_id == kINVALID_SIZE) {
-      ProducerName_t id("image2D", _image_producer);
+      ProducerName_t id("image2d", _image_producer);
       _image_id = mgr.producer_id(id);
     }
 

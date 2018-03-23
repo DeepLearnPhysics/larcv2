@@ -43,6 +43,7 @@ namespace larcv {
                 ProjectionID_t id = kINVALID_PROJECTIONID);
     void update(const Point2D& pt1, const Point2D& pt2, 
                 ProjectionID_t id = kINVALID_PROJECTIONID);
+    void update(ProjectionID_t id);
     inline bool empty() const { return (_p1 == _p2); }
     inline const Point2D& origin      () const { return _p1; }
     inline const Point2D& bottom_left () const { return _p1; }
