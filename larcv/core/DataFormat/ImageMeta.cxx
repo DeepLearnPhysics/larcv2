@@ -17,21 +17,23 @@ namespace larcv {
 
   size_t ImageMeta::col(double x) const
   {
-    if (x < min_x() || x >= max_x()) {
+    if (x < min_x() || x > max_x()) {
       std::stringstream ss;
       ss << "Requested col for x=" << x << " ... but the x (cols) span only " << min_x() << " => " << max_x() << "!" << std::endl;
       throw larbys(ss.str());
     }
+    if(x == max_x()) return (cols() - 1);
     return (size_t)((x - min_x()) / pixel_width());
   }
 
   size_t ImageMeta::row(double y) const
   {
-    if (y < min_y() || y >= max_y()) {
+    if (y < min_y() || y > max_y()) {
       std::stringstream ss;
-      ss << "Requested col for y=" << y << " ... but the y (rows) spans only " << min_y() << " => " << max_y() << "!" << std::endl;
+      ss << "Requested row for y=" << y << " ... but the y (rows) spans only " << min_y() << " => " << max_y() << "!" << std::endl;
       throw larbys(ss.str());
     }
+    if(y == max_y()) return (rows() - 1);
     return (size_t)((y - min_y()) / pixel_height());
   }
 
