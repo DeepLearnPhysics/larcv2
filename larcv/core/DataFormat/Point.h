@@ -27,6 +27,8 @@ namespace larcv {
     Point2D(double xv=0, double yv=0) : x(xv), y(yv) {}
     ~Point2D() {}
 
+    Point2D(const Point2D& pt) : x(pt.x), y(pt.y) {};
+
     double x, y;
     
     inline bool operator== (const Point2D& rhs) const
@@ -52,8 +54,10 @@ namespace larcv {
     inline Point2D operator- (const Point2D& rhs) const
     { return Point2D(x-rhs.x,y-rhs.y); }
 
+    inline double squared_distance(const Point2D& pt) const
+    { return pow(x-pt.x,2)+pow(y-pt.y,2); }
     inline double distance(const Point2D& pt) const
-    { return sqrt(pow(x-pt.x,2)+pow(y-pt.y,2)); }
+    { return sqrt(squared_distance(pt)); }
     inline Point2D direction(const Point2D& pt) const
     { Point2D res(pt.x - x, pt.y - y); res /= distance(pt); return res; }
 
@@ -67,6 +71,8 @@ namespace larcv {
   public:
     Point3D(double xv=0, double yv=0, double zv=0) : x(xv), y(yv), z(zv) {}
     ~Point3D() {}
+
+    Point3D(const Point3D& pt) : x(pt.x), y(pt.y), z(pt.z) {}
 
     double x, y, z;
     
@@ -93,8 +99,10 @@ namespace larcv {
     inline Point3D operator- (const Point3D& rhs) const
     { return Point3D(x-rhs.x,y-rhs.y,z-rhs.z); }
 
+    inline double squared_distance(const Point3D& pt) const
+    { return pow(x-pt.x,2)+pow(y-pt.y,2)+pow(z-pt.z,2); }
     inline double distance(const Point3D& pt) const
-    { return sqrt(pow(x-pt.x,2)+pow(y-pt.y,2)+pow(z-pt.z,2)); }
+    { return sqrt(squared_distance(pt)); }
     inline Point3D direction(const Point3D& pt) const
     { Point3D res(pt.x - x, pt.y - y, pt.z - z); res /= distance(pt); return res; }
 
