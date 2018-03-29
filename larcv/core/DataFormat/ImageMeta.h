@@ -65,7 +65,7 @@ namespace larcv {
               DistanceUnit_t unit = kUnitUnknown)
       : BBox2D(box), _unit(unit)
     { update(y_row_count, x_column_count); }
-    
+
     /// Default destructor
     ~ImageMeta() {}
 
@@ -114,6 +114,13 @@ namespace larcv {
     ImageMeta overlap(const ImageMeta& meta) const;
     /// Construct a union bounding box
     ImageMeta inclusive(const ImageMeta& meta) const;
+
+    // Find row that corresponds to a specified index
+    size_t index_to_row(size_t index) const;
+    // Find col that corresponds to a specified index
+    size_t index_to_col(size_t index) const;
+
+
 
     /// Dump info in text
     std::string dump() const;

@@ -37,13 +37,34 @@ namespace larcv {
     return (size_t)((y - min_y()) / pixel_height());
   }
 
+  size_t ImageMeta::index_to_row(size_t index) const
+  {
+    if ( index >= _row_count * _col_count ) {
+      std::stringstream ss;
+      ss << "Invalid pixel index queried: (" << index << ") but the dimension is only (" << _row_count * _col_count << ")!" << std::endl;
+      throw larbys(ss.str());
+    }
+    return ( index % _row_count  );
+  }
+
+  size_t ImageMeta::index_to_col(size_t index) const
+  {
+    if ( index >= _row_count * _col_count ) {
+      std::stringstream ss;
+      ss << "Invalid pixel index queried: (" << index << ") but the dimension is only (" << _row_count * _col_count << ")!" << std::endl;
+      throw larbys(ss.str());
+    }
+    return ( index / _row_count );
+  }
+
+
   ImageMeta ImageMeta::overlap(const ImageMeta& meta) const
   {
     auto box = BBox2D::overlap((BBox2D)meta);
 
-    return ImageMeta(box, 
+    return ImageMeta(box,
                      box.height() / pixel_height(),
-                     box.width() / pixel_width(), 
+                     box.width() / pixel_width(),
                      _unit);
   }
 
