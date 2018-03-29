@@ -44,7 +44,8 @@ namespace larcv {
 
   private:
 
-    std::vector<std::string> _image_producer_v;
+    std::vector<std::string> _producer_v;
+    std::vector<std::string> _data_type_v;
     std::vector<size_t     > _row_compression_v;
     std::vector<size_t     > _col_compression_v;
     std::vector<size_t     > _output_rows_v;
