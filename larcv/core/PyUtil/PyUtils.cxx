@@ -54,7 +54,7 @@ void copy_array(PyObject *arrayin, const std::vector<float> &cvec) {
 */
 
 template<class T>
-void copy_array(PyObject *arrayin, const std::vector<T> &cvec) {
+void _copy_array(PyObject *arrayin, const std::vector<T> &cvec) {
   SetPyUtil();
   PyArrayObject *ptr = (PyArrayObject *)(arrayin);
 
@@ -77,6 +77,22 @@ void copy_array(PyObject *arrayin, const std::vector<T> &cvec) {
     fptr[i] = cvec[i];
   };
 }
+
+template void _copy_array< unsigned short >(PyObject *arrayin, const std::vector< unsigned short > &cvec);
+template void _copy_array< unsigned int   >(PyObject *arrayin, const std::vector< unsigned int   > &cvec);
+template void _copy_array< short          >(PyObject *arrayin, const std::vector< short          > &cvec);
+template void _copy_array< int            >(PyObject *arrayin, const std::vector< int            > &cvec);
+template void _copy_array< long long      >(PyObject *arrayin, const std::vector< long long      > &cvec);
+template void _copy_array< float          >(PyObject *arrayin, const std::vector< float          > &cvec);
+template void _copy_array< double         >(PyObject *arrayin, const std::vector< double         > &cvec);
+
+void copy_array(PyObject *arrayin, const std::vector< unsigned short > &cvec) { _copy_array(arrayin, cvec); }
+void copy_array(PyObject *arrayin, const std::vector< unsigned int   > &cvec) { _copy_array(arrayin, cvec); }
+void copy_array(PyObject *arrayin, const std::vector< short          > &cvec) { _copy_array(arrayin, cvec); }
+void copy_array(PyObject *arrayin, const std::vector< int            > &cvec) { _copy_array(arrayin, cvec); }
+void copy_array(PyObject *arrayin, const std::vector< long long      > &cvec) { _copy_array(arrayin, cvec); }
+void copy_array(PyObject *arrayin, const std::vector< float          > &cvec) { _copy_array(arrayin, cvec); }
+void copy_array(PyObject *arrayin, const std::vector< double         > &cvec) { _copy_array(arrayin, cvec); }
 
 PyObject *as_caffe_ndarray(const Image2D &img) {
   SetPyUtil();

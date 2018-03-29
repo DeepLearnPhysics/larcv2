@@ -22,7 +22,7 @@ namespace larcv {
 void SetPyUtil();
 ///
 template <class T>
-PyObject* as_ndarray(const std::vector<T>& data);
+PyObject* _as_ndarray(const std::vector<T>& data);
 PyObject* as_ndarray(const std::vector< short              > &data);
 PyObject* as_ndarray(const std::vector< unsigned short     > &data);
 PyObject* as_ndarray(const std::vector< int                > &data);
@@ -37,7 +37,15 @@ PyObject* as_ndarray(const Image2D &img);
 PyObject* as_caffe_ndarray(const Image2D &img);
 /// copy array
 template <class T> 
-void copy_array(PyObject *arrayin, const std::vector<T> &cvec);
+void _copy_array(PyObject *arrayin, const std::vector<T> &cvec);
+void copy_array(PyObject *arrayin, const std::vector< unsigned short > &cvec);
+void copy_array(PyObject *arrayin, const std::vector< unsigned int   > &cvec);
+void copy_array(PyObject *arrayin, const std::vector< short          > &cvec);
+void copy_array(PyObject *arrayin, const std::vector< int            > &cvec);
+void copy_array(PyObject *arrayin, const std::vector< long long      > &cvec);
+void copy_array(PyObject *arrayin, const std::vector< float          > &cvec);
+void copy_array(PyObject *arrayin, const std::vector< double         > &cvec);
+
 //void copy_array(PyObject *arrayin, const std::vector<float> &cvec);
 // void copy_array(PyObject *arrayin);//, const std::vector<float>& vec);
 

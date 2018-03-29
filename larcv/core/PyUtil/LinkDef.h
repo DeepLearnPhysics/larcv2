@@ -15,7 +15,14 @@
 #ifndef __CINT__
 #pragma link C++ function larcv::as_ndarray(const larcv::Image2D&)+;
 #pragma link C++ function larcv::as_image2d(PyObject*,size_t,size_t)+;
-#pragma link C++ function larcv::copy_array(PyObject*, const std::vector<float> &)+;
+#pragma link C++ function larcv::copy_array(PyObject*, const std::vector< short              > &)+;
+#pragma link C++ function larcv::copy_array(PyObject*, const std::vector< unsigned short     > &)+;
+#pragma link C++ function larcv::copy_array(PyObject*, const std::vector< int                > &)+;
+#pragma link C++ function larcv::copy_array(PyObject*, const std::vector< unsigned int       > &)+;
+#pragma link C++ function larcv::copy_array(PyObject*, const std::vector< long long          > &)+;
+#pragma link C++ function larcv::copy_array(PyObject*, const std::vector< unsigned long long > &)+;
+#pragma link C++ function larcv::copy_array(PyObject*, const std::vector< float              > &)+;
+#pragma link C++ function larcv::copy_array(PyObject*, const std::vector< double             > &)+;
 #pragma link C++ function larcv::fill_img_col( Image2D&, std::vector<short>&, const int, const int, const float pedestal=0.0);
 #pragma link C++ function larcv::play(PyObject*)+;
 //#pragma link C++ function larcv::as_mat(const larcv::Image2D&)+;
