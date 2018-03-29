@@ -61,7 +61,7 @@ namespace larcv {
       auto const& image_producer  = _image_producer_v[i];
       auto const& row_compression = _row_compression_v[i];
       auto const& col_compression = _col_compression_v[i];
-      auto ev_image = (EventImage2D*)(mgr.get_data("image_2d", image_producer));
+      auto ev_image = (EventImage2D*)(mgr.get_data("image2d", image_producer));
       if (!ev_image) {
         LARCV_CRITICAL() << "Input image not found by producer name " << image_producer << std::endl;
         throw larbys();
@@ -91,7 +91,7 @@ namespace larcv {
       auto const& row_compression = _row_compression_v[i];
       auto const& col_compression = _col_compression_v[i];
       auto const& mode = _mode_v[i];
-      auto ev_image = (EventImage2D*)(mgr.get_data("image_2d", image_producer));
+      auto ev_image = (EventImage2D*)(mgr.get_data("image2d", image_producer));
 
       std::vector<larcv::Image2D> image_v;
       ev_image->move(image_v);
