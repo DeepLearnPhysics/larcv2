@@ -36,7 +36,7 @@ PyObject* as_ndarray(const Image2D &img);
 /// larcv::Image2D to numpy array converter
 PyObject* as_caffe_ndarray(const Image2D &img);
 /// copy array
-template <class T> 
+template <class T>
 void _copy_array(PyObject *arrayin, const std::vector<T> &cvec);
 void copy_array(PyObject *arrayin, const std::vector< unsigned short > &cvec);
 void copy_array(PyObject *arrayin, const std::vector< unsigned int   > &cvec);
@@ -52,6 +52,8 @@ void copy_array(PyObject *arrayin, const std::vector< double         > &cvec);
 Image2D as_image2d_meta(PyObject *, ImageMeta meta);
 
 Image2D as_image2d(PyObject *);
+
+VoxelSet as_tensor2d(PyObject * values, PyObject * indexes);
 
 VoxelSet as_tensor3d(PyObject *, float min_threshold=0);
 
