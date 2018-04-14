@@ -32,6 +32,10 @@ namespace larcv {
            double xmax = 0, double ymax = 0,
            ProjectionID_t id = kINVALID_PROJECTIONID);
 
+    // Alternative constructor
+    BBox2D(const Point2D& pt1, const Point2D& pt2, 
+      ProjectionID_t id=kINVALID_PROJECTIONID);
+
     /// Default destructor
     virtual ~BBox2D() {}
 

@@ -17,7 +17,7 @@ ifeq ($(LARCV_OPENCV),1)
   CORE_SUBDIRS += CVUtil
 endif
 
-APP_SUBDIRS := Filter ImageAna ImageMod ThreadIO #Merger
+APP_SUBDIRS := Filter ImageAna ImageMod ThreadIO Algorithms #Merger
 
 .phony: all clean
 

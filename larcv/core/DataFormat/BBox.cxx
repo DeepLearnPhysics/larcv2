@@ -14,6 +14,13 @@ namespace larcv {
     if(ymin > ymax) throw larbys("ymin > ymax not allowed for BBox2D construction!");
   }
 
+  BBox2D::BBox2D(const Point2D& pt1, const Point2D& pt2, ProjectionID_t id)
+    : _id(id), _p1(pt1) , _p2(pt2)
+  {
+    if(min_x() > max_x()) throw larbys("xmin > xmax not allowed for BBox2D construction!");
+    if(min_y() > max_y()) throw larbys("ymin > ymax not allowed for BBox2D construction!");
+  }
+
   void BBox2D::update(double xmin, double ymin, double xmax, double ymax, ProjectionID_t id)
   {
     if(xmin > xmax) throw larbys("xmin > xmax not allowed for BBox2D::Update!");

@@ -97,7 +97,7 @@ namespace larcv {
     /// Provide absolute coordinate of the center of a specified pixel index
     inline Point2D position (size_t index) const { return Point2D(pos_x(index / rows()), pos_y(index % rows())); }
     /// Provide absolute coordinate of the center of a specified pixel (row,col)
-    inline Point2D position (size_t row, size_t col) const { return Point2D(index(row, col)); }
+    inline Point2D position (size_t row, size_t col) const { return position(index(row, col)); }
     /// Provide absolute horizontal coordinate of the center of a specified pixel row
     inline double pos_x   (size_t col) const { return min_x() + pixel_width() * col; }
     /// Provide absolute vertical coordinate of the center of a specified pixel row
