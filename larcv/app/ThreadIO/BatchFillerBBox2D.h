@@ -52,6 +52,10 @@ namespace larcv {
     // bounding boxes from different views
     ProjectionID_t _projid;
 
+    // we're stuck with a fixed batch size. So we need to cap num of boxes
+    // if slot unused, vaues are 0,0,0,0
+    int _maxboxes;
+
     // the name of the ROOT tree storing bbox2d instances
     std::string _bbox2d_producer;
 
