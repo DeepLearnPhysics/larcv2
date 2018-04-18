@@ -31,8 +31,14 @@ bool EventPIDLabel::process(IOManager& mgr) {
   auto& ev_particle_output =
       mgr.get_data<larcv::EventParticle>(_output_producer);
 
+  ev_particle_output.set_id(ev_particle.run(), ev_particle.subrun(), ev_particle.event());
+
   std::vector<int> primary_pdgs;
 
+  // std::cout << "Number of input particles: " << ev_particle.as_vector().size() << std::endl;
+  // std::cout << "Input info: " << ev_particle.event_key() << std::endl;
+  // std::cout << "Number of particles in output already: " << ev_particle_output.as_vector().size() << std::endl;
+  // std::cout << "Output info: " << ev_particle_output.event_key() << std::endl;
   for (auto& particle : ev_particle.as_vector()) {
 
     // Primary?
@@ -55,27 +61,27 @@ bool EventPIDLabel::process(IOManager& mgr) {
       break;
     }
     if (label ==  13){
-      final_pdg = 13;
+      final_pdg = 14;
       break;
     }
     if (label ==  11){
-      final_pdg = 11;
+      final_pdg = 12;
       break;
     }
     if (label ==  -12){
-      final_pdg = -12;
+      final_pdg = 12;
       break;
     }
     if (label ==  -14){
-      final_pdg = -14;
+      final_pdg = 14;
       break;
     }
     if (label ==  -13){
-      final_pdg = -13;
+      final_pdg = 14;
       break;
     }
     if (label ==  -11){
-      final_pdg = -11;
+      final_pdg = 12;
       break;
     }
 
@@ -84,6 +90,7 @@ bool EventPIDLabel::process(IOManager& mgr) {
   larcv::Particle _output_part;
   _output_part.pdg_code(final_pdg);
   ev_particle_output.append(_output_part);
+  // std::cout << "Number of output particles: " << ev_particle_output.as_vector().size() << std::endl;
 
 
   return true;
