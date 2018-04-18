@@ -59,6 +59,13 @@ namespace larcv {
     // the name of the ROOT tree storing bbox2d instances
     std::string _bbox2d_producer;
 
+    // we read the x,y values from BBox2D. However, if this
+    // is in the (x,y) coordinates of the Image2D and not in the pixel coordinates
+    // we need to convert. Set the configuration parameter, ConvertXTtoPixel, to true to do this.
+    // You also need to provide the image2d producer from which we will get the meta
+    bool _convert_xy_to_pix;
+    std::string _imageproducer;
+
     // entry_data is where we store values before passing it into the
     // data members of the parent BatchFillerTemplate class
     // we have to provide unrolled values.

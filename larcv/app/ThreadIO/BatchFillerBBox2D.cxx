@@ -18,6 +18,8 @@ namespace larcv {
   {
     _bbox2d_producer = cfg.get<std::string>("BBox2DProducer");
     _projid = (ProjectionID_t)cfg.get<int>("ProjectionID");
+    _convert_xy_to_pix = cfg.get<bool>("ConvertXYtoPixel",false);
+    _imageproducer = cfg.get<std::string>("ImageProducerForMeta","");
     _maxboxes = cfg.get<int>("MaxNumBoxes");
   }
 
@@ -48,25 +50,57 @@ namespace larcv {
   {
 
     LARCV_DEBUG() << "start" << std::endl;
-    
+
+    // get the bboxes for the entry
     auto const& event_bbox2d = mgr.get_data<larcv::EventBBox2D>(_bbox2d_producer);
+
+    // if we need to convert coordinate systems
+    //  from (x,y) to (row,col)
+    //  we need the image2d event container as well
+    larcv::EventImage2D* ev_img2d = NULL;
+    std::vector< const larcv::ImageMeta* > meta_v;
+    if ( _convert_xy_to_pix ) {
+      ev_img2d = (larcv::EventImage2D*)mgr.get_data("image2d",_imageproducer);
+
+      // we need the metas for the projections
+      // whats't he max id?
+      int maxid = 0 ;
+      for ( auto const& img : ev_img2d->image2d_array() ) {
+	if ( maxid<img.meta().id() )
+	  maxid = img.meta().id();
+      }
+      meta_v.resize( maxid+1, 0 );
+      // store pointers to the metas
+      for ( auto const& img : ev_img2d->image2d_array() ) {
+	if ( !meta_v[img.meta().id()] )
+	  meta_v[img.meta().id()] = &(img.meta());
+      }
+    }
 
     // if slow, one thing to try is to allocate this only once
     // by keeping as member data
     std::vector< std::array<float,4> > tempstore;
     tempstore.reserve( event_bbox2d.size() );
 
-
     for ( auto const& bbox2d : event_bbox2d ) {
       if ( bbox2d.id()!=_projid )
 	continue;
-
+      
+      const ImageMeta* pmeta = meta_v[bbox2d.id()];
+      
       std::array<float,4> xybh;
       xybh[0] = bbox2d.center_x();
       xybh[1] = bbox2d.center_y();
-      xybh[2] = bbox2d.width();
-      xybh[3] = bbox2d.height();
+      xybh[2] = 0.5*bbox2d.width();
+      xybh[3] = 0.5*bbox2d.height();
 
+      if  (_convert_xy_to_pix ) {
+	xybh[0] = pmeta->col( xybh[0] );
+	xybh[1] = pmeta->row( xybh[1] );
+	xybh[2] /= pmeta->pixel_width();
+	xybh[3] /= pmeta->pixel_height();
+      }
+      
       tempstore.push_back( xybh );
     }
       
