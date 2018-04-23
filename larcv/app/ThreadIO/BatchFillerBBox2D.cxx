@@ -5,6 +5,7 @@
 #include "larcv/core/DataFormat/EventImage2D.h"
 #include "larcv/core/DataFormat/EventBBox.h"
 #include <random>
+#include <array>
 
 namespace larcv {
 
