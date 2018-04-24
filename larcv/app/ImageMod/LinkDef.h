@@ -58,8 +58,12 @@
 #pragma link C++ class larcv::VertexWeight3D+;
 #pragma link C++ class larcv::Cluster2DThreshold+;
 #pragma link C++ class larcv::OneParticleTensor+;
+#pragma link C++ class larcv::MCTrackFix+;
+#pragma link C++ class larcv::PPNParticleRemover+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
 
 
 

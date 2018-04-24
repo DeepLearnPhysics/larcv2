@@ -159,7 +159,6 @@ namespace larcv {
       if(v<1) continue;
       ahoaho += 1;
     }
-    std::cout<<ahoaho<<std::endl;
     /*
     auto weight_data = weight_image.move();
     for (size_t idx = 0; idx < weight_data.size(); ++idx) {

@@ -82,6 +82,22 @@ namespace larcv {
 
       LARCV_INFO() << "Data length: " << data_ctr 
 		   << " ... " << pt_ctr << (_point_type == kPoint3D ? " 3D points" : " 2D points") << std::endl;
+
+      if(logger().level() <= msg::kDEBUG) {
+	std::stringstream ss;
+	size_t dim = (_point_type == kPoint3D ? 3 : 2);
+	ss << "Dumpint coordinates..." << std::endl << "    Buffer 0 ";
+	for(size_t i=0; i<batch_data().data().size(); ++i) {
+	  ss << batch_data().data()[i] << "    ";
+	  if((i+1) % dim == 0) {
+	    ss << std::endl;
+	    if((i+1) < batch_data().data().size())
+	      ss << "    Buffer " << (i+1) / dim << " ";
+	  }
+	}
+	LARCV_DEBUG() << ss.str() << std::endl;
+      }
+
     }
   }
 
@@ -113,8 +129,8 @@ namespace larcv {
       meta = mgr.get_data<larcv::EventImage2D>(_tensor_producer).as_vector().at(_image_channel).meta();
     }
     auto const& part_v = event_part.as_vector();
-    LARCV_DEBUG() << "Resizing _entry_data " << _buffer_size * (_point_type == kPoint3D ? 3 : 2) << std::endl;
-    _entry_data.resize(_buffer_size * (_point_type == kPoint3D ? 3 : 2));
+    LARCV_DEBUG() << "Resizing _entry_data " << batch_data().entry_data_size() << std::endl;
+    _entry_data.resize(batch_data().entry_data_size());
     LARCV_DEBUG() << "Resetting _entry_data " << std::endl;
     for(auto& v : _entry_data) v = -1.;
 
