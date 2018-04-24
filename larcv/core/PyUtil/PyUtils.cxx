@@ -149,12 +149,83 @@ larcv::Image2D as_image2d(PyObject *pyarray) {
   }
   PyArray_Free(pyarray, (void *)carray);
 
-  ImageMeta meta(0., 0., (double)(dims[0]), (double)(dims[1]), 
+  ImageMeta meta(0., 0., (double)(dims[0]), (double)(dims[1]),
                  (size_t)(dims[0]),
-                 (size_t)(dims[1]), 
+                 (size_t)(dims[1]),
                  larcv::kINVALID_PROJECTIONID);
 
   Image2D res(std::move(meta), std::move(res_data));
+  return res;
+}
+
+
+larcv::VoxelSet as_tensor2d(PyObject * values_in, PyObject * indexes_in) {
+  SetPyUtil();
+
+  // Cast to pyarrayobject
+  PyArrayObject *values  = (PyArrayObject *)(values_in);
+  PyArrayObject *indexes = (PyArrayObject *)(indexes_in);
+
+  // Dtype needs to be float32, uint64:
+  const int dtype_values = NPY_FLOAT32;
+  PyArray_Descr *descr_values = PyArray_DescrFromType(dtype_values);
+
+  const int dtype_indexes = NPY_UINT64;
+  PyArray_Descr *descr_indexes = PyArray_DescrFromType(dtype_indexes);
+
+  // Each of values, indexes should come in as a 1D array.
+
+
+  if (PyArray_NDIM(values) != 1 || PyArray_NDIM(indexes) != 1){
+    LARCV_CRITICAL() << "Must feed flattened values and indexes to larcv.as_tensor2d!" << std::endl;
+    throw larbys();
+  }
+
+  if (PyArray_SIZE(values) != PyArray_SIZE(indexes)){
+    LARCV_CRITICAL() << "Values and Indexes do not have the same size!" << std::endl;
+    throw larbys();
+  }
+
+  // // Require the right input values:
+  // if (*PyArray_DTYPE(values) != * descr_values){
+  //   LARCV_CRITICAL() << "Values must be type float 32!" << std::endl;
+  //   throw larbys();
+  // }
+  // if (*PyArray_DTYPE(values) != * descr_indexes){
+  //   LARCV_CRITICAL() << "Indexes must be type uint 64!" << std::endl;
+  //   throw larbys();
+  // }
+
+  // Create C arrays from numpy objects:
+  float * carray_values;
+
+  npy_intp dims_values[1];
+  if (PyArray_AsCArray(&values_in, (void *)&carray_values, dims_values, 1, descr_values) < 0) {
+    logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+                               "ERROR: cannot convert values to 1D C-array\n");
+    throw larbys();
+  }
+
+  // Create C arrays from numpy objects:
+  uint64_t * carray_indexes;
+
+  npy_intp dims_indexes[1];
+  if (PyArray_AsCArray(&indexes_in, (void *)&carray_indexes, dims_indexes, 1, descr_indexes) < 0) {
+    logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+                               "ERROR: cannot convert indexes to 1D C-array\n");
+    throw larbys();
+  }
+
+
+  // Loop over them simultaneously and add voxels to a voxel set
+  VoxelSet res;
+  for (int i = 0; i < dims_values[0]; ++i){
+    res.emplace(carray_indexes[i],carray_values[i],true);
+  }
+
+  PyArray_Free(values_in,  (void *)carray_values);
+  PyArray_Free(indexes_in, (void *)carray_indexes);
+
   return res;
 }
 
@@ -188,7 +259,7 @@ VoxelSet as_tensor3d(PyObject* pyarray, float min_threshold) {
   return res;
 }
 
-void fill_img_col(Image2D &img, std::vector<short> &adcs, const int col, const float pedestal) 
+void fill_img_col(Image2D &img, std::vector<short> &adcs, const int col, const float pedestal)
 //const int timedownsampling, const float pedestal) {
 {
   if (col < 0 || col >= (long)(img.meta().cols()))
@@ -293,7 +364,7 @@ PyObject* numpy_array(std::vector<size_t> dims)
   // Check dimension size is 1:
   //std::cout<<"ndim " << PyArray_NDIM(ptr) << std::endl;
   size_t len = PyArray_SIZE(ptr);
-  //std::cout<<"len " << len <<std::endl; 
+  //std::cout<<"len " << len <<std::endl;
   npy_intp loc[1];
   loc[0] = 0;
   auto fptr = (T *)(PyArray_GetPtr(ptr, loc));
