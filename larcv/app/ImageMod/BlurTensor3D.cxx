@@ -79,12 +79,12 @@ namespace larcv {
       if(ev_output.meta().valid()) {
         static bool one_time_warning=true;
         if(_output_producer_v[producer_index].empty()) {
-          LARCV_CRITICAL() << "Over-writing existing EventSparseTensor3D data for label "
+          LARCV_CRITICAL() << "Over-writing existing EventClusterVoxel3D data for label "
           << output_producer << std::endl;
           throw larbys();
         }
         else if(one_time_warning) {
-          LARCV_WARNING() << "Output EventSparseTensor3D producer " << output_producer
+          LARCV_WARNING() << "Output EventClusterVoxel3D producer " << output_producer
           << " already holding valid data will be over-written!" << std::endl;
           one_time_warning = false;
         }
