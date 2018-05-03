@@ -114,10 +114,16 @@ namespace larcv {
 
         switch (pi_type) {
         case PIType_t::kPITypeFixedPI:
-          for (auto const& vox : cluster.as_vector()) {vs.emplace(vox.id(), fixed_pi, false);}
+          for (auto const& vox : cluster.as_vector()) {
+            if (vox.id() == meta.invalid_voxel_id()) continue;
+            vs.emplace(vox.id(), fixed_pi, false);
+          }
           break;
         case PIType_t::kPITypeInputVoxel:
-          for (auto const& vox : cluster.as_vector()) {vs.add(vox);}
+          for (auto const& vox : cluster.as_vector()) {
+            if (vox.id() == meta.invalid_voxel_id()) continue;
+            vs.add(vox);
+          }
           break;
         case PIType_t::kPITypeClusterIndex:
           for (auto const& vox : cluster.as_vector()) {
