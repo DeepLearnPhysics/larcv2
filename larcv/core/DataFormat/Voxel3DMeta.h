@@ -2,7 +2,7 @@
  * \file Voxel3DMeta.h
  *
  * \ingroup core_DataFormat
- * 
+ *
  * \brief Class def header for a class larcv::Voxel3DMeta
  *
  * @author kazuhiro
@@ -45,7 +45,7 @@ namespace larcv {
     void clear();
     /// Uniry == operator
     inline bool operator ==(const Voxel3DMeta& rhs) const
-    { return ((BBox3D)(rhs) == (BBox3D)(*this) && 
+    { return ((BBox3D)(rhs) == (BBox3D)(*this) &&
               _xlen == rhs._xlen && _ylen == rhs._ylen && _zlen == rhs._zlen &&
               _xnum == rhs._xnum && _ynum == rhs._ynum && _znum == rhs._znum); }
     /// Uniry != operator
@@ -60,8 +60,12 @@ namespace larcv {
     { return id(pt.x, pt.y, pt.z); }
     /// Given a position, returns voxel ID
     VoxelID_t id(const double x, const double y, const double z) const;
+    /// Give the i_x, i_y, i_z indexes (indexs in 3 axes), find the total 1D index:
+
+    VoxelID_t index(const size_t i_x, const size_t i_y, const size_t i_z) const;
+
     /// Given a voxel id, returns a neighbor voxel ID with (x,y,z) shift
-    VoxelID_t shift(const VoxelID_t origin_id, 
+    VoxelID_t shift(const VoxelID_t origin_id,
                     const int shift_x, const int shift_y, const int shift_z) const;
     /// Return value of invalid voxel ID:
     VoxelID_t invalid_voxel_id() const{return kINVALID_VOXELID;}
@@ -89,24 +93,33 @@ namespace larcv {
     inline DistanceUnit_t unit() const { return _unit; }
     /// text dumper
     std::string  dump() const;
-    
+
+
+    // Find x index that corresponds to a specified index
+    size_t id_to_x_index(VoxelID_t id) const;
+    // Find col that corresponds to a specified index
+    size_t id_to_y_index(VoxelID_t id) const;
+    // Find col that corresponds to a specified index
+    size_t id_to_z_index(VoxelID_t id) const;
+
+
   private:
 
     bool   _valid; ///< Boolean set to true only if voxel parameters are properly set
     size_t _num_element; ///< Total number of voxel elements
-    
+
     double _xlen; ///< X voxel size in [cm]
     double _ylen; ///< Y voxel size in [cm]
     double _zlen; ///< Z voxel size in [cm]
-    
+
     size_t _xnum; ///< Number of voxels along X
     size_t _ynum; ///< Number of voxels along Y
     size_t _znum; ///< Number of voxels along Z
 
     DistanceUnit_t _unit; ///< length unit
-  };  
+  };
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 
