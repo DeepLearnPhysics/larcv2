@@ -50,6 +50,8 @@ namespace larcv {
     std::vector<double> _sigma_v;
     std::vector<std::vector<std::vector<double> > > _scale_vvv;
     bool _normalize;
+    float _threshold;
+    float _division_threshold;
   };
 
   /**
