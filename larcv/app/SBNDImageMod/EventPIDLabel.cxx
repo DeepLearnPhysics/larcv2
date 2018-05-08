@@ -15,7 +15,12 @@ EventPIDLabel::EventPIDLabel(const std::string name)
     : ProcessBase(name) {}
 
 void EventPIDLabel::configure(const PSet& cfg) {
-  _output_producer          = cfg.get<std::string>("OutputProducer");
+  _output_neutrino_id_producer = cfg.get<std::string>("OutputNeutrinoIDProducer", "neutID");
+  _output_proton_id_producer   = cfg.get<std::string>("OutputProtonIDProducer", "protID");
+  _output_chrpion_id_producer  = cfg.get<std::string>("OutputChargedPionIDProducer", "cpiID");
+  _output_ntrpion_id_producer  = cfg.get<std::string>("OutputNeutralPionIDProducer", "npiID");
+
+
   _particle_producer        = cfg.get<std::string>("ParticleProducer");
   _neutrino_producer        = cfg.get<std::string>("NeutrinoProducer");
 
@@ -43,11 +48,6 @@ bool EventPIDLabel::process(IOManager& mgr) {
   // std::cout << "Number of neutrino particles: " << ev_neutrino.as_vector().size() << std::endl;
 
 
-  // Also output a corresponding particle 2d to match the clusters:
-  auto& ev_particle_output =
-      mgr.get_data<larcv::EventParticle>(_output_producer);
-
-  ev_particle_output.set_id(ev_neutrino.run(), ev_neutrino.subrun(), ev_neutrino.event());
 
   std::vector<int> primary_pdgs;
 
@@ -154,12 +154,41 @@ bool EventPIDLabel::process(IOManager& mgr) {
   // kNEventCategories*kNProtonCategories*kNChargedPionCategories*kNNeutralPionCategories
   // categories.  The index is set exclusively, in an 'unraveled' way from the above categories
 
-  int final_index = npc
-                  + kNNeutralPionCategories * cpc
-                  + (kNNeutralPionCategories * kNChargedPionCategories) * pc
-                  + (kNNeutralPionCategories
-                   * kNChargedPionCategories
-                   * kNProtonCategories) * _int_type;
+  // int final_index = npc
+  //                 + kNNeutralPionCategories * cpc
+  //                 + (kNNeutralPionCategories * kNChargedPionCategories) * pc
+  //                 + (kNNeutralPionCategories
+  //                  * kNChargedPionCategories
+  //                  * kNProtonCategories) * _int_type;
+
+
+  auto& ev_particle_neutrino_output = mgr.get_data<larcv::EventParticle>(_output_neutrino_id_producer);
+  auto& ev_particle_proton_output   = mgr.get_data<larcv::EventParticle>(_output_proton_id_producer);
+  auto& ev_particle_chrpion_output  = mgr.get_data<larcv::EventParticle>(_output_chrpion_id_producer);
+  auto& ev_particle_ntrpion_output  = mgr.get_data<larcv::EventParticle>(_output_ntrpion_id_producer);
+
+  ev_particle_neutrino_output.set_id(ev_neutrino.run(), ev_neutrino.subrun(), ev_neutrino.event());
+  ev_particle_proton_output.set_id(ev_neutrino.run(), ev_neutrino.subrun(), ev_neutrino.event());
+  ev_particle_chrpion_output.set_id(ev_neutrino.run(), ev_neutrino.subrun(), ev_neutrino.event());
+  ev_particle_ntrpion_output.set_id(ev_neutrino.run(), ev_neutrino.subrun(), ev_neutrino.event());
+
+
+
+  larcv::Particle _output_neutrino_part;
+  _output_neutrino_part.pdg_code(_int_type);
+  ev_particle_neutrino_output.append(_output_neutrino_part);
+
+  larcv::Particle _output_proton_part;
+  _output_proton_part.pdg_code(pc);
+  ev_particle_proton_output.append(_output_proton_part);
+
+  larcv::Particle _output_chrpion_part;
+  _output_chrpion_part.pdg_code(cpc);
+  ev_particle_chrpion_output.append(_output_chrpion_part);
+
+  larcv::Particle _output_ntrpion_part;
+  _output_ntrpion_part.pdg_code(npc);
+  ev_particle_ntrpion_output.append(_output_ntrpion_part);
 
 
   // std::cout << "Category: " << _int_type
@@ -167,12 +196,6 @@ bool EventPIDLabel::process(IOManager& mgr) {
   //           << "\t Npi: "  << charged_pion_count
   //           << "\t Npi0: " << neutral_pion_count
   //           << "\tfinal: " << final_index << std::endl;
-
-
-  larcv::Particle _output_part;
-  _output_part.pdg_code(final_index);
-  ev_particle_output.append(_output_part);
-  // std::cout << "Number of output particles: " << ev_particle_output.as_vector().size() << std::endl;
 
 
   return true;

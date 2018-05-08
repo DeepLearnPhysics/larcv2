@@ -58,7 +58,10 @@ class EventPIDLabel : public ProcessBase {
 
  private:
 
-  std::string _output_producer;
+  std::string _output_neutrino_id_producer;
+  std::string _output_proton_id_producer;
+  std::string _output_chrpion_id_producer;
+  std::string _output_ntrpion_id_producer;
   std::string _particle_producer;
   std::string _neutrino_producer;
 
