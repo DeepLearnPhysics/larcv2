@@ -9,7 +9,7 @@ namespace larcv {
   static BlurCluster3DProcessFactory __global_BlurCluster3DProcessFactory__;
 
   BlurCluster3D::BlurCluster3D(const std::string name)
-    : ProcessBase(name)
+  : ProcessBase(name)
   {}
 
   void BlurCluster3D::configure_labels(const PSet& cfg)
@@ -97,8 +97,8 @@ namespace larcv {
           for (size_t zshift = 0; zshift <= _numvox_v[2]; ++zshift) {
 
             double val = exp( - pow(xshift * meta.size_voxel_x(), 2) / (2. * _sigma_v[0])
-                              - pow(yshift * meta.size_voxel_y(), 2) / (2. * _sigma_v[1])
-                              - pow(zshift * meta.size_voxel_z(), 2) / (2. * _sigma_v[2]) );
+              - pow(yshift * meta.size_voxel_y(), 2) / (2. * _sigma_v[1])
+              - pow(zshift * meta.size_voxel_z(), 2) / (2. * _sigma_v[2]) );
             _scale_vvv[xshift][yshift][zshift] = val;
           }
         }
@@ -106,96 +106,96 @@ namespace larcv {
 
       double scale_sum = 1.;
       if(_normalize) {
-	scale_sum = 0.;
-	int x_ctr = -((int)_numvox_v[0]);
-	while(x_ctr <= (int)(_numvox_v[0])) {
-	  int y_ctr = -((int)_numvox_v[1]);
-	  while(y_ctr <= (int)(_numvox_v[1])) {
-	    int z_ctr = -((int)_numvox_v[2]);
-	    while(z_ctr <= (int)(_numvox_v[2])) {
-	      scale_sum += _scale_vvv[std::abs(x_ctr)][std::abs(y_ctr)][std::abs(z_ctr)];
-	      ++z_ctr;
-	    }
-	    ++y_ctr;
-	  }
-	  ++x_ctr;
-	}
+       scale_sum = 0.;
+       int x_ctr = -((int)_numvox_v[0]);
+       while(x_ctr <= (int)(_numvox_v[0])) {
+         int y_ctr = -((int)_numvox_v[1]);
+         while(y_ctr <= (int)(_numvox_v[1])) {
+           int z_ctr = -((int)_numvox_v[2]);
+           while(z_ctr <= (int)(_numvox_v[2])) {
+             scale_sum += _scale_vvv[std::abs(x_ctr)][std::abs(y_ctr)][std::abs(z_ctr)];
+             ++z_ctr;
+           }
+           ++y_ctr;
+         }
+         ++x_ctr;
+       }
+     }
+
+     LARCV_INFO() << "scale_sum: " << scale_sum << std::endl;
+
+     ev_output->meta(meta);
+     std::vector<larcv::VoxelSet> vsa_output;
+     for(size_t cluster_index=0; cluster_index<ev_cluster3d.as_vector().size(); ++cluster_index) {
+
+       auto const& cluster = ev_cluster3d.as_vector()[cluster_index];
+       larcv::VoxelSet res_data;
+       for (auto const& vox : cluster.as_vector()) {
+         LARCV_DEBUG() << "Re-mapping vox ID " << vox.id() << " charge " << vox.value() << std::endl;
+         float sum_charge = 0.;
+         auto const pos = meta.position(vox.id());
+         double xpos = pos.x - _numvox_v[0] * meta.size_voxel_x();
+         double xmax = pos.x + (_numvox_v[0] + 0.5) * meta.size_voxel_x();
+         int x_ctr = 0;
+         while (xpos < xmax) {
+           double ypos = pos.y - _numvox_v[1] * meta.size_voxel_y();
+           double ymax = pos.y + (_numvox_v[1] + 0.5) * meta.size_voxel_y();
+           int y_ctr = 0;
+           while (ypos < ymax) {
+             double zpos = pos.z - _numvox_v[2] * meta.size_voxel_z();
+             double zmax = pos.z + (_numvox_v[2] + 0.5) * meta.size_voxel_z();
+             int z_ctr = 0;
+             while (zpos < zmax) {
+              
+              auto const id = meta.id(xpos, ypos, zpos);
+              if (id != kINVALID_VOXELID) {
+                
+                int xindex = std::abs(((int)(_numvox_v[0])) - x_ctr);
+                int yindex = std::abs(((int)(_numvox_v[1])) - y_ctr);
+                int zindex = std::abs(((int)(_numvox_v[2])) - z_ctr);
+                
+                float scale_factor = _scale_vvv[xindex][yindex][zindex];
+                float charge = vox.value() * scale_factor / scale_sum;
+
+                if(charge > _division_threshold) {
+                  LARCV_DEBUG() << "... to ID " << id << " charge " << charge << std::endl;
+                  res_data.emplace(id, charge, true);
+                  sum_charge += charge;
+                }
+              }
+              zpos += meta.size_voxel_z();
+              ++z_ctr;
+            }
+            ypos += meta.size_voxel_y();
+            ++y_ctr;
+          }
+          xpos += meta.size_voxel_x();
+          ++x_ctr;
+        }
+        LARCV_DEBUG() << "Re-mapped sum charge " << sum_charge << std::endl;
       }
-
-      LARCV_INFO() << "scale_sum: " << scale_sum << std::endl;
-
-      ev_output->meta(meta);
-      std::vector<larcv::VoxelSet> vsa_output;
-      for(size_t cluster_index=0; cluster_index<ev_cluster3d.as_vector().size(); ++cluster_index) {
-
-	auto const& cluster = ev_cluster3d.as_vector()[cluster_index];
-	larcv::VoxelSet res_data;
-	for (auto const& vox : cluster.as_vector()) {
-	  LARCV_DEBUG() << "Re-mapping vox ID " << vox.id() << " charge " << vox.value() << std::endl;
-	  float sum_charge = 0.;
-	  auto const pos = meta.position(vox.id());
-	  double xpos = pos.x - _numvox_v[0] * meta.size_voxel_x();
-	  double xmax = pos.x + (_numvox_v[0] + 0.5) * meta.size_voxel_x();
-	  int x_ctr = 0;
-	  while (xpos < xmax) {
-	    double ypos = pos.y - _numvox_v[1] * meta.size_voxel_y();
-	    double ymax = pos.y + (_numvox_v[1] + 0.5) * meta.size_voxel_y();
-	    int y_ctr = 0;
-	    while (ypos < ymax) {
-	      double zpos = pos.z - _numvox_v[2] * meta.size_voxel_z();
-	      double zmax = pos.z + (_numvox_v[2] + 0.5) * meta.size_voxel_z();
-	      int z_ctr = 0;
-	      while (zpos < zmax) {
-		
-		auto const id = meta.id(xpos, ypos, zpos);
-		if (id != kINVALID_VOXELID) {
-		  
-		  int xindex = std::abs(((int)(_numvox_v[0])) - x_ctr);
-		  int yindex = std::abs(((int)(_numvox_v[1])) - y_ctr);
-		  int zindex = std::abs(((int)(_numvox_v[2])) - z_ctr);
-		  
-		  float scale_factor = _scale_vvv[xindex][yindex][zindex];
-		  float charge = vox.value() * scale_factor / scale_sum;
-
-		  if(charge > _division_threshold) {
-		    LARCV_DEBUG() << "... to ID " << id << " charge " << charge << std::endl;
-		    res_data.emplace(id, charge, true);
-		    sum_charge += charge;
-		  }
-		}
-		zpos += meta.size_voxel_z();
-		++z_ctr;
-	      }
-	      ypos += meta.size_voxel_y();
-	      ++y_ctr;
-	    }
-	    xpos += meta.size_voxel_x();
-	    ++x_ctr;
-	  }
-	  LARCV_DEBUG() << "Re-mapped sum charge " << sum_charge << std::endl;
-	}
 	// Only keep voxels above threshold
-	VoxelSet res_data_threshold;
-	for(auto const& vox : res_data.as_vector()) {
-	  if(vox.value() <= _threshold) continue;
-	  res_data_threshold.emplace(vox.id(), vox.value(), true);
-	}
+      VoxelSet res_data_threshold;
+      for(auto const& vox : res_data.as_vector()) {
+       if(vox.value() <= _threshold) continue;
+       res_data_threshold.emplace(vox.id(), vox.value(), true);
+     }
 
-	LARCV_INFO() << "Before: vox count = " << cluster.as_vector().size() << " charge = " << cluster.sum()
-		     << " ... "
-		     << res_data.sum() << " ... " 
-		     << "After: vox count = " << res_data_threshold.as_vector().size() << " charge = " << res_data_threshold.sum() << std::endl;
-	
-	vsa_output.emplace_back(std::move(res_data));
-      }
-      ((VoxelSetArray*)(ev_output))->emplace(std::move(vsa_output));
-    }
-    return true;
-    
-  }
+     LARCV_INFO() << "Before: vox count = " << cluster.as_vector().size() << " charge = " << cluster.sum()
+     << " ... "
+     << res_data.sum() << " ... " 
+     << "After: vox count = " << res_data_threshold.as_vector().size() << " charge = " << res_data_threshold.sum() << std::endl;
+     
+     vsa_output.emplace_back(std::move(res_data));
+   }
+   ((VoxelSetArray*)(ev_output))->emplace(std::move(vsa_output));
+ }
+ return true;
+ 
+}
 
-  void BlurCluster3D::finalize()
-  {}
+void BlurCluster3D::finalize()
+{}
 
 }
 #endif
