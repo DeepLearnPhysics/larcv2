@@ -79,7 +79,6 @@ bool BatchFillerTensor2D::process(IOManager& mgr) {
   //   throw larbys();
   // }
 
-  std::cout << "Num channels: " << _num_channels << std::endl;
 
   // one time operation: get image dimension
   if (batch_data().dim().empty()) {
@@ -104,7 +103,6 @@ bool BatchFillerTensor2D::process(IOManager& mgr) {
 
   for (auto& v : _entry_data) v = _voxel_base_value;
 
-  std::cout << "_entry_data.size(): " << _entry_data.size() << std::endl;
 
   for ( auto const& voxel_set : voxel_data.as_vector()){
     auto & meta = voxel_set.meta();
