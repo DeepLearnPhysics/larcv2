@@ -167,6 +167,11 @@ bool EventPIDLabel::process(IOManager& mgr) {
   auto& ev_particle_chrpion_output  = mgr.get_data<larcv::EventParticle>(_output_chrpion_id_producer);
   auto& ev_particle_ntrpion_output  = mgr.get_data<larcv::EventParticle>(_output_ntrpion_id_producer);
 
+  ev_particle_neutrino_output.clear();
+  ev_particle_proton_output.clear();
+  ev_particle_chrpion_output.clear();
+  ev_particle_ntrpion_output.clear();
+
   ev_particle_neutrino_output.set_id(ev_neutrino.run(), ev_neutrino.subrun(), ev_neutrino.event());
   ev_particle_proton_output.set_id(ev_neutrino.run(), ev_neutrino.subrun(), ev_neutrino.event());
   ev_particle_chrpion_output.set_id(ev_neutrino.run(), ev_neutrino.subrun(), ev_neutrino.event());
