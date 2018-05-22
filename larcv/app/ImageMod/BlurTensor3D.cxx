@@ -9,7 +9,7 @@ namespace larcv {
   static BlurTensor3DProcessFactory __global_BlurTensor3DProcessFactory__;
 
   BlurTensor3D::BlurTensor3D(const std::string name)
-    : ProcessBase(name)
+  : ProcessBase(name)
   {}
 
   void BlurTensor3D::configure_labels(const PSet& cfg)
@@ -18,7 +18,8 @@ namespace larcv {
     _output_producer_v.clear();
     _tensor3d_producer_v = cfg.get<std::vector<std::string> >("Tensor3DProducerList",_tensor3d_producer_v);
     _output_producer_v   = cfg.get<std::vector<std::string> >("OutputProducerList",_output_producer_v);
-
+    _threshold = cfg.get<float>("Threshold",0);
+    _division_threshold = cfg.get<float>("DivisionThreshold",0);
     if(_tensor3d_producer_v.empty()) {
       auto tensor3d_producer = cfg.get<std::string>("Tensor3DProducer","");
       auto output_producer   = cfg.get<std::string>("OutputProducer","");
@@ -79,82 +80,108 @@ namespace larcv {
       if(ev_output.meta().valid()) {
         static bool one_time_warning=true;
         if(_output_producer_v[producer_index].empty()) {
-          LARCV_CRITICAL() << "Over-writing existing EventSparseTensor3D data for label "
+          LARCV_CRITICAL() << "Over-writing existing EventClusterVoxel3D data for label "
           << output_producer << std::endl;
           throw larbys();
         }
         else if(one_time_warning) {
-          LARCV_WARNING() << "Output EventSparseTensor3D producer " << output_producer
+          LARCV_WARNING() << "Output EventClusterVoxel3D producer " << output_producer
           << " already holding valid data will be over-written!" << std::endl;
           one_time_warning = false;
         }
       }
 
       auto const& meta = ev_tensor3d.meta();
-      double scale_sum = 0.;
       for (size_t xshift = 0; xshift <= _numvox_v[0]; ++xshift) {
         for (size_t yshift = 0; yshift <= _numvox_v[1]; ++yshift) {
           for (size_t zshift = 0; zshift <= _numvox_v[2]; ++zshift) {
 
             double val = exp( - pow(xshift * meta.size_voxel_x(), 2) / (2. * _sigma_v[0])
-                              - pow(yshift * meta.size_voxel_y(), 2) / (2. * _sigma_v[1])
-                              - pow(zshift * meta.size_voxel_z(), 2) / (2. * _sigma_v[2]) );
+              - pow(yshift * meta.size_voxel_y(), 2) / (2. * _sigma_v[1])
+              - pow(zshift * meta.size_voxel_z(), 2) / (2. * _sigma_v[2]) );
             _scale_vvv[xshift][yshift][zshift] = val;
-            scale_sum += val;
           }
         }
       }
-      if (!_normalize) scale_sum = 1.;
 
-      larcv::VoxelSet res_data;
-      for (auto const& vox : ev_tensor3d.as_vector()) {
+      double scale_sum = 1.;
+      if(_normalize) {
+       scale_sum = 0.;
+       int x_ctr = -((int)_numvox_v[0]);
+       while(x_ctr <= (int)(_numvox_v[0])) {
+         int y_ctr = -((int)_numvox_v[1]);
+         while(y_ctr <= (int)(_numvox_v[1])) {
+           int z_ctr = -((int)_numvox_v[2]);
+           while(z_ctr <= (int)(_numvox_v[2])) {
+             scale_sum += _scale_vvv[std::abs(x_ctr)][std::abs(y_ctr)][std::abs(z_ctr)];
+             ++z_ctr;
+           }
+           ++y_ctr;
+         }
+         ++x_ctr;
+       }
+     }
 
-        auto const pos = meta.position(vox.id());
+     larcv::VoxelSet res_data;
+     for (auto const& vox : ev_tensor3d.as_vector()) {
+       LARCV_DEBUG() << "Re-mapping vox ID " << vox.id() << " charge " << vox.value() << std::endl;
+       float sum_charge = 0.;
+       auto const pos = meta.position(vox.id());
 
-        double xpos = pos.x - _numvox_v[0] * meta.size_voxel_x();
-        double xmax = pos.x + (_numvox_v[0] + 0.5) * meta.size_voxel_x();
-        int x_ctr = 0;
-        while (xpos < xmax) {
-          double ypos = pos.y - _numvox_v[1] * meta.size_voxel_y();
-          double ymax = pos.y + (_numvox_v[1] + 0.5) * meta.size_voxel_y();
-          int y_ctr = 0;
-          while (ypos < ymax) {
-            double zpos = pos.z - _numvox_v[2] * meta.size_voxel_z();
-            double zmax = pos.z + (_numvox_v[2] + 0.5) * meta.size_voxel_z();
-            int z_ctr = 0;
-            while (zpos < zmax) {
+       double xpos = pos.x - _numvox_v[0] * meta.size_voxel_x();
+       double xmax = pos.x + (_numvox_v[0] + 0.5) * meta.size_voxel_x();
+       int x_ctr = 0;
+       while (xpos < xmax) {
+        double ypos = pos.y - _numvox_v[1] * meta.size_voxel_y();
+        double ymax = pos.y + (_numvox_v[1] + 0.5) * meta.size_voxel_y();
+        int y_ctr = 0;
+        while (ypos < ymax) {
+          double zpos = pos.z - _numvox_v[2] * meta.size_voxel_z();
+          double zmax = pos.z + (_numvox_v[2] + 0.5) * meta.size_voxel_z();
+          int z_ctr = 0;
+          while (zpos < zmax) {
 
-              auto const id = meta.id(xpos, ypos, zpos);
-              if (id != kINVALID_VOXELID) {
+            auto const id = meta.id(xpos, ypos, zpos);
+            if (id != kINVALID_VOXELID) {
 
-                int xindex = std::abs(((int)(_numvox_v[0])) - x_ctr);
-                int yindex = std::abs(((int)(_numvox_v[1])) - y_ctr);
-                int zindex = std::abs(((int)(_numvox_v[2])) - z_ctr);
+              int xindex = std::abs(((int)(_numvox_v[0])) - x_ctr);
+              int yindex = std::abs(((int)(_numvox_v[1])) - y_ctr);
+              int zindex = std::abs(((int)(_numvox_v[2])) - z_ctr);
 
-                float scale_factor = _scale_vvv[xindex][yindex][zindex];
+              float scale_factor = _scale_vvv[xindex][yindex][zindex];
+              float charge = vox.value() * scale_factor / scale_sum;
 
-                res_data.emplace(id, vox.value() * scale_factor / scale_sum, true);
+              if(charge > _division_threshold) {
+                LARCV_DEBUG() << "... to ID " << id << " charge " << charge << std::endl;
+                res_data.emplace(id, charge, true);
+                sum_charge += charge;
               }
-              zpos += meta.size_voxel_z();
-              ++z_ctr;
             }
-            ypos += meta.size_voxel_y();
-            ++y_ctr;
+            zpos += meta.size_voxel_z();
+            ++z_ctr;
           }
-          xpos += meta.size_voxel_x();
-          ++x_ctr;
+          ypos += meta.size_voxel_y();
+          ++y_ctr;
         }
+        xpos += meta.size_voxel_x();
+        ++x_ctr;
       }
-
-      ev_output.emplace(std::move(res_data), meta);
-
     }
-    return true;
+    VoxelSet res_data_threshold;
+    for(auto const& vox : res_data.as_vector()) {
+     if(vox.value() <= _threshold) continue;
+     res_data_threshold.emplace(vox.id(), vox.value(), true);
+   }
 
-  }
+   ev_output.emplace(std::move(res_data), meta);
 
-  void BlurTensor3D::finalize()
-  {}
+ }
+ return true;
+
+}
+
+void BlurTensor3D::finalize()
+{}
 
 }
 #endif

@@ -1,9 +1,9 @@
 /**
- * \file BlurTensor3D.h
+ * \file BlurCluster3D.h
  *
  * \ingroup ImageMod
  * 
- * \brief Class def header for a class BlurTensor3D
+ * \brief Class def header for a class BlurCluster3D
  *
  * @author kazuhiro
  */
@@ -20,18 +20,18 @@ namespace larcv {
 
   /**
      \class ProcessBase
-     User defined class BlurTensor3D ... these comments are used to generate
+     User defined class BlurCluster3D ... these comments are used to generate
      doxygen documentation!
   */
-  class BlurTensor3D : public ProcessBase {
+  class BlurCluster3D : public ProcessBase {
 
   public:
     
     /// Default constructor
-    BlurTensor3D(const std::string name="BlurTensor3D");
+    BlurCluster3D(const std::string name="BlurCluster3D");
     
     /// Default destructor
-    ~BlurTensor3D(){}
+    ~BlurCluster3D(){}
 
     void configure(const PSet&);
 
@@ -45,7 +45,7 @@ namespace larcv {
 
     void configure_labels(const PSet& cfg);
     std::vector<std::string> _output_producer_v;
-    std::vector<std::string> _tensor3d_producer_v;
+    std::vector<std::string> _cluster3d_producer_v;
     std::vector<size_t> _numvox_v;
     std::vector<double> _sigma_v;
     std::vector<std::vector<std::vector<double> > > _scale_vvv;
@@ -55,17 +55,17 @@ namespace larcv {
   };
 
   /**
-     \class larcv::BlurTensor3DFactory
-     \brief A concrete factory class for larcv::BlurTensor3D
+     \class larcv::BlurCluster3DFactory
+     \brief A concrete factory class for larcv::BlurCluster3D
   */
-  class BlurTensor3DProcessFactory : public ProcessFactoryBase {
+  class BlurCluster3DProcessFactory : public ProcessFactoryBase {
   public:
     /// ctor
-    BlurTensor3DProcessFactory() { ProcessFactory::get().add_factory("BlurTensor3D",this); }
+    BlurCluster3DProcessFactory() { ProcessFactory::get().add_factory("BlurCluster3D",this); }
     /// dtor
-    ~BlurTensor3DProcessFactory() {}
+    ~BlurCluster3DProcessFactory() {}
     /// creation method
-    ProcessBase* create(const std::string instance_name) { return new BlurTensor3D(instance_name); }
+    ProcessBase* create(const std::string instance_name) { return new BlurCluster3D(instance_name); }
   };
 
 }

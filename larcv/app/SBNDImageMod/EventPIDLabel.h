@@ -33,6 +33,12 @@ namespace larcv {
 
 
 class EventPIDLabel : public ProcessBase {
+
+  enum interaction_type_t     {kNueCC, kNumuCC, kNC, kNEventCategories};
+  enum proton_counter_t       {kZeroProtons, kOneProton, kNProtons, kNProtonCategories};
+  enum charged_pion_counter_t {kZeroChargedPions, kNChargedPions, kNChargedPionCategories};
+  enum neutral_pion_counter_t {kZeroNeutralPions, kNNeutralPions, kNNeutralPionCategories};
+
  public:
   /// Default constructor
   EventPIDLabel(
@@ -52,9 +58,16 @@ class EventPIDLabel : public ProcessBase {
 
  private:
 
-  std::string _output_producer;
+  std::string _output_neutrino_id_producer;
+  std::string _output_proton_id_producer;
+  std::string _output_chrpion_id_producer;
+  std::string _output_ntrpion_id_producer;
   std::string _particle_producer;
+  std::string _neutrino_producer;
 
+  float _proton_threshold;
+  float _charged_pion_threshold;
+  float _neutral_pion_threshold;
 
 };
 
