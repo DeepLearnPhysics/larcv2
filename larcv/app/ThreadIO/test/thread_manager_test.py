@@ -5,16 +5,20 @@ import sys, time
 batch_size=100
 report_cycle=1
 sleep_time=0.0001
-stop_time=10
+stop_time=100
 record=True
 
-proc=larcv.ThreadProcessor("ThreadProcessor")
-proc.configure(sys.argv[1])
+cfg_file = sys.argv[1]
+cfg_name = open(cfg_file,'r').read()
+cfg_name = cfg_name[0:cfg_name.find(':')].split()[0]
+
+proc=larcv.ThreadProcessor(cfg_name)
+proc.configure(cfg_file)
 
 # list of batch filler IDs
 ids = proc.batch_fillers()
 names = [proc.storage_name(i) for i in ids]
-dtype = [larcv.BatchDataTypeName(proc.batch_types()[i]) for i in ids]
+dtype = [larcv.BatchDataTypeName(proc.batch_types()[i-ids.front()]) for i in ids]
 
 fout=None
 if record:
