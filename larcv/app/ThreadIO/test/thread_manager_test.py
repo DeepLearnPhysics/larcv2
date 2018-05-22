@@ -5,7 +5,7 @@ import sys, time
 batch_size=100
 report_cycle=1
 sleep_time=0.0001
-stop_time=10
+stop_time=100
 record=True
 
 cfg_file = sys.argv[1]
