@@ -8,8 +8,12 @@ sleep_time=0.0001
 stop_time=10
 record=True
 
-proc=larcv.ThreadProcessor("ThreadProcessor")
-proc.configure(sys.argv[1])
+cfg_file = sys.argv[1]
+cfg_name = open(cfg_file,'r').read()
+cfg_name = cfg_name[0:cfg_name.find(':')].split()[0]
+
+proc=larcv.ThreadProcessor(cfg_name)
+proc.configure(cfg_file)
 
 # list of batch filler IDs
 ids = proc.batch_fillers()
