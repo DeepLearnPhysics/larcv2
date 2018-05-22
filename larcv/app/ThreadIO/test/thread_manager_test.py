@@ -14,7 +14,7 @@ proc.configure(sys.argv[1])
 # list of batch filler IDs
 ids = proc.batch_fillers()
 names = [proc.storage_name(i) for i in ids]
-dtype = [larcv.BatchDataTypeName(proc.batch_types()[i]) for i in ids]
+dtype = [larcv.BatchDataTypeName(proc.batch_types()[i-ids.front()]) for i in ids]
 
 fout=None
 if record:
