@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include "BatchFillerTemplate.h"
 #include "BatchDataStorageFactory.h"
+//#include <TROOT.h>
 //#include <stdlib.h>
 #include <mutex>
 #include <chrono>
@@ -359,6 +360,7 @@ namespace larcv {
     _enable_filter = orig_cfg.get<bool>("EnableFilter", false);
     //_use_threading = orig_cfg.get<bool>("UseThread", true);
     _num_threads   = orig_cfg.get<size_t>("NumThreads", 1);
+    //ROOT::EnableImplicitMT(_num_threads+1);
     _input_fname_v = orig_cfg.get<std::vector<std::string> >("InputFiles");
     _num_batch_storage = orig_cfg.get<size_t>("NumBatchStorage", _num_threads);
 

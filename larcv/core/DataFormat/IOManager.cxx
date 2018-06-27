@@ -515,7 +515,7 @@ namespace larcv {
 
   EventBase* IOManager::get_data(const size_t id)
   {
-    //__ioman_mtx.lock();
+    __ioman_mtx.lock();
     LARCV_DEBUG() << "start" << std::endl;
 
     if (id >= _product_ctr) {
@@ -550,7 +550,7 @@ namespace larcv {
         }
       }
     }
-    //__ioman_mtx.unlock();
+    __ioman_mtx.unlock();
     return _product_ptr_v[id];
   }
 
