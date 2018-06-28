@@ -69,10 +69,12 @@ namespace larcv {
 
     // labels
     auto const& part_v = event_part.as_vector();
+    /*
     if (part_v.size() != 1) {
       LARCV_CRITICAL() << "Only support single particle label now: EventParticle size != 1" << std::endl;
       throw larbys();
     }
+    */
     // class
     size_t label = kINVALID_SIZE;
     int pdg = 0;
