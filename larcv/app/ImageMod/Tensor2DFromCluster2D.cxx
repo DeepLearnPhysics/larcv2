@@ -87,7 +87,6 @@ namespace larcv {
         mgr.get_data<larcv::EventClusterPixel2D>(producer);
 
       auto& ev_output = mgr.get_data<larcv::EventSparseTensor2D>(output_producer);
-      std::cout <<"ev_output.size(): " << ev_output.size() << std::endl;
       // treat the case if this "output producer" already holds some data
       if (ev_output.size()) {
         static bool one_time_warning = true;
