@@ -5,6 +5,7 @@
 #include "larcv/core/DataFormat/EventImage2D.h"
 #include "larcv/core/DataFormat/EventParticle.h"
 #include "larcv/core/DataFormat/EventVoxel2D.h"
+#include "larcv/core/DataFormat/EventVoxel3D.h"
 
 namespace larcv {
 
@@ -15,29 +16,38 @@ ParentParticleSeg::ParentParticleSeg(const std::string name)
     : ProcessBase(name) {}
 
 void ParentParticleSeg::configure(const PSet& cfg) {
-  _cluster2d_producer = cfg.get<std::string>("Cluster2dProducer");
+  _cluster2d_producer = cfg.get<std::string>("Cluster2dProducer", "");
+  _cluster3d_producer = cfg.get<std::string>("Cluster3dProducer", "");
   _output_producer = cfg.get<std::string>("OutputProducer");
   _particle_producer = cfg.get<std::string>("ParticleProducer");
+
+  if (_cluster2d_producer == "" && _cluster3d_producer == ""){
+        LARCV_CRITICAL() << "Must specify at least one cluster producer!" << std::endl;
+        throw larbys();
+  }
+
 }
 
 void ParentParticleSeg::initialize() {}
 
 bool ParentParticleSeg::process(IOManager& mgr) {
-  // Read in the original source of segmentation, the cluster indexes:
-  auto const& ev_cluster2d =
-      mgr.get_data<larcv::EventClusterPixel2D>(_cluster2d_producer);
+
+
 
   // Read in the particles that define the pdg types:
   auto const& ev_particle =
       mgr.get_data<larcv::EventParticle>(_particle_producer);
 
-  // The output is an instance of cluster2d, so prepare that:
-  auto& ev_cluster2d_output =
-      mgr.get_data<larcv::EventClusterPixel2D>(_output_producer);
-
   // Also output a corresponding particle 2d to match the clusters:
   auto& ev_particle_output =
       mgr.get_data<larcv::EventParticle>(_output_producer);
+
+  ev_particle_output.clear();
+
+  // std::cout << "Initial number of particles: " << ev_particle.as_vector().size() << std::endl;
+  // std::cout << "Initial number of clusters: " << ev_cluster2d.cluster_pixel_2d(0).as_vector().size() << std::endl;
+
+  // std::cout << "Initial number of output particles: " << ev_particle_output.as_vector().size() << std::endl;
 
   // Loop over all of the input particles and determine their ancestor
   // This dictates which particle ID gets mapped to which output particle
@@ -179,32 +189,81 @@ bool ParentParticleSeg::process(IOManager& mgr) {
 
   // We now loop over the clusters indicated and merge them together based on
 
+  if (_cluster2d_producer != ""){
+    // Read in the original source of segmentation, the cluster indexes:
+    auto const& ev_cluster2d =
+        mgr.get_data<larcv::EventClusterPixel2D>(_cluster2d_producer);
 
-  for (size_t projection_index = 0;
-       projection_index < ev_cluster2d.as_vector().size(); ++projection_index) {
+
+    // The output is an instance of cluster2d, so prepare that:
+    auto& ev_cluster2d_output =
+        mgr.get_data<larcv::EventClusterPixel2D>(_output_producer);
+
+
+    for (size_t projection_index = 0;
+         projection_index < ev_cluster2d.as_vector().size(); ++projection_index) {
+      // For each projection index, get the list of clusters
+      auto const& clusters = ev_cluster2d.cluster_pixel_2d(projection_index);
+      larcv::ClusterPixel2D new_clusters;
+      new_clusters.meta(clusters.meta());
+
+      int i = 0;
+      for (auto ancestor_node : primary_nodes) {
+        auto out_cluster = cluster_merger(clusters, ancestor_node);
+        out_cluster.id(i);
+        i++;
+        new_clusters.emplace(std::move(out_cluster));
+      }
+      // Handle the orphanage, as well:
+      orphanage->trackID = i;
+      auto out_cluster = cluster_merger(clusters, orphanage);
+      new_clusters.emplace(std::move(out_cluster));
+      // std::cout << "Number of primary_nodes: " << primary_nodes.size()
+      //           << std::endl;
+      // std::cout << "Number of new clusters: " << new_clusters.size() << std::endl;
+      // Append the output image2d:
+      ev_cluster2d_output.emplace(std::move(new_clusters));
+    }
+  }
+  if (_cluster3d_producer != ""){
+
+    // Read in the original source of segmentation, the cluster indexes:
+    auto const& ev_cluster3d =
+        mgr.get_data<larcv::EventClusterVoxel3D>(_cluster3d_producer);
+
+    // The output is an instance of cluster3d, so prepare that:
+    auto& ev_cluster3d_output =
+        mgr.get_data<larcv::EventClusterVoxel3D>(_output_producer);
+
+
     // For each projection index, get the list of clusters
-    auto const& clusters = ev_cluster2d.cluster_pixel_2d(projection_index);
-    larcv::ClusterPixel2D new_clusters;
-    new_clusters.meta(clusters.meta());
+    larcv::ClusterVoxel3D new_clusters;
+    new_clusters.meta(ev_cluster3d.meta());
 
     int i = 0;
     for (auto ancestor_node : primary_nodes) {
-      auto out_cluster = cluster_merger(clusters, ancestor_node);
+      auto out_cluster = cluster_merger(ev_cluster3d, ancestor_node);
       out_cluster.id(i);
       i++;
-      new_clusters.emplace(std::move(out_cluster));
+      new_clusters.insert(out_cluster);
     }
     // Handle the orphanage, as well:
     orphanage->trackID = i;
-    auto out_cluster = cluster_merger(clusters, orphanage);
-    new_clusters.emplace(std::move(out_cluster));
+    auto out_cluster = cluster_merger(ev_cluster3d, orphanage);
+    new_clusters.insert(out_cluster);
     // std::cout << "Number of primary_nodes: " << primary_nodes.size()
     //           << std::endl;
     // std::cout << "Number of new clusters: " << new_clusters.size() << std::endl;
     // Append the output image2d:
-    ev_cluster2d_output.emplace(std::move(new_clusters));
+    ev_cluster3d_output.emplace(std::move(new_clusters), ev_cluster3d.meta());
+
   }
 
+
+
+  // Final numbers:
+  // std::cout << "Final number of particles: " << ev_particle_output.as_vector().size() << std::endl;
+  // std::cout << "Final number of clusters: " << ev_cluster2d_output.cluster_pixel_2d(0).as_vector().size() << std::endl;
 
   // Clean up:
   for (auto node : particle_nodes){
@@ -250,6 +309,36 @@ larcv::VoxelSet ParentParticleSeg::cluster_merger(
 
   return output_set;
 }
+
+larcv::VoxelSet ParentParticleSeg::cluster_merger(
+    const larcv::ClusterVoxel3D & clusters, particle_node * primary_node) {
+  // Create an empty voxelset to hold the output:
+  larcv::VoxelSet output_set;
+  output_set.id(primary_node->trackID);
+
+  if (primary_node -> reference == NULL){
+    return output_set;
+  }
+
+  std::vector<int> cluster_indexes;
+
+  get_all_daughter_ids(cluster_indexes, primary_node);
+
+
+  for (auto id : cluster_indexes) {
+    auto& input_cluster = clusters.voxel_set(id);
+    for (auto& voxel : input_cluster.as_vector()) {
+      if (voxel.id() >= clusters.meta().size()){
+        continue;
+      }
+      output_set.add(larcv::Voxel(voxel.id(), voxel.value()));
+    }
+  }
+
+
+  return output_set;
+}
+
 
 void ParentParticleSeg::finalize() {}
 }
