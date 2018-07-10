@@ -15,6 +15,46 @@ namespace larcv {
     throw larbys(ss.str());
   }
 
+  const larcv::Vertex& Particle::first_position_inside(const BBox2D& bbox, larcv::PointType_t point_type) const
+  {
+    if (!bbox.contains(_first_step.as_point2d(point_type))) {
+      return _vtx;
+    }
+    else {
+      return _first_step;
+    }
+  }
+
+  const larcv::Vertex& Particle::first_position_inside(const BBox3D& bbox) const
+  {
+    if (!bbox.contains(_first_step.as_point3d())) {
+      return _vtx;
+    }
+    else {
+      return _first_step;
+    }
+  }
+
+  const larcv::Vertex& Particle::last_position_inside(const BBox2D& bbox, larcv::PointType_t point_type) const
+  {
+    if (!bbox.contains(_last_step.as_point2d(point_type))) {
+      return _end_pt;
+    }
+    else {
+      return _last_step;
+    }
+  }
+
+  const larcv::Vertex& Particle::last_position_inside(const BBox3D& bbox) const
+  {
+    if (!bbox.contains(_last_step.as_point3d())) {
+      return _end_pt;
+    }
+    else {
+      return _last_step;
+    }
+  }
+
   std::string Particle::dump() const
   {
     std::stringstream ss;
@@ -33,7 +73,7 @@ namespace larcv {
     buf << "    ";
     for(size_t i=0; i<_bb2d_v.size(); ++i)
       ss << buf.str() << "Plane " << i << " BBox2D: " << _bb2d_v[i].dump();
-      
+
     return ss.str();
   }
 
