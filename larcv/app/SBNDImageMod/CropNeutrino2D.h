@@ -44,13 +44,13 @@ namespace larcv {
 
   private:
 
+
     std::string  _vertex_cluster2d_producer;
     int _output_rows;
     int _output_cols;
-    int _rand_shift_row;
-    int _rand_shift_col;
-    std::string  _image_producer;
-    std::string  _output_producer;
+    std::vector<std::string>  _producer_names_v;
+    std::vector<std::string>  _product_types_v;
+    std::vector<std::string>  _output_producers_v;
 
   };
 
