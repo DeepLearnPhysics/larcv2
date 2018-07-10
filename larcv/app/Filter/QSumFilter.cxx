@@ -10,7 +10,7 @@ namespace larcv {
   QSumFilter::QSumFilter(const std::string name)
     : ProcessBase(name)
   {}
-    
+
   void QSumFilter::configure(const PSet& cfg)
   {
     _image_producer = cfg.get< std::string          >("ImageProducer");
@@ -34,8 +34,8 @@ namespace larcv {
 
     if(image_v.size() != _min_qsum_v.size()) {
       if(image_v.empty()) {
-	LARCV_INFO() << "Skipping an empty image event..." << std::endl;
-	return false;
+        LARCV_INFO() << "Skipping an empty image event..." << std::endl;
+        return false;
       }
       LARCV_CRITICAL() << "# planes do not agree between data and configuration parameters!" << std::endl;
       throw larbys();
@@ -49,10 +49,10 @@ namespace larcv {
       for(auto const& v : img) if(v > _min_adc_v[i]) { pixel_ctr++; qsum += v; }
 
       bool decision = (qsum > _min_qsum_v[i] && pixel_ctr > _min_pixel_v[i]);
-      LARCV_INFO() << "Plane " << i << " QSum = " << qsum << " : NPx = " << pixel_ctr 
-		   << " ... Charge Thres.: " << _min_qsum_v[i]
-		   << " ... Pixel Thres.: " << _min_pixel_v[i]
-		   << " ... " << (decision ? "store!" : "skip!") << std::endl;
+      LARCV_INFO() << "Plane " << i << " QSum = " << qsum << " : NPx = " << pixel_ctr
+                   << " ... Charge Thres.: " << _min_qsum_v[i]
+                   << " ... Pixel Thres.: " << _min_pixel_v[i]
+                   << " ... " << (decision ? "store!" : "skip!") << std::endl;
       if(!decision) return decision;
     }
     return true;
