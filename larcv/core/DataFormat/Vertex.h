@@ -1,6 +1,9 @@
 #ifndef __LARCV_VERTEX_H__
 #define __LARCV_VERTEX_H__
 
+#include "DataFormatTypes.h"
+#include "Point.h"
+
 namespace larcv {
 
   class Vertex {
@@ -14,6 +17,11 @@ namespace larcv {
 
     /// Reset function for x, y, z, t
     void reset(double x, double y, double z, double t);
+    
+    /// Convert to point
+    const larcv::Point2D as_point2d(larcv::PointType_t point_type);
+    const larcv::Point3D as_point3d();
+    void as_point(larcv::PointType_t point_type, double * x, double * y, double * z);
     
     inline double x() const { return _x; }
     inline double y() const { return _y; }

@@ -14,6 +14,7 @@
 #ifndef __BATCHFILLERPIDLABEL_H__
 #define __BATCHFILLERPIDLABEL_H__
 
+#include "larcv/core/DataFormat/DataFormatTypes.h"
 #include "larcv/core/Processor/ProcessFactory.h"
 #include "BatchFillerTemplate.h"
 
@@ -49,7 +50,7 @@ namespace larcv {
   private:
 
     enum ShapeType_t {kShower, kTrack};
-    enum PointType_t {kPoint3D, kPointXY, kPointYZ, kPointZX};
+    typedef larcv::PointType_t PointType_t;
 
     std::string _tensor_producer;
     std::string _part_producer;

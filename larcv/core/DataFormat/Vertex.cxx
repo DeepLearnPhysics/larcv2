@@ -30,6 +30,43 @@ namespace larcv {
     approx();
   }
   
+  const larcv::Point2D Vertex::as_point2d(larcv::PointType_t point_type)
+  {
+    switch(point_type) {
+      case kPointXY:
+        return Point2D(_x, _y);
+      case kPointYZ:
+        return Point2D(_y, _z);
+      case kPointZX:
+        return Point2D(_z, _x); 
+      // TODO throw an exception if kPoint3D
+    }
+  }
+
+  const larcv::Point3D Vertex::as_point3d()
+  {
+    return Point3D(_x, _y, _z);
+  }
+
+  void Vertex::as_point(larcv::PointType_t point_type, double * x, double * y, double * z)
+  {
+    switch(point_type) {
+      case kPointXY:
+        *x = _x;
+        *y = _y;
+      case kPointYZ:
+        *x = _y;
+        *y = _z;
+      case kPointZX:
+        *x = _z;
+        *y = _x;
+      case kPoint3D:
+        *x = _x;
+        *y = _y;
+        *z = _z;
+    }
+  }
+  
   void Vertex::approx()
   {
     _x = (double)( ((double)((signed long long)(_x * 1.e6)) * 1.e-6 ));
