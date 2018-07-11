@@ -48,11 +48,9 @@ namespace larcv {
     int _output_n_x;
     int _output_n_y;
     int _output_n_z;
-    int _rand_shift_x;
-    int _rand_shift_y;
-    int _rand_shift_z;
-    std::string  _sparse3d_producer;
-    std::string  _output_producer;
+    std::vector<std::string>  _producer_names_v;
+    std::vector<std::string>  _product_types_v;
+    std::vector<std::string>  _output_producers_v;;
 
   };
 

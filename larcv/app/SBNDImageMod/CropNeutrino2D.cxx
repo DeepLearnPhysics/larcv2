@@ -12,12 +12,13 @@ static CropNeutrino2DProcessFactory __global_CropNeutrino2DProcessFactory__;
 CropNeutrino2D::CropNeutrino2D(const std::string name) : ProcessBase(name) {}
 
 void CropNeutrino2D::configure(const PSet& cfg) {
-  _vertex_cluster2d_producer = cfg.get<std::string>("VertexProducer");
-  _producer_names_v = cfg.get<std::vector<std::string> >("Producers");
-  _product_types_v = cfg.get<std::vector<std::string> >("ProductTypes");
-  _output_producers_v = cfg.get<std::vector<std::string> >("OutputProducers");
-  _output_rows = cfg.get<int>("OutputRows");
-  _output_cols = cfg.get<int>("OutputCols");
+
+  _vertex_cluster2d_producer  = cfg.get<std::string>("VertexProducer");
+  _producer_names_v           = cfg.get<std::vector<std::string> >("Producers");
+  _product_types_v            = cfg.get<std::vector<std::string> >("ProductTypes");
+  _output_producers_v         = cfg.get<std::vector<std::string> >("OutputProducers");
+  _output_rows                = cfg.get<int>("OutputRows");
+  _output_cols                = cfg.get<int>("OutputCols");
 
   if (_producer_names_v.size() != _product_types_v.size() ||
       _producer_names_v.size() != _output_producers_v.size()) {
