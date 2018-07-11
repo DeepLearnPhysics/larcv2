@@ -178,6 +178,13 @@ namespace larcv {
     return zid;
   }
 
+  bool Voxel3DMeta::hasBoundaryCloseTo(const Point3D& point) const
+  {
+    return ((std::abs(point.x - this->min_x()) < this->size_voxel_x() || std::abs(point.x - this->max_x()) < this->size_voxel_x()) && point.y >= this->min_y() && point.y <= this->max_y() && point.z >= this->min_z() && point.z <= this->max_z())
+        || ((std::abs(point.y - this->min_y()) < this->size_voxel_y() || std::abs(point.y - this->max_y()) < this->size_voxel_y()) && point.x >= this->min_x() && point.x <= this->max_x() && point.z >= this->min_z() && point.z <= this->max_z())
+        || ((std::abs(point.z - this->min_z()) < this->size_voxel_z() || std::abs(point.z - this->max_z()) < this->size_voxel_z()) && point.x >= this->min_x() && point.x <= this->max_x() && point.y >= this->min_y() && point.y <= this->max_y());
+  }
+
   std::string  Voxel3DMeta::dump() const
   {
     std::stringstream ss;

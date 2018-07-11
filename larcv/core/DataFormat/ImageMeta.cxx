@@ -78,6 +78,12 @@ namespace larcv {
                      _unit);
   }
 
+  bool ImageMeta::hasBoundaryCloseTo(const Point2D& point) const
+  {
+    return ((std::abs(point.x - this->min_x()) < this->pixel_width() || std::abs(point.x - this->max_x()) < this->pixel_width()) && point.y >= this->min_y() && point.y <= this->max_y())
+        || ((std::abs(point.y - this->min_y()) < this->pixel_height() || std::abs(point.y - this->max_y()) < this->pixel_height()) && point.x >= this->min_x() && point.x <= this->max_x());
+  }
+
   std::string ImageMeta::dump() const
   {
     std::stringstream ss;

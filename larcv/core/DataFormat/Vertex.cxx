@@ -3,6 +3,8 @@
 
 #include <sstream>
 #include "Vertex.h"
+#include "larcv/core/Base/larbys.h"
+#include "larcv/core/Base/larcv_logger.h"
 
 namespace larcv {
 
@@ -40,7 +42,9 @@ namespace larcv {
         return Point2D(_y, _z);
       case kPointZX:
         return Point2D(_z, _x);
-      // TODO throw an exception if kPoint3D
+      case kPoint3D:
+        LARCV_CRITICAL() << "Wrong point type (Point3D) in Vertex::as_point2d" << std::endl;
+        throw larbys();
     }
   }
 

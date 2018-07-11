@@ -120,8 +120,8 @@ namespace larcv {
     // Find col that corresponds to a specified index
     size_t index_to_col(size_t index) const;
 
-
-
+    /// Check whether point is close to a boundary
+    bool hasBoundaryCloseTo(const Point2D& point) const;
     /// Dump info in text
     std::string dump() const;
 
@@ -137,4 +137,3 @@ namespace larcv {
 
 #endif
 /** @} */ // end of doxygen group
-

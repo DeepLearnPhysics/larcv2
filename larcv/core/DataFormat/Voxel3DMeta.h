@@ -91,6 +91,8 @@ namespace larcv {
     inline double size_voxel_z() const { return _zlen; }
     /// Distance unit
     inline DistanceUnit_t unit() const { return _unit; }
+    /// Check whether point is close to a boundary
+    bool hasBoundaryCloseTo(const Point3D& point) const;
     /// text dumper
     std::string  dump() const;
 
@@ -122,4 +124,3 @@ namespace larcv {
 
 #endif
 /** @} */ // end of doxygen group
-
