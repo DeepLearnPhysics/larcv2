@@ -59,4 +59,8 @@ proc.initialize()
 
 proc.batch_process(args.nskip,args.nevents)
 
+print "Number of entries processed: " + str(proc.io().get_n_entries_out())
+print "Output file name: " + str(proc.io().get_file_out_name())
+
+
 proc.finalize()
