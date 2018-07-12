@@ -33,7 +33,7 @@ void ParentParticleSeg::initialize() {}
 bool ParentParticleSeg::process(IOManager& mgr) {
 
 
-
+  // std::cout << "Enter ParentParticleSeg::process " << std::endl;
   // Read in the particles that define the pdg types:
   auto const& ev_particle =
       mgr.get_data<larcv::EventParticle>(_particle_producer);
@@ -270,6 +270,9 @@ bool ParentParticleSeg::process(IOManager& mgr) {
     delete node;
   }
   delete orphanage;
+
+  // std::cout << "Exit ParentParticleSeg::process " << std::endl;
+
 
   return true;
 }
