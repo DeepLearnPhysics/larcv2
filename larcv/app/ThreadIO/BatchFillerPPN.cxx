@@ -127,6 +127,8 @@ namespace larcv {
     }else{
       LARCV_INFO() << "Retrieving Image2D " << _tensor_producer << std::endl;
       meta = mgr.get_data<larcv::EventImage2D>(_tensor_producer).as_vector().at(_image_channel).meta();
+      LARCV_WARNING() << "Pixel " << mgr.get_data<larcv::EventImage2D>(_tensor_producer).as_vector().at(_image_channel).pixel(248, 191) << std::endl;
+      LARCV_WARNING() << "Pixel " << mgr.get_data<larcv::EventImage2D>(_tensor_producer).as_vector().at(_image_channel).pixel(191, 248) << std::endl;
     }
     auto const& part_v = event_part.as_vector();
     LARCV_DEBUG() << "Resizing _entry_data " << batch_data().entry_data_size() << std::endl;
@@ -144,32 +146,24 @@ namespace larcv {
 
       if(part.energy_deposit()<1) continue;
 
-      if(_shape_type == kTrack  && (pdg_code == 11 || pdg_code == 22 || pdg_code == -11) )
-	continue;
+      if(_shape_type == kTrack  && (pdg_code == 11 || pdg_code == 22 || pdg_code == -11) ) continue;
 
-      if(_shape_type == kShower && (pdg_code != 11 && pdg_code != 22 && pdg_code != -11) )
-	continue;
+      if(_shape_type == kShower && (pdg_code != 11 && pdg_code != 22 && pdg_code != -11) ) continue;
 
       if(pdg_code > 1000000000) {
-	LARCV_INFO() << "Skipping nucleus TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << std::endl;
-	continue;
+      	LARCV_INFO() << "Skipping nucleus TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << std::endl;
+      	continue;
       }
 
       if(_shape_type == kShower && part.parent_pdg_code() == 13 && part.creation_process() == "muIoni") {
-	LARCV_INFO() << "Skipping delta ray TrackID " << track_id << " Energy " << energy << std::endl;
-	continue;
+      	LARCV_INFO() << "Skipping delta ray TrackID " << track_id << " Energy " << energy << std::endl;
+      	continue;
       }
 
       // Register start point
       double x, y, z;
       larcv::Vertex start_point;
-      if (_point_type == kPoint3D) {
-        start_point = part.first_position_inside(meta3d);
-      }
-      else {
-        start_point = part.first_position_inside(meta, _point_type);
-      }
-      
+      start_point = part.first_step();
       start_point.as_point(_point_type, &x, &y, &z);
 
       if (_point_type == kPoint3D) {
@@ -188,24 +182,17 @@ namespace larcv {
       }
 
       if(_point_type == kPoint3D) {
-	LARCV_INFO() << "TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << " start (" << x << "," << y << "," << z << ")" << std::endl;
+	       LARCV_INFO() << "TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << " start (" << x << "," << y << "," << z << ")" << std::endl;
       }else{
-	LARCV_INFO() << "TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << " start (" << x << "," << y << ")" << std::endl;
+	       LARCV_INFO() << "TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << " start (" << x << "," << y << ")" << std::endl;
       }
 
       if(_shape_type==kShower) continue;
 
       // for track, add end point
       larcv::Vertex end_point;
-      if (_point_type == kPoint3D) {
-        end_point = part.last_position_inside(meta3d);
-      }
-      else {
-        end_point = part.last_position_inside(meta, _point_type);
-      }
-
+      end_point = part.last_step();
       end_point.as_point(_point_type, &x, &y, &z);
-
 
       if (_point_type == kPoint3D) {
         x = (x - meta3d.min_x()) / meta3d.size_voxel_x();
@@ -223,9 +210,9 @@ namespace larcv {
       }
 
       if(_point_type == kPoint3D) {
-	LARCV_INFO() << "TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << " end (" << x << "," << y << "," << z << ")" << std::endl;
+	       LARCV_INFO() << "TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << " end (" << x << "," << y << "," << z << ")" << std::endl;
       }else{
-	LARCV_INFO() << "TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << " end (" << x << "," << y << ")" << std::endl;
+	       LARCV_INFO() << "TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << " end (" << x << "," << y << ")" << std::endl;
       }
     }
 

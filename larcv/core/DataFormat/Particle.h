@@ -142,12 +142,6 @@ namespace larcv {
     inline void ancestor_position (const larcv::Vertex& vtx) { _ancestor_vtx = vtx; }
     inline void ancestor_position (double x, double y, double z, double t) { _ancestor_vtx = Vertex(x,y,z,t); }
 
-    // Depending on the bbox boundaries return the right start/end position
-    const larcv::Vertex& first_position_inside(const BBox2D& bbox, larcv::PointType_t point_type) const;
-    const larcv::Vertex& first_position_inside(const BBox3D& bbox) const;
-    const larcv::Vertex& last_position_inside(const BBox2D& bbox, larcv::PointType_t point_type) const;
-    const larcv::Vertex& last_position_inside(const BBox3D& bbox) const;
-
     std::string dump() const;
 
   private:

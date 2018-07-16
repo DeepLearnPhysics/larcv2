@@ -5,6 +5,7 @@
 #include <set>
 #include <sstream>
 #include "larcv/core/Base/larbys.h"
+
 namespace larcv {
 
   const BBox2D& Particle::boundingbox_2d(ProjectionID_t id) const
@@ -13,26 +14,6 @@ namespace larcv {
     if(id < _bb2d_v.size()) return _bb2d_v[id];
     ss << "BBox2D not stored for ProjectionID_t " << id << std::endl;
     throw larbys(ss.str());
-  }
-
-  const larcv::Vertex& Particle::first_position_inside(const BBox2D& bbox, larcv::PointType_t point_type) const
-  {
-    return (bbox.contains(_first_step.as_point2d(point_type)) ? _first_step : _vtx);
-  }
-
-  const larcv::Vertex& Particle::first_position_inside(const BBox3D& bbox) const
-  {
-    return (bbox.contains(_first_step.as_point3d()) ? _first_step : _vtx);
-  }
-
-  const larcv::Vertex& Particle::last_position_inside(const BBox2D& bbox, larcv::PointType_t point_type) const
-  {
-    return (bbox.contains(_last_step.as_point2d(point_type)) ? _last_step : _end_pt);
-  }
-
-  const larcv::Vertex& Particle::last_position_inside(const BBox3D& bbox) const
-  {
-    return (bbox.contains(_last_step.as_point3d()) ? _last_step : _end_pt);
   }
 
   std::string Particle::dump() const
