@@ -138,6 +138,37 @@ namespace larcv {
   //
   // VoxelSetArray
   //
+  float VoxelSetArray::sum() const
+  { float res=0.; for(auto const& vox_v : _voxel_vv) res+=vox_v.sum(); return res;}
+
+  float VoxelSetArray::mean() const
+  { 
+    size_t vox_ctr = 0; 
+    for(auto const& vox_v : _voxel_vv) vox_ctr += vox_v.size(); 
+    return (vox_ctr<1 ? 0. : this->sum() / (float)vox_ctr);
+  }
+
+  float VoxelSetArray::max() const
+  {
+    float val = std::numeric_limits<float>::min();
+    float ival = 0.;
+    for(auto const& vox_v : _voxel_vv) {
+      ival = vox_v.max();
+      val = (val < ival ? ival : val);
+    }
+    return val;
+  }
+
+  float VoxelSetArray::min() const
+  {
+    float val = std::numeric_limits<float>::max();
+    float ival = 0.;
+    for(auto const& vox_v : _voxel_vv) {
+      ival = vox_v.min();
+      val = (val > ival ? ival : val);
+    }
+    return val;
+  }
 
   const larcv::VoxelSet& VoxelSetArray::voxel_set(InstanceID_t id) const
   {

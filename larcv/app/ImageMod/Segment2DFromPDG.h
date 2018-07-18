@@ -16,6 +16,9 @@
 
 #include "larcv/core/Processor/ProcessBase.h"
 #include "larcv/core/Processor/ProcessFactory.h"
+#include "larcv/core/DataFormat/Image2D.h"
+#include "larcv/core/DataFormat/Voxel2D.h"
+#include "larcv/core/DataFormat/Particle.h"
 namespace larcv {
 
   /**

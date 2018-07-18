@@ -181,10 +181,26 @@ namespace larcv {
     /// Access all VoxelSet as a vector
     inline const std::vector<larcv::VoxelSet>& as_vector() const
     { return _voxel_vv; }
+    float sum() const;
+    /// Mean of contained voxel values
+    float mean() const;
+    /// Max of contained voxel values
+    float max() const;
+    /// Min of contained voxel values
+    float min() const;
 
     //
     // Write-access
     //
+    /// Thresholding voxels by an upper and lower end values
+    inline void threshold(float min, float max)
+    { for(auto& vox_s : _voxel_vv) vox_s.threshold(min,max); }
+    /// Thresholding by only lower end value
+    inline void threshold_min(float min)
+    { for(auto& vox_s : _voxel_vv) vox_s.threshold_min(min); }
+    /// Thresholding by only upper end value
+    inline void threshold_max(float max)
+    { for(auto& vox_s : _voxel_vv) vox_s.threshold_max(max); }
     /// Clear everything
     inline void clear_data() { _voxel_vv.clear(); }
     /// Resize voxel array
