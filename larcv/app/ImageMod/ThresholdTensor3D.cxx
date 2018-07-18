@@ -87,18 +87,10 @@ namespace larcv {
         }
       }
 
-      larcv::VoxelSet vs;
+      ev_output = ev_tensor3d;
       auto const& voxel_value_min = _voxel_value_min_v[producer_index];
       auto const& voxel_value_max = _voxel_value_max_v[producer_index];
-      for (auto const& vox : ev_tensor3d.as_vector()) {
-        if (vox.value() < voxel_value_min) continue;
-        vs.emplace(vox.id(), std::min(vox.value(), voxel_value_max), false);
-      }
-      auto meta = ev_tensor3d.meta();
-      ev_output.emplace(std::move(vs), meta);
-      LARCV_INFO() << "EventSparseTensor3D " << target_producer << " thresholded to " << output_producer << std::endl
-                   << "Original meta:" << std::endl << meta.dump() << std::endl
-                   << "New meta:" << std::endl << ev_output.meta().dump() << std::endl;
+      ev_output.threshold(voxel_value_min, voxel_value_max);
     }
     return true;
   }

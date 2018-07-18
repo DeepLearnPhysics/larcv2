@@ -9,6 +9,57 @@ namespace larcv {
   Voxel::Voxel(VoxelID_t id, float value)
   { _id = id; _value = value; }
 
+  float VoxelSet::max() const
+  {
+    float val = std::numeric_limits<float>::min();
+    for(auto const& vox : _voxel_v) {
+      if(vox.value() > val) val = vox.value();
+    }
+    return val;
+  }
+
+  float VoxelSet::min() const
+  {
+    float val = std::numeric_limits<float>::max();
+    for(auto const& vox : _voxel_v) {
+      if(vox.value() < val) val = vox.value();
+    }
+    return val;
+  }
+
+  void VoxelSet::threshold(float min, float max)
+  {
+    std::vector<larcv::Voxel> vox_v;
+    vox_v.reserve(_voxel_v.size());
+    for(auto const& vox : _voxel_v) {
+      if(vox.value() < min || vox.value() > max) continue;
+      vox_v.push_back(vox);
+    }
+    _voxel_v = std::move(vox_v);
+  }
+  
+  void VoxelSet::threshold_min(float min)
+  {
+    std::vector<larcv::Voxel> vox_v;
+    vox_v.reserve(_voxel_v.size());
+    for(auto const& vox : _voxel_v) {
+      if(vox.value() < min) continue;
+      vox_v.push_back(vox);
+    }
+    _voxel_v = std::move(vox_v);
+  }
+  
+  void VoxelSet::threshold_max(float max)
+  {
+    std::vector<larcv::Voxel> vox_v;
+    vox_v.reserve(_voxel_v.size());
+    for(auto const& vox : _voxel_v) {
+      if(vox.value() > max) continue;
+      vox_v.push_back(vox);
+    }
+    _voxel_v = std::move(vox_v);
+  }
+
   void VoxelSet::add(const Voxel& vox)
   {
     Voxel copy(vox);

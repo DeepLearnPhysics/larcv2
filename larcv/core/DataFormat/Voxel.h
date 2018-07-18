@@ -110,12 +110,25 @@ namespace larcv {
     inline float sum() const { float res=0.; for(auto const& vox : _voxel_v) res+=vox.value(); return res;}
     /// Mean of contained voxel values
     inline float mean() const { return (_voxel_v.empty() ? 0. : sum() / (float)(_voxel_v.size())); }
+    /// Max of contained voxel values
+    float max() const;
+    /// Min of contained voxel values
+    float min() const;
+    /// Size (count) of voxels
+    inline size_t size() const { return _voxel_v.size(); }
 
     //
     // Write-access
     //    
     /// Clear everything
     inline virtual void clear_data() { _voxel_v.clear(); }
+    /// Thresholding voxels by an upper and lower end values
+    void threshold(float min, float max);
+    /// Thresholding by only lower end value
+    void threshold_min(float min);
+    /// Thresholding by only upper end value
+    void threshold_max(float max);
+
     /// Add a new voxel. If another voxel instance w/ same VoxelID exists, value is added
     void add(const Voxel& vox);
     /// Set a voxel. If another voxel instance w/ same VoxelID exists, value is set
