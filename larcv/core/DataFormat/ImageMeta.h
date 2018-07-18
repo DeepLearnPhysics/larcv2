@@ -119,9 +119,6 @@ namespace larcv {
     size_t index_to_row(size_t index) const;
     // Find col that corresponds to a specified index
     size_t index_to_col(size_t index) const;
-
-
-
     /// Dump info in text
     std::string dump() const;
 
@@ -137,4 +134,3 @@ namespace larcv {
 
 #endif
 /** @} */ // end of doxygen group
-

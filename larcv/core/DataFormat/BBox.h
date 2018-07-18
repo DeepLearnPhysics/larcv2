@@ -38,10 +38,10 @@ namespace larcv {
     inline bool operator== (const BBox2D& rhs) const
     { return (_p1 == rhs._p1 && _p2 == rhs._p2); }
 
-    void update(double xmin, double ymin, 
-                double xmax, double ymax, 
+    void update(double xmin, double ymin,
+                double xmax, double ymax,
                 ProjectionID_t id = kINVALID_PROJECTIONID);
-    void update(const Point2D& pt1, const Point2D& pt2, 
+    void update(const Point2D& pt1, const Point2D& pt2,
                 ProjectionID_t id = kINVALID_PROJECTIONID);
     void update(ProjectionID_t id);
     inline bool empty() const { return (_p1 == _p2); }
@@ -62,8 +62,8 @@ namespace larcv {
     std::string dump() const;
 
     BBox2D overlap(const BBox2D& box) const;
-
     BBox2D inclusive(const BBox2D& box) const;
+    bool contains(const Point2D& point) const;
 
   private:
     ProjectionID_t _id; ///< ProjectionID_t identifies types of 2D projections to which BBox belongs
@@ -114,6 +114,7 @@ namespace larcv {
     double area(int axis) const;
     BBox3D overlap(const BBox3D& box) const;
     BBox3D inclusive(const BBox3D& box) const;
+    bool contains(const Point3D& point) const;
 
     std::string dump() const;
 
@@ -125,4 +126,3 @@ namespace larcv {
 }
 #endif
 /** @} */ // end of doxygen group
-

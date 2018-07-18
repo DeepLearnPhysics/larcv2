@@ -5,6 +5,7 @@
 #include <set>
 #include <sstream>
 #include "larcv/core/Base/larbys.h"
+
 namespace larcv {
 
   const BBox2D& Particle::boundingbox_2d(ProjectionID_t id) const
@@ -33,7 +34,7 @@ namespace larcv {
     buf << "    ";
     for(size_t i=0; i<_bb2d_v.size(); ++i)
       ss << buf.str() << "Plane " << i << " BBox2D: " << _bb2d_v[i].dump();
-      
+
     return ss.str();
   }
 

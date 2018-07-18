@@ -2,7 +2,7 @@
  * \file Particle.h
  *
  * \ingroup core_DataFormat
- * 
+ *
  * \brief Class def header for a class larcv::Particle
  *
  * @author kazuhiro
@@ -25,9 +25,9 @@ namespace larcv {
      \brief Particle/Interaction-wise truth information data
   */
   class Particle{
-    
+
   public:
-    
+
     /// Default constructor
     Particle(larcv::ShapeType_t shape=larcv::kShapeUnknown)
       : _id         (kINVALID_INDEX)
@@ -50,7 +50,7 @@ namespace larcv {
       , _ancestor_trackid (kINVALID_UINT)
       , _ancestor_pdg     (0)
     {}
-    
+
     /// Default destructor
     ~Particle(){}
     /// particle's ID getter
@@ -142,9 +142,8 @@ namespace larcv {
     inline void ancestor_position (const larcv::Vertex& vtx) { _ancestor_vtx = vtx; }
     inline void ancestor_position (double x, double y, double z, double t) { _ancestor_vtx = Vertex(x,y,z,t); }
 
-    
     std::string dump() const;
-    
+
   private:
 
     InstanceID_t   _id; ///< "ID" of this particle
@@ -163,7 +162,7 @@ namespace larcv {
     Vertex       _end_pt;      ///< (x,y,z,t) at which particle disappeared from G4WorldVolume
     Vertex       _first_step;  ///< (x,y,z,t) of the first energy deposition point in the detector
     Vertex       _last_step;   ///< (x,y,z,t) of the last energy deposition point in the detector
-    double       _dist_travel; ///< filled only if MCTrack origin: distance measured along the trajectory 
+    double       _dist_travel; ///< filled only if MCTrack origin: distance measured along the trajectory
     double       _energy_init; ///< initial energy of the particle
     double       _energy_deposit; ///< deposited energy of the particle in the detector
     std::string  _process;     ///< string identifier of the particle's creation process from Geant4
@@ -210,5 +209,4 @@ namespace larcv {
   };
 }
 #endif
-/** @} */ // end of doxygen group 
-
+/** @} */ // end of doxygen group

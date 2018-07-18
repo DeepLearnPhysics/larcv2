@@ -122,4 +122,3 @@ namespace larcv {
 
 #endif
 /** @} */ // end of doxygen group
-
