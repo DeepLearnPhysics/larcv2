@@ -59,16 +59,20 @@ namespace larcv {
       case kPointXY:
         *x = _x;
         *y = _y;
+        break;
       case kPointYZ:
         *x = _y;
         *y = _z;
+        break;
       case kPointZX:
         *x = _z;
         *y = _x;
+        break;
       case kPoint3D:
         *x = _x;
         *y = _y;
         *z = _z;
+        break;
     }
   }
 

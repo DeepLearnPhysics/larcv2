@@ -45,6 +45,7 @@ namespace larcv {
       , _energy_init      (0.)
       , _energy_deposit   (0.)
       , _process          ("")
+      , _num_voxels       (0)
       , _parent_trackid   (kINVALID_UINT)
       , _parent_pdg       (0)
       , _ancestor_trackid (kINVALID_UINT)
@@ -82,6 +83,7 @@ namespace larcv {
     const BBox2D& boundingbox_2d(ProjectionID_t id) const;
     inline const std::vector<larcv::BBox2D>& boundingbox_2d() const { return _bb2d_v; }
     inline const BBox3D& boundingbox_3d() const { return _bb3d; }
+    inline int num_voxels() const { return _num_voxels; }
 
     // parent info getter
     inline unsigned int parent_track_id () const { return _parent_trackid; }
@@ -130,6 +132,7 @@ namespace larcv {
     inline void boundingbox_2d(const std::vector<larcv::BBox2D>& bb_v) { _bb2d_v = bb_v; }
     inline void boundingbox_2d(const BBox2D& bb, ProjectionID_t id) { _bb2d_v.resize(id+1); _bb2d_v[id] = bb; }
     inline void boundingbox_3d(const BBox3D& bb) { _bb3d = bb; }
+    inline void num_voxels(int count) { _num_voxels = count; }
     //inline void type_score (const std::vector<float>& score_v) { _type_score_v = score_v; }
     // parent info setter
     inline void parent_track_id (unsigned int id )   { _parent_trackid = id;}
@@ -168,6 +171,7 @@ namespace larcv {
     std::string  _process;     ///< string identifier of the particle's creation process from Geant4
     std::vector<larcv::BBox2D> _bb2d_v; ///< bounding box of particle's trajectory in 2D projections. index = ProjectionID_t
     larcv::BBox3D _bb3d; ///< bounding box of particle's trajectory in 3D
+    int _num_voxels; ///< Number of voxels in the particle's 3D cluster.
 
     unsigned int _parent_trackid; ///< Geant4 track id of the parent particle
     int          _parent_pdg;     ///< PDG code of the parent particle
