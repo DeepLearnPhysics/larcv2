@@ -129,8 +129,6 @@ namespace larcv {
     }else{
       LARCV_INFO() << "Retrieving Image2D " << _tensor_producer << std::endl;
       meta = mgr.get_data<larcv::EventImage2D>(_tensor_producer).as_vector().at(_image_channel).meta();
-      LARCV_WARNING() << "Pixel " << mgr.get_data<larcv::EventImage2D>(_tensor_producer).as_vector().at(_image_channel).pixel(248, 191) << std::endl;
-      LARCV_WARNING() << "Pixel " << mgr.get_data<larcv::EventImage2D>(_tensor_producer).as_vector().at(_image_channel).pixel(191, 248) << std::endl;
     }
     auto const& part_v = event_part.as_vector();
     LARCV_DEBUG() << "Resizing _entry_data " << batch_data().entry_data_size() << std::endl;

@@ -49,10 +49,6 @@ namespace larcv {
 
       for(size_t j=0; j<vs.size(); ++j) {
         if (vs[j].value() > _voxel_min_value) particle_positions.push_back(meta3d.position(vs[j].id()));
-        //if (meta3d.position(vs[j].id()).x >= 214 && meta3d.position(vs[j].id()).x <= 215 ) {
-        //  std::cout << vs[j].id() << " " << meta3d.position(vs[j].id()).x << " " << meta3d.position(vs[j].id()).y << " " << meta3d.position(vs[j].id()).z << " " << vs[j].value() << std::endl;
-        //  std::flush(std::cout);
-        //}
       }
       positions_v.push_back(particle_positions);
     }
@@ -77,14 +73,9 @@ namespace larcv {
     std::vector<std::vector<larcv::Point3D> > cluster3d_v
   ) {
     std::vector<larcv::Particle> out_particle_v;
-    std::cout << meta3d.dump()<< std::endl;
     for(size_t i=0; i<particle_v.size(); ++i) {
       auto particle  = particle_v[i];
       auto const& vs = cluster3d_v[i];
-
-			//if (vs.size() == 0) {
-			//	continue;
-			//}
 
       // LArbys => neither track nor shower
       if (particle.shape() == kShapeUnknown || particle.shape() == kShapeShower) {
@@ -94,7 +85,7 @@ namespace larcv {
 
       bool correctStart = !(meta3d.contains(particle.position().as_point3d()));
       bool correctEnd = !meta3d.contains(particle.end_position().as_point3d());
-      std::cout << particle.pdg_code() << " " << particle.id() << " " << correctStart << " " << correctEnd << " " << vs.size() << std::endl;
+      LARCV_INFO() << particle.pdg_code() << " " << particle.id() << " " << correctStart << " " << correctEnd << " " << vs.size() << std::endl;
 
       // If the particle is a shower and start position is included
       // OR it is a track with both start/end positions included
@@ -135,7 +126,7 @@ namespace larcv {
 
       // Correct starting point
       if (correctStart && i_best_start > -1) {
-        std::cout << particle.pdg_code() << " " << particle.id() << " " << vs[i_best_start].x << " " << vs[i_best_start].y << " " << vs[i_best_start].z << std::endl;
+        LARCV_INFO() << particle.pdg_code() << " " << particle.id() << " " << vs[i_best_start].x << " " << vs[i_best_start].y << " " << vs[i_best_start].z << std::endl;
         particle.first_step(vs[i_best_start].x, vs[i_best_start].y, vs[i_best_start].z, particle.first_step().t());
       }
       else {
@@ -145,7 +136,7 @@ namespace larcv {
 
       // Correct end point
       if (correctEnd && i_best_end > -1) {
-        std::cout << particle.pdg_code() << " " << particle.id() << " " << vs[i_best_end].x << " " << vs[i_best_end].y << " " << vs[i_best_end].z << std::endl;
+        LARCV_INFO() << particle.pdg_code() << " " << particle.id() << " " << vs[i_best_end].x << " " << vs[i_best_end].y << " " << vs[i_best_end].z << std::endl;
         particle.last_step(vs[i_best_end].x, vs[i_best_end].y, vs[i_best_end].z, particle.last_step().t());
       }
       else {
