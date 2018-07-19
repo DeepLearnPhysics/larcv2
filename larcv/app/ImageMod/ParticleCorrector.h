@@ -46,6 +46,7 @@ namespace larcv {
 
     void finalize();
 
+		bool _correct_energy_deposit;
     std::string _particle_producer;
     std::string _cluster3d_producer;
     double _voxel_min_value;

@@ -15,6 +15,7 @@ namespace larcv {
 
   void ParticleCorrector::configure(const PSet& cfg)
   {
+		_correct_energy_deposit = cfg.get<bool>    ( "CorrectEnergyDeposit", true);
     _particle_producer  = cfg.get<std::string> ( "ParticleProducer"        );
     _cluster3d_producer = cfg.get<std::string> ( "Cluster3DProducer"       );
     _voxel_min_value = cfg.get<double>         ( "VoxelMinValue"           );
@@ -29,7 +30,7 @@ namespace larcv {
     auto const& event_particle  = mgr.get_data< EventParticle       > ( _particle_producer  );
 
     auto const& cluster3d_v = event_cluster3d.as_vector ();
-    auto const& particle_v  = event_particle.as_vector  ();
+    auto particle_v  = event_particle.as_vector  ();
     if((particle_v.size()+1) != cluster3d_v.size()) {
       LARCV_CRITICAL() << "Size of particles " << particle_v.size() << " mismatch w/ " << cluster3d_v.size() << std::endl;
       throw larbys();
@@ -42,6 +43,10 @@ namespace larcv {
     for(size_t i=0; i<particle_v.size(); ++i) {
       std::vector<larcv::Point3D> particle_positions;
       auto const& vs = cluster3d_v[i].as_vector(); // VoxelSet
+      // Correct / fill informations on particle
+			if (_correct_energy_deposit) particle_v[i].energy_deposit(cluster3d_v[i].sum());
+      particle_v[i].num_voxels(vs.size());
+
       for(size_t j=0; j<vs.size(); ++j) {
         if (vs[j].value() > _voxel_min_value) particle_positions.push_back(meta3d.position(vs[j].id()));
         //if (meta3d.position(vs[j].id()).x >= 214 && meta3d.position(vs[j].id()).x <= 215 ) {
@@ -77,15 +82,19 @@ namespace larcv {
       auto particle  = particle_v[i];
       auto const& vs = cluster3d_v[i];
 
+			//if (vs.size() == 0) {
+			//	continue;
+			//}
+
       // LArbys => neither track nor shower
-      if (particle.shape() == kShapeUnknown) {
+      if (particle.shape() == kShapeUnknown || particle.shape() == kShapeShower) {
         out_particle_v.push_back(particle);
         continue;
       }
 
       bool correctStart = !(meta3d.contains(particle.position().as_point3d()));
-      bool correctEnd = particle.shape() == kShapeTrack && !meta3d.contains(particle.end_position().as_point3d());
-      std::cout << particle.pdg_code() << " " << particle.id() << " " << correctStart << " " << correctEnd <<  std::endl;
+      bool correctEnd = !meta3d.contains(particle.end_position().as_point3d());
+      std::cout << particle.pdg_code() << " " << particle.id() << " " << correctStart << " " << correctEnd << " " << vs.size() << std::endl;
 
       // If the particle is a shower and start position is included
       // OR it is a track with both start/end positions included

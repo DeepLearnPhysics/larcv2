@@ -18,6 +18,8 @@ namespace larcv {
   void BatchFillerPPN::configure(const PSet& cfg)
   {
     bool error = false;
+    _min_voxel_count = cfg.get<int>("MinVoxelCount", 5);
+		_min_energy_deposit = cfg.get<double>("MinEnergyDeposit", 0.05);
     _part_producer   = cfg.get<std::string>("ParticleProducer");
     _buffer_size     = cfg.get<size_t>("BufferSize",100);
     auto const shape_type = cfg.get<std::string>("ShapeType");
@@ -144,11 +146,13 @@ namespace larcv {
       auto track_id = part.track_id();
       auto energy   = part.energy_deposit();
 
-      if(part.energy_deposit()<1) continue;
+      if(part.energy_deposit()<_min_energy_deposit || part.num_voxels() < _min_voxel_count) continue;
 
       if(_shape_type == kTrack  && (pdg_code == 11 || pdg_code == 22 || pdg_code == -11) ) continue;
 
       if(_shape_type == kShower && (pdg_code != 11 && pdg_code != 22 && pdg_code != -11) ) continue;
+
+      if(_shape_type == kShower && ((_point_type == kPoint3D && !meta3d.contains(part.first_step().as_point3d())) || !meta.contains(part.first_step().as_point2d(_point_type)))) continue;
 
       if(pdg_code > 1000000000) {
       	LARCV_INFO() << "Skipping nucleus TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << std::endl;
