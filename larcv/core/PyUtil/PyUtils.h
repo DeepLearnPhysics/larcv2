@@ -14,7 +14,7 @@ typedef _object PyObject;
 //#endif
 
 #include "larcv/core/DataFormat/Image2D.h"
-#include "larcv/core/DataFormat/Voxel.h"
+#include "larcv/core/DataFormat/Voxel3D.h"
 
 namespace larcv {
 /// Utility function: call one-time-only numpy module initialization (you don't
@@ -35,6 +35,8 @@ PyObject* as_ndarray(const std::vector< double             > &data);
 PyObject* as_ndarray(const Image2D &img);
 /// larcv::Image2D to numpy array converter
 PyObject* as_caffe_ndarray(const Image2D &img);
+/// larcv::VoxelSet to numpy array converter
+PyObject* as_ndarray(const SparseTensor3D &data, bool clear_mem=false);
 /// copy array
 template <class T>
 void _copy_array(PyObject *arrayin, const std::vector<T> &cvec);
