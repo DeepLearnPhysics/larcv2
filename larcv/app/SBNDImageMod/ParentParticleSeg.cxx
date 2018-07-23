@@ -44,15 +44,15 @@ bool ParentParticleSeg::process(IOManager& mgr) {
 
   ev_particle_output.clear();
 
-  // std::cout << "Initial number of particles: " << ev_particle.as_vector().size() << std::endl;
-  // std::cout << "Initial number of clusters: " << ev_cluster2d.cluster_pixel_2d(0).as_vector().size() << std::endl;
+  bool debug = false;
 
-  // std::cout << "Initial number of output particles: " << ev_particle_output.as_vector().size() << std::endl;
+  if (debug){
+    std::cout << "Initial number of particles: " << ev_particle.as_vector().size() << std::endl;
+    std::cout << "Initial number of output particles: " << ev_particle_output.as_vector().size() << std::endl;
+  }
 
   // Loop over all of the input particles and determine their ancestor
-  // This dictates which particle ID gets mapped to which output particle
-  // std::map <int, int> _trackID_to_Ancestor;
-  // std::map<int, std::vector<int> > _particles_by_ancestor;
+
 
   // Make a particle node for every particle (to build a particle tree)
   std::vector<particle_node*> particle_nodes;
@@ -67,14 +67,15 @@ bool ParentParticleSeg::process(IOManager& mgr) {
   std::set<int> _found_ancestor_nodes;
 
   for (auto& particle : ev_particle.as_vector()) {
-    // std::cout << "Ancestor track ID, ancestor PDG, id, parent ID, PDG, track id: ("
-    //           << particle.ancestor_track_id() << ", "
-    //           << particle.ancestor_pdg_code() << ", "
-    //           << particle.id() << ", "
-    //           << particle.parent_track_id() << ", "
-    //           << particle.pdg_code() << ", "
-    //           << particle.track_id() << ")" << std::endl;
-
+    if (debug){
+      std::cout << "Ancestor track ID, ancestor PDG, id, parent ID, PDG, track id: ("
+                << particle.ancestor_track_id() << ", "
+                << particle.ancestor_pdg_code() << ", "
+                << particle.id() << ", "
+                << particle.parent_track_id() << ", "
+                << particle.pdg_code() << ", "
+                << particle.track_id() << ")" << std::endl;
+    }
 
     // Particles are top level if their ancestor ID == their own track ID
 
@@ -84,9 +85,13 @@ bool ParentParticleSeg::process(IOManager& mgr) {
     node->reference = &particle;
     node->trackID = particle.track_id();
     node->parentID = particle.parent_track_id();
+    node->ancestorID = particle.ancestor_track_id();
 
     // Primary?
-    if (particle.ancestor_track_id() == particle.track_id()){
+    if (particle.ancestor_track_id() == particle.track_id() ||
+        particle.ancestor_pdg_code() == 111 ||  // neutral particles make new primaries
+        particle.ancestor_pdg_code() == 2112
+      ){
       // Yes, it's a primary
       // std::cout << "primary " << particle.track_id() << std::endl;
       // std::cout << "Address: " << node << std::endl;
@@ -120,9 +125,15 @@ bool ParentParticleSeg::process(IOManager& mgr) {
     // std::cout << "Ancestor ID " << trackID << std::endl;
   }
 
-  // for (auto node : primary_nodes){
-  //   std::cout << "Found the following primary: " << node->trackID << std::endl;
-  // }
+  if (debug){
+    for (auto node : primary_nodes){
+      std::cout << "Found the following primary: " << node->trackID << std::endl;
+    }
+  }
+
+  if (debug){
+    std::cout << "Created " << particle_nodes.size() << " total nodes." << std::endl;
+  }
 
   // Now, every particle has a corresponding particle node,
   // And there are particle nodes made for the trackIDs that aren't actually
@@ -155,26 +166,43 @@ bool ParentParticleSeg::process(IOManager& mgr) {
       }
     }
     if (! found){
+      // Try to match this particle's ancestor with a primary node
+      found = false;
+      for (auto primary_node : primary_nodes){
+        if (node->ancestorID == primary_node -> trackID){
+          primary_node -> daughters.push_back(node);
+          // std::cout << "Found node " << primary_node->trackID << " as parent of " << node->trackID << std::endl;
+          found = true;
+          break;
+        }
+      }
       // std::cout << "node with track ID " << node->trackID << " is orphaned." << std::endl;
-      orphanage -> daughters.push_back(node);
+      if (!found)
+        orphanage -> daughters.push_back(node);
     }
 
   }
 
 
-  // for (auto ancestor_node : primary_nodes){
-  //   std::cout << "Top level particle.  TrackID is "
-  //             << ancestor_node->trackID
-  //             << ", number of daughers: "
-  //             << ancestor_node->daughters.size()
-  //             << ", reference: " << ancestor_node->reference
-  //             << std::endl;
-  //   for (auto daughter : ancestor_node->daughters){
-  //     std::cout << "--> daughter trackID " << daughter->trackID << std::endl;
-  //     // std::cout << "--> daughter trackID " << daughter->trackID << ", id " << daughter->reference->id() << std::endl;
-  //   }
-  // }
-
+  if (debug){
+    for (auto ancestor_node : primary_nodes){
+      std::cout << "Top level particle.  TrackID is "
+                << ancestor_node->trackID
+                << ", number of daughers: "
+                << ancestor_node->daughters.size()
+                << ", reference: " << ancestor_node->reference
+                << std::endl;
+      for (auto daughter : ancestor_node->daughters){
+        std::cout << "--> daughter trackID " << daughter->trackID << std::endl;
+        // std::cout << "--> daughter trackID " << daughter->trackID << ", id " << daughter->reference->id() << std::endl;
+      }
+    }
+    // Print out the orphaned particles too:
+    std::cout << "Orphanage: " <<std::endl;
+    for (auto & particle : orphanage->daughters){
+        std::cout << "--> orphan trackID " << particle->trackID << std::endl;
+    }
+  }
   // Here, every particle is sorted into it's own group by ancestor.
 
   // Make the appropriate list of new particles:
@@ -204,6 +232,7 @@ bool ParentParticleSeg::process(IOManager& mgr) {
          projection_index < ev_cluster2d.as_vector().size(); ++projection_index) {
       // For each projection index, get the list of clusters
       auto const& clusters = ev_cluster2d.cluster_pixel_2d(projection_index);
+
       larcv::ClusterPixel2D new_clusters;
       new_clusters.meta(clusters.meta());
 
@@ -293,13 +322,17 @@ larcv::VoxelSet ParentParticleSeg::cluster_merger(
   larcv::VoxelSet output_set;
   output_set.id(primary_node->trackID);
 
-  if (primary_node -> reference == NULL){
-    return output_set;
-  }
+  // if (primary_node -> reference == NULL){
+  //   return output_set;
+  // }
 
   std::vector<int> cluster_indexes;
 
   get_all_daughter_ids(cluster_indexes, primary_node);
+
+  // std::cout << "For particle with track ID " << primary_node->trackID << ", "
+  //           << "the following cluster indexes are to be merged: " << std::endl;
+  // for (auto & index : cluster_indexes) std::cout << " - " << index << std::endl;
 
 
   for (auto id : cluster_indexes) {
@@ -330,6 +363,7 @@ larcv::VoxelSet ParentParticleSeg::cluster_merger(
 
   for (auto id : cluster_indexes) {
     auto& input_cluster = clusters.voxel_set(id);
+    // std::cout << "Cluster index " << id << ", number of voxels: " << input_cluster.as_vector().size() << std::endl;
     for (auto& voxel : input_cluster.as_vector()) {
       if (voxel.id() >= clusters.meta().size()){
         continue;

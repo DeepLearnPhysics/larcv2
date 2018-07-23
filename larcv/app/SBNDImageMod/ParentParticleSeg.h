@@ -34,6 +34,7 @@ namespace larcv {
 struct particle_node{
   int trackID;
   int parentID;
+  int ancestorID;
   bool primary;
   const Particle * reference;
   particle_node * parent;
