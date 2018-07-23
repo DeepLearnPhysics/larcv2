@@ -57,6 +57,17 @@ namespace larcv {
     return ( index / _row_count );
   }
 
+  void ImageMeta::index_to_rowcol(size_t index, size_t& row, size_t& col) const
+  {
+     if ( index >= _row_count * _col_count ) {
+      std::stringstream ss;
+      ss << "Invalid pixel index queried: (" << index << ") but the dimension is only (" << _row_count * _col_count << ")!" << std::endl;
+      throw larbys(ss.str());
+    }
+    row = index % _row_count;
+    col = index / _row_count;
+  }
+
 
   ImageMeta ImageMeta::overlap(const ImageMeta& meta) const
   {

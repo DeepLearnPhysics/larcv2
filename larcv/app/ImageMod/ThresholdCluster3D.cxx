@@ -1,17 +1,17 @@
-#ifndef __ThresholdTensor3D_CXX__
-#define __ThresholdTensor3D_CXX__
+#ifndef __ThresholdCluster3D_CXX__
+#define __ThresholdCluster3D_CXX__
 
-#include "ThresholdTensor3D.h"
+#include "ThresholdCluster3D.h"
 #include "larcv/core/DataFormat/EventVoxel3D.h"
 namespace larcv {
 
-  static ThresholdTensor3DProcessFactory __global_ThresholdTensor3DProcessFactory__;
+  static ThresholdCluster3DProcessFactory __global_ThresholdCluster3DProcessFactory__;
 
-  ThresholdTensor3D::ThresholdTensor3D(const std::string name)
+  ThresholdCluster3D::ThresholdCluster3D(const std::string name)
     : ProcessBase(name)
   {}
 
-  void ThresholdTensor3D::configure_labels(const PSet& cfg)
+  void ThresholdCluster3D::configure_labels(const PSet& cfg)
   {
     _target_producer_v.clear();
     _output_producer_v.clear();
@@ -19,10 +19,10 @@ namespace larcv {
     _output_producer_v   = cfg.get<std::vector<std::string> >("OutputProducerList", _output_producer_v);
 
     if (_target_producer_v.empty()) {
-      auto tensor3d_producer = cfg.get<std::string>("TargetProducer", "");
+      auto Cluster3D_producer = cfg.get<std::string>("TargetProducer", "");
       auto output_producer   = cfg.get<std::string>("OutputProducer", "");
-      if (!tensor3d_producer.empty()) {
-        _target_producer_v.push_back(tensor3d_producer);
+      if (!Cluster3D_producer.empty()) {
+        _target_producer_v.push_back(Cluster3D_producer);
         _output_producer_v.push_back(output_producer);
       }
     }
@@ -36,7 +36,7 @@ namespace larcv {
     }
   }
 
-  void ThresholdTensor3D::configure(const PSet& cfg)
+  void ThresholdCluster3D::configure(const PSet& cfg)
   {
     configure_labels(cfg);
 
@@ -59,10 +59,10 @@ namespace larcv {
     }
   }
 
-  void ThresholdTensor3D::initialize()
+  void ThresholdCluster3D::initialize()
   {}
 
-  bool ThresholdTensor3D::process(IOManager& mgr)
+  bool ThresholdCluster3D::process(IOManager& mgr)
   {
     for (size_t producer_index = 0; producer_index < _target_producer_v.size(); ++producer_index) {
 
@@ -70,24 +70,24 @@ namespace larcv {
       auto output_producer = _output_producer_v[producer_index];
       if (output_producer.empty()) output_producer = target_producer + "_threshold";
 
-      auto const& ev_tensor3d = mgr.get_data<larcv::EventSparseTensor3D>(target_producer);
-      auto& ev_output = mgr.get_data<larcv::EventSparseTensor3D>(output_producer);
+      auto const& ev_cluster3D = mgr.get_data<larcv::EventClusterVoxel3D>(target_producer);
+      auto& ev_output = mgr.get_data<larcv::EventClusterVoxel3D>(output_producer);
 
       if (ev_output.meta().valid()) {
         static bool one_time_warning = true;
         if (_output_producer_v[producer_index].empty()) {
-          LARCV_CRITICAL() << "Over-writing existing EventSparseTensor3D data for label "
+          LARCV_CRITICAL() << "Over-writing existing EventSparseCluster3D data for label "
                            << output_producer << std::endl;
           throw larbys();
         }
         else if (one_time_warning) {
-          LARCV_WARNING() << "Output EventSparseTensor3D producer " << output_producer
+          LARCV_WARNING() << "Output EventSparseCluster3D producer " << output_producer
                           << " already holding valid data will be over-written!" << std::endl;
           one_time_warning = false;
         }
       }
 
-      ev_output = ev_tensor3d;
+      ev_output = ev_cluster3D;
       auto const& voxel_value_min = _voxel_value_min_v[producer_index];
       auto const& voxel_value_max = _voxel_value_max_v[producer_index];
       ev_output.threshold(voxel_value_min, voxel_value_max);
@@ -95,7 +95,7 @@ namespace larcv {
     return true;
   }
 
-  void ThresholdTensor3D::finalize()
+  void ThresholdCluster3D::finalize()
   {}
 
 }

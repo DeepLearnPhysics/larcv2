@@ -66,9 +66,9 @@ namespace larcv {
   VoxelID_t Voxel3DMeta::index(const size_t i_x, const size_t i_y, const size_t i_z) const
   {
     if (!_valid) throw larbys("Voxel3DMeta::ID cannot be called on invalid meta!");
-    if (i_x < 0 || i_x >= _xnum) return kINVALID_VOXELID;
-    if (i_y < 0 || i_y >= _ynum) return kINVALID_VOXELID;
-    if (i_z < 0 || i_z >= _znum) return kINVALID_VOXELID;
+    if (i_x >= _xnum) return kINVALID_VOXELID;
+    if (i_y >= _ynum) return kINVALID_VOXELID;
+    if (i_z >= _znum) return kINVALID_VOXELID;
 
     return (i_z * (_xnum * _ynum) + i_y * _xnum + i_x);
 
@@ -176,6 +176,15 @@ namespace larcv {
     VoxelID_t zid = id / (_xnum * _ynum);
 
     return zid;
+  }
+
+  void Voxel3DMeta::id_to_xyz_index(VoxelID_t id, size_t& x, size_t& y, size_t& z) const
+  {
+    if(id >= _num_element) throw larbys("Voxel3DMeta::pos invalid VoxelID_t!");
+    z = id / (_xnum * _ynum);
+    id -= z * (_xnum * _ynum);
+    y = id / _xnum;
+    x = (id - y * _xnum);
   }
 
   std::string  Voxel3DMeta::dump() const

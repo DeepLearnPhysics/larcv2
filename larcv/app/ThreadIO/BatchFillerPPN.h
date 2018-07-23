@@ -2,7 +2,7 @@
  * \file BatchFillerPPN.h
  *
  * \ingroup ThreadIO
- * 
+ *
  * \brief Class def header for a class BatchFillerPPN
  *
  * @author kazuhiro
@@ -14,6 +14,7 @@
 #ifndef __BATCHFILLERPIDLABEL_H__
 #define __BATCHFILLERPIDLABEL_H__
 
+#include "larcv/core/DataFormat/DataFormatTypes.h"
 #include "larcv/core/Processor/ProcessFactory.h"
 #include "BatchFillerTemplate.h"
 
@@ -27,10 +28,10 @@ namespace larcv {
   class BatchFillerPPN : public BatchFillerTemplate<float> {
 
   public:
-    
+
     /// Default constructor
     BatchFillerPPN(const std::string name="BatchFillerPPN");
-    
+
     /// Default destructor
     ~BatchFillerPPN(){}
 
@@ -49,8 +50,10 @@ namespace larcv {
   private:
 
     enum ShapeType_t {kShower, kTrack};
-    enum PointType_t {kPoint3D, kPointXY, kPointYZ, kPointZX};
+    typedef larcv::PointType_t PointType_t;
 
+    int _min_voxel_count;
+		double _min_energy_deposit;
     std::string _tensor_producer;
     std::string _part_producer;
     ShapeType_t _shape_type;
@@ -78,5 +81,4 @@ namespace larcv {
 }
 
 #endif
-/** @} */ // end of doxygen group 
-
+/** @} */ // end of doxygen group
