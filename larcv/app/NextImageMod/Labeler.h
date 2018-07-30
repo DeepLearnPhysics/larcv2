@@ -46,8 +46,8 @@ namespace larcv {
     std::string _output_producer = "";
 
     enum VoxelStatus {
-      kNormal = 0,
       kBackground,
+      kNormal,
       kParticleStart,
       kParticleEnd,
       kOther

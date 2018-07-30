@@ -55,7 +55,9 @@ namespace larcv {
     // Then replace voxels with labels we are interested in
     for(auto const& part : particle_v) {
 
-      LARCV_INFO() << "Checking (Y,Z) : (" << part.y() << "," << part.z() << ")\n";
+      LARCV_DEBUG() << "Checking (Y,Z) : (" << part.y() << "," << part.z() << ")\n";
+
+      if (part.creation_process() != "none") continue; // exclude non-primary particles 
 
       ev_voxel3d_output.emplace(part.position().x(),     part.position().y(),     part.position().z(),     kParticleStart, false);
       ev_voxel3d_output.emplace(part.end_position().x(), part.end_position().y(), part.end_position().z(), kParticleEnd,   false);
