@@ -15,22 +15,23 @@ namespace larcv {
   void Cropper::configure(const PSet& cfg)
   {
 
-    _cluster3d_producer         = cfg.get<std::string>("ClusterProducer");
-    _producer_names_v           = cfg.get<std::vector<std::string> >("Producers");
-    _product_types_v            = cfg.get<std::vector<std::string> >("ProductTypes");
-    _output_producers_v         = cfg.get<std::vector<std::string> >("OutputProducers");
+    _pmaps_producer             = cfg.get<std::string>("PMAPSProducer");
+    _producer_names_v           = cfg.get<std::vector<std::string>>("Producers");
+    _product_types_v            = cfg.get<std::vector<std::string>>("ProductTypes");
+    _output_producers_v         = cfg.get<std::vector<std::string>>("OutputProducers");
     _output_n_x                 = cfg.get<int>("OutputNX");
     _output_n_y                 = cfg.get<int>("OutputNY");
     _output_n_z                 = cfg.get<int>("OutputNZ");
+    _scale_mc                   = cfg.get<int>("ScaleMC");
 
 
     if (_producer_names_v.size() != _product_types_v.size() ||
       _producer_names_v.size() != _output_producers_v.size()) {
-    LARCV_CRITICAL() << "Number of product names, product tyes, and output "
-                        "producers does not match"
-                     << std::endl;
-    throw larbys();
-  }
+      LARCV_CRITICAL() << "Number of product names, product tyes, and output "
+                          "producers does not match"
+                       << std::endl;
+      throw larbys();
+    }
   }
 
   void Cropper::initialize()
@@ -54,12 +55,16 @@ namespace larcv {
   bool Cropper::process(IOManager& mgr)
   {
 
-    auto ev_reference_cluster = mgr.get_data<larcv::EventClusterVoxel3D>(_cluster3d_producer);
-    if (ev_reference_cluster.as_vector().size() == 0) {
+    auto ev_sparse3d_pmaps = mgr.get_data<larcv::EventSparseTensor3D>(_pmaps_producer);
+    if (ev_sparse3d_pmaps.as_vector().size() == 0) {
       LARCV_CRITICAL() << "Input cluster not found by producer name "
-                       << _cluster3d_producer << std::endl;
+                       << _pmaps_producer << std::endl;
       throw larbys();
     }
+
+    auto & reference_pmap = ev_sparse3d_pmaps.as_vector().front();
+    auto & original_meta  = ev_sparse3d_pmaps.meta();
+
 
 
     // Make sure all metas match against the reference meta:
@@ -73,18 +78,6 @@ namespace larcv {
                            << _producer_names_v.at(i) << std::endl;
           throw larbys();
         }
-
-        auto const& sparse3d_meta = ev_sparse3d.meta();
-        auto const& ref_meta = ev_reference_cluster.meta();
-
-        // Meta comparisons:
-        if (sparse3d_meta != ref_meta) {
-          LARCV_CRITICAL() << "Meta mismatch between image2d by "
-                           << _producer_names_v.at(i)
-                           << " and reference clsuter." << std::endl;
-          throw larbys();
-        }
-
        
       } else if (_product_types_v.at(i) == "cluster3d") {
         auto const& ev_cluster3d = mgr.get_data<larcv::EventClusterVoxel3D>(_producer_names_v.at(i));
@@ -95,18 +88,6 @@ namespace larcv {
           throw larbys();
         }
 
-        auto const& cluster3d_meta = ev_cluster3d.meta();
-        auto const& ref_meta = ev_reference_cluster.meta();
-
-        // Meta comparisons:
-        if (cluster3d_meta != ref_meta) {
-          LARCV_CRITICAL() << "Meta mismatch between image2d by "
-                           << _producer_names_v.at(i)
-                           << " and reference clsuter." << std::endl;
-          throw larbys();
-        }
-
-
       } else {
         LARCV_CRITICAL() << "Product type " << _product_types_v.at(i)
                          << " not supported for cropping." << std::endl;
@@ -116,14 +97,12 @@ namespace larcv {
 
 
 
-    auto & reference_cluster = ev_reference_cluster.as_vector().front();
-    auto & original_meta     = ev_reference_cluster.meta();
 
 
-    // Take the average point of the clusters, weighted by value:
+    // Take the average point of the pmaps, weighted by value:
     float mean_x(0.0), mean_y(0.0), mean_z(0.0);
     float weight = 0;
-    for (auto & voxel : reference_cluster.as_vector()){
+    for (auto & voxel : ev_sparse3d_pmaps.as_vector()){
       // std::cout << "Voxel id: " << voxel.id() << std::endl;
       if (voxel.id() > original_meta.size())
         continue;
@@ -135,6 +114,8 @@ namespace larcv {
     mean_x /= weight;
     mean_y /= weight;
     mean_z /= weight;
+
+    LARCV_INFO() << "PMAPS Center: mean_x = " << mean_x << "; mean_y = " << mean_y << "; mean_z = " << mean_z << std::endl;
 
     // Now we have the mean x/y/z, figure out what pixels this is in the image:
     auto id = original_meta.id(mean_x, mean_y, mean_z);
@@ -167,14 +148,19 @@ namespace larcv {
     float max_z = original_meta.min_z() + original_meta.size_voxel_z() * max_z_ind;
 
 
-    // Create a new meta object:
-    larcv::Voxel3DMeta new_meta;
-    new_meta.set(min_x, min_y, min_z,
-                 max_x, max_y, max_z,
-                 _output_n_x, _output_n_y, _output_n_z,
-                 original_meta.unit());
+    // Create a new meta object for pmaps
+    larcv::Voxel3DMeta new_meta_pmaps;
+    new_meta_pmaps.set(min_x, min_y, min_z,
+                       max_x, max_y, max_z,
+                       _output_n_x, _output_n_y, _output_n_z,
+                       original_meta.unit());
 
-
+    // Create a new meta object for mc
+    larcv::Voxel3DMeta new_meta_mc;
+    new_meta_mc.set(min_x, min_y, min_z,
+                    max_x, max_y, max_z,
+                    _output_n_x * _scale_mc, _output_n_y * _scale_mc, _output_n_z * _scale_mc,
+                    original_meta.unit());
 
 
 
@@ -185,6 +171,8 @@ namespace larcv {
       if (_product_types_v.at(i) == "sparse3d"){
         // std::cout << "Making a sparse3d crop" << std::endl;
         auto const& ev_sparse3d = mgr.get_data<larcv::EventSparseTensor3D>(_producer_names_v.at(i));  
+
+        bool is_mc = _producer_names_v.at(i).find("mc") != std::string::npos;
 
         larcv::VoxelSet _output_voxel_set;  
 
@@ -207,19 +195,31 @@ namespace larcv {
           if (new_i_z < 0 || new_i_z >= _output_n_z) continue;  
 
           // Ok, find the new ID:
-          auto index = new_meta.index(new_i_x, new_i_y, new_i_z);
+          VoxelID_t index; 
+          if (is_mc) 
+            index = new_meta_mc.index(new_i_x, new_i_y, new_i_z);
+          else 
+            index = new_meta_pmaps.index(new_i_x, new_i_y, new_i_z);
+
           _output_voxel_set.insert(larcv::Voxel(index, voxel.value()));
         }  
 
         // Make an output sparse3d producer
         auto & ev_sparse3d_out = mgr.get_data<larcv::EventSparseTensor3D>(_output_producers_v.at(i));
-        ev_sparse3d_out.emplace(std::move(_output_voxel_set), new_meta);
-        // std::cout << "Finished a sparse3d crop" << std::endl;  
+        if (is_mc) 
+          ev_sparse3d_out.emplace(std::move(_output_voxel_set), new_meta_mc);
+        else
+          ev_sparse3d_out.emplace(std::move(_output_voxel_set), new_meta_pmaps);
+
+        LARCV_DEBUG() << "Finished a sparse3d crop with output label " << _output_producers_v.at(i)
+                      << ". Treated as " << (is_mc ? "MC." : "PMAPS.") << std::endl;  
 
       }
       else if (_product_types_v.at(i) == "cluster3d"){
         // std::cout << "Making a cluster3d crop" << std::endl;
         auto const& ev_cluster3d = mgr.get_data<larcv::EventClusterVoxel3D>(_producer_names_v.at(i));  
+
+        bool is_mc = _producer_names_v.at(i).find("mc") != std::string::npos;
   
         larcv::ClusterVoxel3D _output_cluster_set;
 
@@ -246,7 +246,12 @@ namespace larcv {
             if (new_i_z < 0 || new_i_z >= _output_n_z) continue;  
 
             // Ok, find the new ID:
-            auto index = new_meta.index(new_i_x, new_i_y, new_i_z);
+            VoxelID_t index; 
+            if (is_mc) 
+              index = new_meta_mc.index(new_i_x, new_i_y, new_i_z);
+            else 
+              index = new_meta_pmaps.index(new_i_x, new_i_y, new_i_z);
+
             _output_voxel_set.insert(larcv::Voxel(index, voxel.value()));
           }  
 
@@ -254,11 +259,16 @@ namespace larcv {
 
         }  
   
-
         // Make an output sparse3d producer
         auto & ev_cluster3d_out = mgr.get_data<larcv::EventClusterVoxel3D>(_output_producers_v.at(i));
-        ev_cluster3d_out.emplace(std::move(_output_cluster_set), new_meta);
-        // std::cout << "Finished a cluster3d crop" << std::endl;  
+
+        if (is_mc)
+          ev_cluster3d_out.emplace(std::move(_output_cluster_set), new_meta_mc);
+        else 
+          ev_cluster3d_out.emplace(std::move(_output_cluster_set), new_meta_pmaps);
+
+        LARCV_DEBUG() << "Finished a cluster3d crop with output label " << _output_producers_v.at(i)
+                      << ". Treated as " << (is_mc ? "MC." : "PMAPS.") << std::endl;   
 
       }  
 

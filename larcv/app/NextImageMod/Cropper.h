@@ -46,10 +46,11 @@ namespace larcv {
     int _output_n_x;
     int _output_n_y;
     int _output_n_z;
-    std::string               _cluster3d_producer;
+    std::string               _pmaps_producer;
     std::vector<std::string>  _producer_names_v;
     std::vector<std::string>  _product_types_v;
     std::vector<std::string>  _output_producers_v;
+    int _scale_mc = 10.;
 
   };
 
