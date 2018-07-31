@@ -13,8 +13,11 @@
 
 
 #pragma link C++ class larcv::Labeler+;
+#pragma link C++ class larcv::Cropper+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
 
 
 

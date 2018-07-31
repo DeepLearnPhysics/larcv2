@@ -6,8 +6,8 @@ ProcessDriver: {
   EnableFilter:    true
   RandomAccess:    false
   RandomSeed:      0
-  ProcessType:     ["Labeler"]
-  ProcessName:     ["Labeler"]
+  ProcessType:     ["Labeler","Cropper"]
+  ProcessName:     ["Labeler","Cropper"]
   # StartEntry: 0
   # NumEntries: 50
 
@@ -28,10 +28,21 @@ ProcessDriver: {
 
   ProcessList: {
     Labeler: {
-      Verbosity: 0
+      Verbosity: 2
       ParticleProducer:   "mcpart"
       Voxel3DProducer:    "mcpart"
       OutputProducer:     "mctruth"
+    }
+
+    Cropper: {
+      Verbosity: 0
+      ClusterProducer:    "mcpart"
+      Producers:          ["mcpart","mctruth","mcpart"]
+      ProductTypes:       ["sparse3d","sparse3d","cluster3d"]
+      OutputProducers:    ["mcpartcropped","mctruthcropped","mcpartcropped"]
+      OutputNX:           512
+      OutputNY:           512
+      OutputNZ:           512
     }
   }
 }

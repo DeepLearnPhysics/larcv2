@@ -1,14 +1,14 @@
 /**
  * \file Labeler.h
  *
- * \ingroup Next
+ * \ingroup NextImageMod
  * 
  * \brief Class def header for a class Labeler
  *
  * @author deltutto
  */
 
-/** \addtogroup Next
+/** \addtogroup NextImageMod
 
     @{*/
 #ifndef __LABELER_H__
