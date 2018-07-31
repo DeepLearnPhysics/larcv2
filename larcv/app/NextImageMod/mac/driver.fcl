@@ -1,0 +1,37 @@
+
+
+
+ProcessDriver: {
+  Verbosity:       0
+  EnableFilter:    true
+  RandomAccess:    false
+  RandomSeed:      0
+  ProcessType:     ["Labeler"]
+  ProcessName:     ["Labeler"]
+  # StartEntry: 0
+  # NumEntries: 50
+
+
+
+  IOManager: {
+    Verbosity:   2
+    Name:        "IOManager"
+    IOMode:      2
+    OutFileName: "out.root"
+    InputFiles:  []
+    InputDirs:   []
+
+    # Just the 3D pass:
+    # StoreOnlyType: ["cluster2d"]
+    # StoreOnlyName: ["nextlabels"]
+  }
+
+  ProcessList: {
+    Labeler: {
+      Verbosity: 0
+      ParticleProducer:   "mcpart"
+      Voxel3DProducer:    "mcpart"
+      OutputProducer:     "mctruth"
+    }
+  }
+}
