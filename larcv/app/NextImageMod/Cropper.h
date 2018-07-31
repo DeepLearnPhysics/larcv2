@@ -50,7 +50,9 @@ namespace larcv {
     std::vector<std::string>  _producer_names_v;
     std::vector<std::string>  _product_types_v;
     std::vector<std::string>  _output_producers_v;
-    int _scale_mc = 10.;
+    int _scale_mc_x = 10.;
+    int _scale_mc_y = 10.;
+    int _scale_mc_z = 1.;
 
   };
 

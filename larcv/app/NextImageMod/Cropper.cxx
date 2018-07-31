@@ -22,7 +22,9 @@ namespace larcv {
     _output_n_x                 = cfg.get<int>("OutputNX");
     _output_n_y                 = cfg.get<int>("OutputNY");
     _output_n_z                 = cfg.get<int>("OutputNZ");
-    _scale_mc                   = cfg.get<int>("ScaleMC");
+    _scale_mc_x                   = cfg.get<int>("ScaleMCX");
+    _scale_mc_y                   = cfg.get<int>("ScaleMCY");
+    _scale_mc_z                   = cfg.get<int>("ScaleMCZ");
 
 
     if (_producer_names_v.size() != _product_types_v.size() ||
@@ -159,7 +161,7 @@ namespace larcv {
     larcv::Voxel3DMeta new_meta_mc;
     new_meta_mc.set(min_x, min_y, min_z,
                     max_x, max_y, max_z,
-                    _output_n_x * _scale_mc, _output_n_y * _scale_mc, _output_n_z * _scale_mc,
+                    _output_n_x * _scale_mc_x, _output_n_y * _scale_mc_y, _output_n_z * _scale_m_z,
                     original_meta.unit());
 
 

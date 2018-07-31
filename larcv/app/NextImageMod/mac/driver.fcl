@@ -39,10 +39,12 @@ ProcessDriver: {
       Producers:          ["mcpart","mctruth","mcpart","pmaps"]
       ProductTypes:       ["sparse3d","sparse3d","cluster3d","sparse3d"]
       OutputProducers:    ["mcpartcropped","mctruthcropped","mcpartcropped","pmapscropped"]
-      OutputNX:           512
-      OutputNY:           512
+      OutputNX:           60
+      OutputNY:           60
       OutputNZ:           512
-      ScaleMC:            10
+      ScaleMCX:           10
+      ScaleMCY:           10
+      ScaleMCZ:           1
     }
   }
 }
