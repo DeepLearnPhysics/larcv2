@@ -137,6 +137,39 @@ void as_flat_arrays(const VoxelSet& tensor, const Voxel3DMeta& meta,
   };
 }
 
+void as_flat_arrays(const VoxelSet& tensor, const Voxel3DMeta& meta,
+                    PyObject* index, PyObject* value)
+{
+  SetPyUtil();
+  PyArrayObject *iarr = (PyArrayObject*)(index);
+  PyArrayObject *varr = (PyArrayObject*)(value);
+
+  auto const& voxel_v = tensor.as_vector();
+
+  assert(PyArray_NDIM(iarr) == 1);
+  assert(PyArray_NDIM(varr) == 1);
+
+  if(PyArray_SIZE(iarr) < (int)(voxel_v.size()) ||
+     PyArray_SIZE(varr) < (int)(voxel_v.size())) {
+    std::cerr << "PyArray size smaller than data size!" << std::endl;
+    throw std::exception();
+  }
+
+  npy_intp loc[1];
+  loc[0] = 0;
+  auto iptr =   (int*)(PyArray_GetPtr(iarr, loc));
+  auto vptr = (float*)(PyArray_GetPtr(varr, loc));
+
+  size_t xpos, ypos, zpos;
+
+  for (size_t i = 0; i < voxel_v.size(); ++i) {
+    // std::cout << fptr[i] << std::endl;
+    auto const& vox = voxel_v[i];
+    iptr[i] = vox.id();
+    vptr[i] = vox.value();
+  };
+}
+
 template<class T>
 void _copy_array(PyObject *arrayin, const std::vector<T> &cvec) {
   SetPyUtil();
