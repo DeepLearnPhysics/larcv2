@@ -21,9 +21,8 @@ ProcessDriver: {
     InputFiles:  []
     InputDirs:   []
 
-    # Just the 3D pass:
-    # StoreOnlyType: ["cluster2d"]
-    # StoreOnlyName: ["nextlabels"]
+    StoreOnlyType: ["particle","sparse3d","sparse3d","cluster3d"]
+    StoreOnlyName: ["mcpartcropped","nextlabels","pmapscropped","mctruthcropped"]
   }
 
   ProcessList: {
@@ -37,9 +36,9 @@ ProcessDriver: {
     Cropper: {
       Verbosity: 0
       ClusterProducer:    "mcpart"
-      Producers:          ["mcpart","mctruth","mcpart"]
-      ProductTypes:       ["sparse3d","sparse3d","cluster3d"]
-      OutputProducers:    ["mcpartcropped","mctruthcropped","mcpartcropped"]
+      Producers:          ["mcpart","mctruth","mcpart","pmaps"]
+      ProductTypes:       ["sparse3d","sparse3d","cluster3d","sparse3d"]
+      OutputProducers:    ["mcpartcropped","mctruthcropped","mcpartcropped","pmapscropped"]
       OutputNX:           512
       OutputNY:           512
       OutputNZ:           512
