@@ -161,7 +161,7 @@ namespace larcv {
     larcv::Voxel3DMeta new_meta_mc;
     new_meta_mc.set(min_x, min_y, min_z,
                     max_x, max_y, max_z,
-                    _output_n_x * _scale_mc_x, _output_n_y * _scale_mc_y, _output_n_z * _scale_m_z,
+                    _output_n_x * _scale_mc_x, _output_n_y * _scale_mc_y, _output_n_z * _scale_mc_z,
                     original_meta.unit());
 
 
