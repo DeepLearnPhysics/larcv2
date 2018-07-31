@@ -11,7 +11,7 @@ namespace larcv {
   Cropper::Cropper(const std::string name)
     : ProcessBase(name)
   {}
-    
+
   void Cropper::configure(const PSet& cfg)
   {
 
@@ -80,7 +80,7 @@ namespace larcv {
                            << _producer_names_v.at(i) << std::endl;
           throw larbys();
         }
-       
+
       } else if (_product_types_v.at(i) == "cluster3d") {
         auto const& ev_cluster3d = mgr.get_data<larcv::EventClusterVoxel3D>(_producer_names_v.at(i));
 
@@ -123,17 +123,17 @@ namespace larcv {
     auto id = original_meta.id(mean_x, mean_y, mean_z);
     int x_ind = original_meta.id_to_x_index(id);
     int y_ind = original_meta.id_to_y_index(id);
-    int z_ind = original_meta.id_to_z_index(id); 
+    int z_ind = original_meta.id_to_z_index(id);
 
 
     // Create a new image meta that contains the cropped pixels
     // By design, the vertex location is placed at 50% of the way across the colums
     // and 50% of the way across the rows;
     int min_x_ind = x_ind - 0.5  * _output_n_x;
-    int max_x_ind = x_ind + 0.5  * _output_n_x;  
+    int max_x_ind = x_ind + 0.5  * _output_n_x;
 
     int min_y_ind = y_ind - 0.5  * _output_n_y;
-    int max_y_ind = y_ind + 0.5  * _output_n_y;  
+    int max_y_ind = y_ind + 0.5  * _output_n_y;
 
     int min_z_ind = z_ind - 0.5  * _output_n_z;
     int max_z_ind = z_ind + 0.5  * _output_n_z;
@@ -141,10 +141,10 @@ namespace larcv {
 
     // get the x/y locations of the min/max row/col in the old meta:
     float min_x = original_meta.min_x() + original_meta.size_voxel_x() * min_x_ind;
-    float max_x = original_meta.min_x() + original_meta.size_voxel_x() * max_x_ind;  
+    float max_x = original_meta.min_x() + original_meta.size_voxel_x() * max_x_ind;
 
     float min_y = original_meta.min_y() + original_meta.size_voxel_y() * min_y_ind;
-    float max_y = original_meta.min_y() + original_meta.size_voxel_y() * max_y_ind;  
+    float max_y = original_meta.min_y() + original_meta.size_voxel_y() * max_y_ind;
 
     float min_z = original_meta.min_z() + original_meta.size_voxel_z() * min_z_ind;
     float max_z = original_meta.min_z() + original_meta.size_voxel_z() * max_z_ind;
@@ -165,69 +165,80 @@ namespace larcv {
                     original_meta.unit());
 
 
+    std::cout << new_meta_mc.dump() << std::endl;
+    std::cout << new_meta_pmaps.dump() << std::endl;
 
+    std::cout << "Does this even appear?" << std::endl;
 
     // Loop over all producers specified and replace by cropped items:
 
     for (size_t i = 0; i < _product_types_v.size(); i++) {
       if (_product_types_v.at(i) == "sparse3d"){
         // std::cout << "Making a sparse3d crop" << std::endl;
-        auto const& ev_sparse3d = mgr.get_data<larcv::EventSparseTensor3D>(_producer_names_v.at(i));  
+        auto const& ev_sparse3d = mgr.get_data<larcv::EventSparseTensor3D>(_producer_names_v.at(i));
 
         bool is_mc = _producer_names_v.at(i).find("mc") != std::string::npos;
 
-        larcv::VoxelSet _output_voxel_set;  
+        larcv::VoxelSet _output_voxel_set;
 
         for (auto & voxel : ev_sparse3d.as_vector() ){
-          if (voxel.id() > original_meta.size() )
+          if (voxel.id() > original_meta.size() ){
+            std::cout << "Skipping voxel with id " << voxel.id() << std::endl;
             continue;
+          }
           // Get the old id and i_x, i_y, i_z of this voxel:
-          int old_i_x = original_meta.id_to_x_index(voxel.id());
-          int old_i_y = original_meta.id_to_y_index(voxel.id());
-          int old_i_z = original_meta.id_to_z_index(voxel.id());  
+          float old_pos_x = original_meta.pos_x(voxel.id());
+          float old_pos_y = original_meta.pos_y(voxel.id());
+          float old_pos_z = original_meta.pos_z(voxel.id());
 
           // Find the new values:
-          int new_i_x = old_i_x - min_x_ind;
-          int new_i_y = old_i_y - min_y_ind;
-          int new_i_z = old_i_z - min_z_ind;  
+          size_t new_index;
+          if (is_mc){
+            new_index = new_meta_mc.id(old_pos_x, old_pos_y, old_pos_z);
+            std::cout << "New index: " << new_index << std::endl;
+            if (new_index < 0  || new_index >= new_meta_mc.size()) continue;
+          }
+          else{
+            new_index = new_meta_pmaps.id(old_pos_x, old_pos_y, old_pos_z);
+            if (new_index < 0  || new_index >= new_meta_pmaps.size()) continue;
+          }
 
           // Skip invalid voxels:
-          if (new_i_x < 0 || new_i_x >= _output_n_x) continue;
-          if (new_i_y < 0 || new_i_y >= _output_n_y) continue;
-          if (new_i_z < 0 || new_i_z >= _output_n_z) continue;  
+          // if (new_i_y < 0 || new_i_y >= _output_n_y) continue;
+          // if (new_i_z < 0 || new_i_z >= _output_n_z) continue;
 
-          // Ok, find the new ID:
-          VoxelID_t index; 
-          if (is_mc) 
-            index = new_meta_mc.index(new_i_x, new_i_y, new_i_z);
-          else 
-            index = new_meta_pmaps.index(new_i_x, new_i_y, new_i_z);
-
-          _output_voxel_set.insert(larcv::Voxel(index, voxel.value()));
-        }  
+          // // Ok, find the new ID:
+          // VoxelID_t index;
+          // if (is_mc)
+          //   index = new_meta_mc.index(new_i_x, new_i_y, new_i_z);
+          // else
+          //   index = new_meta_pmaps.index(new_i_x, new_i_y, new_i_z);
+          _output_voxel_set.insert(larcv::Voxel(new_index, voxel.value()));
+        }
 
         // Make an output sparse3d producer
         auto & ev_sparse3d_out = mgr.get_data<larcv::EventSparseTensor3D>(_output_producers_v.at(i));
-        if (is_mc) 
+        if (is_mc)
           ev_sparse3d_out.emplace(std::move(_output_voxel_set), new_meta_mc);
         else
           ev_sparse3d_out.emplace(std::move(_output_voxel_set), new_meta_pmaps);
 
         LARCV_DEBUG() << "Finished a sparse3d crop with output label " << _output_producers_v.at(i)
-                      << ". Treated as " << (is_mc ? "MC." : "PMAPS.") << std::endl;  
+                      << ", added " << _output_voxel_set.as_vector().size() << " voxels"
+                      << ". Treated as " << (is_mc ? "MC." : "PMAPS.") << std::endl;
 
       }
       else if (_product_types_v.at(i) == "cluster3d"){
         // std::cout << "Making a cluster3d crop" << std::endl;
-        auto const& ev_cluster3d = mgr.get_data<larcv::EventClusterVoxel3D>(_producer_names_v.at(i));  
+        auto const& ev_cluster3d = mgr.get_data<larcv::EventClusterVoxel3D>(_producer_names_v.at(i));
 
         bool is_mc = _producer_names_v.at(i).find("mc") != std::string::npos;
-  
+
         larcv::ClusterVoxel3D _output_cluster_set;
 
-        for (auto const & cluster : ev_cluster3d.as_vector()){  
+        for (auto const & cluster : ev_cluster3d.as_vector()){
           larcv::VoxelSet _output_voxel_set;
-          _output_voxel_set.id(cluster.id());  
+          _output_voxel_set.id(cluster.id());
 
           for (auto & voxel : cluster.as_vector() ){
             if (voxel.id() > original_meta.size() )
@@ -235,44 +246,44 @@ namespace larcv {
             // Get the old id and i_x, i_y, i_z of this voxel:
             int old_i_x = original_meta.id_to_x_index(voxel.id());
             int old_i_y = original_meta.id_to_y_index(voxel.id());
-            int old_i_z = original_meta.id_to_z_index(voxel.id());  
+            int old_i_z = original_meta.id_to_z_index(voxel.id());
 
             // Find the new values:
             int new_i_x = old_i_x - min_x_ind;
             int new_i_y = old_i_y - min_y_ind;
-            int new_i_z = old_i_z - min_z_ind;  
+            int new_i_z = old_i_z - min_z_ind;
 
             // Skip invalid voxels:
             if (new_i_x < 0 || new_i_x >= _output_n_x) continue;
             if (new_i_y < 0 || new_i_y >= _output_n_y) continue;
-            if (new_i_z < 0 || new_i_z >= _output_n_z) continue;  
+            if (new_i_z < 0 || new_i_z >= _output_n_z) continue;
 
             // Ok, find the new ID:
-            VoxelID_t index; 
-            if (is_mc) 
+            VoxelID_t index;
+            if (is_mc)
               index = new_meta_mc.index(new_i_x, new_i_y, new_i_z);
-            else 
+            else
               index = new_meta_pmaps.index(new_i_x, new_i_y, new_i_z);
 
             _output_voxel_set.insert(larcv::Voxel(index, voxel.value()));
-          }  
+          }
 
-          _output_cluster_set.insert(_output_voxel_set);  
+          _output_cluster_set.insert(_output_voxel_set);
 
-        }  
-  
+        }
+
         // Make an output sparse3d producer
         auto & ev_cluster3d_out = mgr.get_data<larcv::EventClusterVoxel3D>(_output_producers_v.at(i));
 
         if (is_mc)
           ev_cluster3d_out.emplace(std::move(_output_cluster_set), new_meta_mc);
-        else 
+        else
           ev_cluster3d_out.emplace(std::move(_output_cluster_set), new_meta_pmaps);
 
         LARCV_DEBUG() << "Finished a cluster3d crop with output label " << _output_producers_v.at(i)
-                      << ". Treated as " << (is_mc ? "MC." : "PMAPS.") << std::endl;   
+                      << ". Treated as " << (is_mc ? "MC." : "PMAPS.") << std::endl;
 
-      }  
+      }
 
     }
 
