@@ -1,0 +1,50 @@
+
+
+
+ProcessDriver: {
+  Verbosity:       0
+  EnableFilter:    true
+  RandomAccess:    false
+  RandomSeed:      0
+  ProcessType:     ["Labeler","Cropper"]
+  ProcessName:     ["Labeler","Cropper"]
+  # StartEntry: 0
+  # NumEntries: 50
+
+
+
+  IOManager: {
+    Verbosity:   2
+    Name:        "IOManager"
+    IOMode:      2
+    OutFileName: "out.root"
+    InputFiles:  []
+    InputDirs:   []
+
+    StoreOnlyType: ["particle","sparse3d","sparse3d","cluster3d"]
+    StoreOnlyName: ["mcpartcropped","mctruthcropped","pmapscropped","mcpartcropped"]
+  }
+
+  ProcessList: {
+    Labeler: {
+      Verbosity: 2
+      ParticleProducer:   "mcpart"
+      Voxel3DProducer:    "mcpart"
+      OutputProducer:     "mctruth"
+    }
+
+    Cropper: {
+      Verbosity: 0
+      PMAPSProducer:      "pmaps"
+      Producers:          ["mcpart","mctruth","mcpart","pmaps"]
+      ProductTypes:       ["sparse3d","sparse3d","cluster3d","sparse3d"]
+      OutputProducers:    ["mcpartcropped","mctruthcropped","mcpartcropped","pmapscropped"]
+      OutputNX:           60
+      OutputNY:           60
+      OutputNZ:           512
+      ScaleMCX:           10
+      ScaleMCY:           10
+      ScaleMCZ:           1
+    }
+  }
+}

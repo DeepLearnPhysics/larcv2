@@ -269,6 +269,7 @@ bool CropNeutrino2D::process(IOManager& mgr) {
         for (size_t cluster_index = 0; cluster_index < old_clusters.as_vector().size(); cluster_index ++){
           larcv::VoxelSet new_vs;
           auto const& cluster = old_clusters.as_vector().at(cluster_index);
+
           new_vs.id(cluster.id());
           // std::cout << " -- Number of voxels for cluster " << cluster_index << ": " << cluster.as_vector().size() << std::endl;
           for (auto const& voxel : cluster.as_vector()){

@@ -51,11 +51,15 @@ void copy_array(PyObject *arrayin, const std::vector< double         > &cvec);
 
 /// Algorithm to extract three 1D arrays (x y and value) from 2D VoxelSet
 void as_flat_arrays(const VoxelSet& tensor, const ImageMeta& meta,
-					PyObject* x, PyObject* y, PyObject* value);
+		    PyObject* x, PyObject* y, PyObject* value);
 
 /// Algorithm to extract four 1D arrays (x y z and value) from 3D VoxelSet
 void as_flat_arrays(const VoxelSet& tensor, const Voxel3DMeta& meta,
-					PyObject* x, PyObject* y, PyObject* z, PyObject* value);
+		    PyObject* x, PyObject* y, PyObject* z, PyObject* value);
+
+/// Algorithm to extract four 1D arrays (index and value) from 3D VoxelSet
+void as_flat_arrays(const VoxelSet& tensor, const Voxel3DMeta& meta,
+		    PyObject* index, PyObject* value);
 
 //void copy_array(PyObject *arrayin, const std::vector<float> &cvec);
 // void copy_array(PyObject *arrayin);//, const std::vector<float>& vec);
