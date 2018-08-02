@@ -97,11 +97,12 @@ namespace larcv {
 
     // Find x index that corresponds to a specified index
     size_t id_to_x_index(VoxelID_t id) const;
-    // Find col that corresponds to a specified index
+    // Find y index that corresponds to a specified index
     size_t id_to_y_index(VoxelID_t id) const;
-    // Find col that corresponds to a specified index
+    // Find z index that corresponds to a specified index
     size_t id_to_z_index(VoxelID_t id) const;
-
+    // Find xyz index that corresponds to a specified index
+    void id_to_xyz_index(VoxelID_t id, size_t& x, size_t& y, size_t& z) const;
 
   private:
 
@@ -122,4 +123,3 @@ namespace larcv {
 
 #endif
 /** @} */ // end of doxygen group
-

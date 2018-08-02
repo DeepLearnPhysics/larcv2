@@ -67,6 +67,8 @@ void Cluster2DThreshold::configure(const PSet& cfg) {
 void Cluster2DThreshold::initialize() {}
 
 bool Cluster2DThreshold::process(IOManager& mgr) {
+
+  // std::cout << "Enter Cluster2DThreshold::process " << std::endl;
   for (size_t producer_index = 0; producer_index < _cluster2d_producer_v.size();
        ++producer_index) {
     auto const& cluster2d_producer = _cluster2d_producer_v[producer_index];
@@ -131,6 +133,8 @@ bool Cluster2DThreshold::process(IOManager& mgr) {
     }
 
   }
+  // std::cout << "Exit Cluster2DThreshold::process " << std::endl;
+
   return true;
 }
 

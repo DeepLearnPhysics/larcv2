@@ -48,6 +48,47 @@ namespace larcv {
     return SparseTensor3D(std::move(vs),std::move(Voxel3DMeta(clusters.meta())));
   }
 
+  FlatTensorContents as_flat_arrays(const VoxelSet& tensor, const ImageMeta& meta)
+  {
+    FlatTensorContents res;
+    res.x.resize(tensor.size());
+    res.y.resize(tensor.size());
+    res.z.resize(0);
+    res.value.resize(tensor.size());
+
+    size_t x,y;
+    auto const& vox_array = tensor.as_vector();
+    for(size_t i=0; i<tensor.as_vector().size(); ++i) {
+      auto const& vox = vox_array[i];
+      meta.index_to_rowcol(vox.id(),y,x);
+      res.x[i] = x;
+      res.y[i] = y;
+      res.value[i] = vox.value();
+    }
+    return res;
+  }
+
+  FlatTensorContents as_flat_arrays(const VoxelSet& tensor, const Voxel3DMeta& meta)
+  {
+    FlatTensorContents res;
+    res.x.resize(tensor.size());
+    res.y.resize(tensor.size());
+    res.z.resize(tensor.size());
+    res.value.resize(tensor.size());
+
+    size_t x,y,z;
+    auto const& vox_array = tensor.as_vector();
+    for(size_t i=0; i<tensor.as_vector().size(); ++i) {
+      auto const& vox = vox_array[i];
+      meta.id_to_xyz_index(vox.id(),x,y,z);
+      res.x[i] = x;
+      res.y[i] = y;
+      res.z[i] = z;
+      res.value[i] = vox.value();
+    }
+    return res;
+  }
+
   
 }
 #endif

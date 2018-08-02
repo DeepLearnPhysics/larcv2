@@ -63,6 +63,12 @@ namespace larcv {
     void set_id(const size_t run, const size_t subrun, const size_t event);
     size_t current_entry() const { return _in_tree_index; }
 
+    size_t get_n_entries_out() const
+    { return _out_tree_entries;}
+
+    std::string get_file_out_name() const
+    { return _out_file_name;}
+
     size_t get_n_entries() const
     { return (_in_tree_entries ? _in_tree_entries : _out_tree_entries); }
 

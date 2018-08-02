@@ -44,6 +44,7 @@ bool CropNeutrino2D::process(IOManager& mgr) {
   // For this algorithm to succeed, all of the products to be cropped need to
   // have the same original
   // meta sizes and such.
+  // std::cout << "Enter CropNeutrino2D::process " << std::endl;
 
   auto ev_reference_cluster =
       mgr.get_data<larcv::EventClusterPixel2D>(_vertex_cluster2d_producer);
@@ -152,6 +153,8 @@ bool CropNeutrino2D::process(IOManager& mgr) {
     float mean_x(0.0), mean_y(0.0);
     float weight = 0;
     for (auto & voxel : clust.as_vector()) {
+      if (voxel.id() > original_meta.size())
+        continue;
       mean_x += voxel.value() *
                 original_meta.pos_x(original_meta.index_to_col(voxel.id()));
       mean_y += voxel.value() *
@@ -269,7 +272,8 @@ bool CropNeutrino2D::process(IOManager& mgr) {
           new_vs.id(cluster.id());
           // std::cout << " -- Number of voxels for cluster " << cluster_index << ": " << cluster.as_vector().size() << std::endl;
           for (auto const& voxel : cluster.as_vector()){
-
+            if (voxel.id() > old_clusters.meta().size())
+              continue;
             // The id of this voxel is in the old meta.
             // We get the row and column in the old meta coordinates,
             // then subtract off the min vals that made it into the new meta
@@ -314,6 +318,7 @@ bool CropNeutrino2D::process(IOManager& mgr) {
       //
   }
 
+  // std::cout << "Exit CropNeutrino2D::process " << std::endl;
 
   return true;
 }

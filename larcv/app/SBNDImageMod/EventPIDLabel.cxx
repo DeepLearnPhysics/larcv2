@@ -32,6 +32,7 @@ void EventPIDLabel::configure(const PSet& cfg) {
 void EventPIDLabel::initialize() {}
 
 bool EventPIDLabel::process(IOManager& mgr) {
+  // std::cout << "Enter EventPIDLabel::process " << std::endl;
 
   // // Read in the particles that define the pdg types:
   // auto const& ev_particle =
@@ -203,6 +204,7 @@ bool EventPIDLabel::process(IOManager& mgr) {
 
 
 
+  // std::cout << "Exit EventPIDLabel::process " << std::endl;
 
   return true;
 }

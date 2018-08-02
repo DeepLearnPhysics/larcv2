@@ -18,13 +18,15 @@ namespace larcv {
   void BatchFillerPPN::configure(const PSet& cfg)
   {
     bool error = false;
+    _min_voxel_count = cfg.get<int>("MinVoxelCount", 5);
+		_min_energy_deposit = cfg.get<double>("MinEnergyDeposit", 0.05);
     _part_producer   = cfg.get<std::string>("ParticleProducer");
     _buffer_size     = cfg.get<size_t>("BufferSize",100);
     auto const shape_type = cfg.get<std::string>("ShapeType");
     if      (shape_type == "shower") _shape_type = kShower;
     else if (shape_type == "track" ) _shape_type = kTrack;
-    else { 
-      LARCV_CRITICAL() << "Invalid ShapeType (" << shape_type << ") ... [shower,track]" << std::endl; 
+    else {
+      LARCV_CRITICAL() << "Invalid ShapeType (" << shape_type << ") ... [shower,track]" << std::endl;
       error = true;
     }
     auto const point_type = cfg.get<std::string>("PointType");
@@ -33,8 +35,8 @@ namespace larcv {
     else if (point_type == "yz") _point_type = kPointYZ;
     else if (point_type == "zx") _point_type = kPointZX;
     else if (point_type == "3d") _point_type = kPoint3D;
-    else { 
-      LARCV_CRITICAL() << "Invalid PointType (" << point_type << ") ... [xy,yz,zx,3d]" << std::endl; 
+    else {
+      LARCV_CRITICAL() << "Invalid PointType (" << point_type << ") ... [xy,yz,zx,3d]" << std::endl;
       error = true;
     }
 
@@ -69,33 +71,33 @@ namespace larcv {
   void BatchFillerPPN::_batch_end_()
   {
     if (logger().level() <= msg::kINFO) {
-      
+
       int data_ctr = 0;
       for(auto const& v : batch_data().data()) {
-	if(v<0) break;
-	++data_ctr;
+      	if(v<0) break;
+      	++data_ctr;
       }
 
       size_t pt_ctr = 0;
       if(_point_type == kPoint3D) pt_ctr = data_ctr / 3;
       else pt_ctr = data_ctr / 2;
 
-      LARCV_INFO() << "Data length: " << data_ctr 
+      LARCV_INFO() << "Data length: " << data_ctr
 		   << " ... " << pt_ctr << (_point_type == kPoint3D ? " 3D points" : " 2D points") << std::endl;
 
       if(logger().level() <= msg::kDEBUG) {
-	std::stringstream ss;
-	size_t dim = (_point_type == kPoint3D ? 3 : 2);
-	ss << "Dumpint coordinates..." << std::endl << "    Buffer 0 ";
-	for(size_t i=0; i<batch_data().data().size(); ++i) {
-	  ss << batch_data().data()[i] << "    ";
-	  if((i+1) % dim == 0) {
-	    ss << std::endl;
-	    if((i+1) < batch_data().data().size())
-	      ss << "    Buffer " << (i+1) / dim << " ";
-	  }
-	}
-	LARCV_DEBUG() << ss.str() << std::endl;
+      	std::stringstream ss;
+      	size_t dim = (_point_type == kPoint3D ? 3 : 2);
+      	ss << "Dumpint coordinates..." << std::endl << "    Buffer 0 ";
+      	for(size_t i=0; i<batch_data().data().size(); ++i) {
+      	  ss << batch_data().data()[i] << "    ";
+      	  if((i+1) % dim == 0) {
+      	    ss << std::endl;
+      	    if((i+1) < batch_data().data().size())
+      	      ss << "    Buffer " << (i+1) / dim << " ";
+      	  }
+      	}
+      	LARCV_DEBUG() << ss.str() << std::endl;
       }
 
     }
@@ -120,7 +122,7 @@ namespace larcv {
     // fill
     larcv::ImageMeta meta;
     larcv::Voxel3DMeta meta3d;
-    
+
     if(_point_type == kPoint3D){
       LARCV_INFO() << "Retrieving SparseTensor3D " << _tensor_producer << std::endl;
       meta3d = mgr.get_data<larcv::EventSparseTensor3D>(_tensor_producer).meta();
@@ -142,95 +144,77 @@ namespace larcv {
       auto track_id = part.track_id();
       auto energy   = part.energy_deposit();
 
-      if(part.energy_deposit()<1) continue;
+      if(part.energy_deposit()<_min_energy_deposit || part.num_voxels() < _min_voxel_count) continue;
 
-      if(_shape_type == kTrack  && (pdg_code == 11 || pdg_code == 22 || pdg_code == -11) )
-	continue;
+      if(_shape_type == kTrack  && (pdg_code == 11 || pdg_code == 22 || pdg_code == -11) ) continue;
 
-      if(_shape_type == kShower && (pdg_code != 11 && pdg_code != 22 && pdg_code != -11) )
-	continue;
+      if(_shape_type == kShower && (pdg_code != 11 && pdg_code != 22 && pdg_code != -11) ) continue;
+
+      if(_shape_type == kShower && ((_point_type == kPoint3D && !meta3d.contains(part.first_step().as_point3d())) || !meta.contains(part.first_step().as_point2d(_point_type)))) continue;
 
       if(pdg_code > 1000000000) {
-	LARCV_INFO() << "Skipping nucleus TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << std::endl;
-	continue;
+      	LARCV_INFO() << "Skipping nucleus TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << std::endl;
+      	continue;
       }
 
       if(_shape_type == kShower && part.parent_pdg_code() == 13 && part.creation_process() == "muIoni") {
-	LARCV_INFO() << "Skipping delta ray TrackID " << track_id << " Energy " << energy << std::endl;
-	continue;
+      	LARCV_INFO() << "Skipping delta ray TrackID " << track_id << " Energy " << energy << std::endl;
+      	continue;
       }
 
       // Register start point
       double x, y, z;
-      switch(_point_type) {
-      case kPointXY:
-	x = (part.first_step().x() - meta.min_x()) / meta.pixel_width();
-	y = (part.first_step().y() - meta.min_y()) / meta.pixel_height();
-	_entry_data.at(data_index) = x; ++data_index;
-	_entry_data.at(data_index) = y; ++data_index;
-	break;
-      case kPointYZ:
-	x = (part.first_step().y() - meta.min_x()) / meta.pixel_width();
-	y = (part.first_step().z() - meta.min_y()) / meta.pixel_height();
-	_entry_data.at(data_index) = x; ++data_index;
-	_entry_data.at(data_index) = y; ++data_index;
-	break;
-      case kPointZX:
-	x = (part.first_step().z() - meta.min_x()) / meta.pixel_width();
-	y = (part.first_step().x() - meta.min_y()) / meta.pixel_height();
-	_entry_data.at(data_index) = x; ++data_index;
-	_entry_data.at(data_index) = y; ++data_index;
-	break;
-      case kPoint3D:
-	x = (part.first_step().x() - meta3d.min_x()) / meta3d.size_voxel_x();
-	y = (part.first_step().y() - meta3d.min_y()) / meta3d.size_voxel_y();
-	z = (part.first_step().z() - meta3d.min_z()) / meta3d.size_voxel_z();
-	_entry_data.at(data_index) = x; ++data_index;
-	_entry_data.at(data_index) = y; ++data_index;
-	_entry_data.at(data_index) = z; ++data_index;
-	break;
+      larcv::Vertex start_point;
+      start_point = part.first_step();
+      start_point.as_point(_point_type, &x, &y, &z);
+
+      if (_point_type == kPoint3D) {
+        x = (x - meta3d.min_x()) / meta3d.size_voxel_x();
+        y = (y - meta3d.min_y()) / meta3d.size_voxel_y();
+        z = (z - meta3d.min_z()) / meta3d.size_voxel_z();
+        _entry_data.at(data_index) = x; ++data_index;
+        _entry_data.at(data_index) = y; ++data_index;
+        _entry_data.at(data_index) = z; ++data_index;
       }
+      else {
+        x = (x - meta.min_x()) / meta.pixel_width();
+        y = (y - meta.min_y()) / meta.pixel_height();
+        _entry_data.at(data_index) = x; ++data_index;
+        _entry_data.at(data_index) = y; ++data_index;
+      }
+
       if(_point_type == kPoint3D) {
-	LARCV_INFO() << "TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << " start (" << x << "," << y << "," << z << ")" << std::endl;
+	       LARCV_INFO() << "TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << " start (" << x << "," << y << "," << z << ")" << std::endl;
       }else{
-	LARCV_INFO() << "TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << " start (" << x << "," << y << ")" << std::endl;
+	       LARCV_INFO() << "TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << " start (" << x << "," << y << ")" << std::endl;
       }
 
       if(_shape_type==kShower) continue;
 
       // for track, add end point
-      switch(_point_type) {
-      case kPointXY:
-	x = (part.last_step().x() - meta.min_x()) / meta.pixel_width();
-	y = (part.last_step().y() - meta.min_y()) / meta.pixel_height();
-	_entry_data.at(data_index) = x; ++data_index;
-	_entry_data.at(data_index) = y; ++data_index;
-	break;
-      case kPointYZ:
-	x = (part.last_step().y() - meta.min_x()) / meta.pixel_width();
-	y = (part.last_step().z() - meta.min_y()) / meta.pixel_height();
-	_entry_data.at(data_index) = x; ++data_index;
-	_entry_data.at(data_index) = y; ++data_index;
-	break;
-      case kPointZX:
-	x = (part.last_step().z() - meta.min_x()) / meta.pixel_width();
-	y = (part.last_step().x() - meta.min_y()) / meta.pixel_height();
-	_entry_data.at(data_index) = x; ++data_index;
-	_entry_data.at(data_index) = y; ++data_index;
-	break;
-      case kPoint3D:
-	x = (part.last_step().x() - meta3d.min_x()) / meta3d.size_voxel_x();
-	y = (part.last_step().y() - meta3d.min_y()) / meta3d.size_voxel_y();
-	z = (part.last_step().z() - meta3d.min_z()) / meta3d.size_voxel_z();
-	_entry_data.at(data_index) = x; ++data_index;
-	_entry_data.at(data_index) = y; ++data_index;
-	_entry_data.at(data_index) = z; ++data_index;
-	break;
+      larcv::Vertex end_point;
+      end_point = part.last_step();
+      end_point.as_point(_point_type, &x, &y, &z);
+
+      if (_point_type == kPoint3D) {
+        x = (x - meta3d.min_x()) / meta3d.size_voxel_x();
+      	y = (y - meta3d.min_y()) / meta3d.size_voxel_y();
+      	z = (z - meta3d.min_z()) / meta3d.size_voxel_z();
+      	_entry_data.at(data_index) = x; ++data_index;
+      	_entry_data.at(data_index) = y; ++data_index;
+      	_entry_data.at(data_index) = z; ++data_index;
       }
+      else {
+        x = (x - meta.min_x()) / meta.pixel_width();
+      	y = (y - meta.min_y()) / meta.pixel_height();
+      	_entry_data.at(data_index) = x; ++data_index;
+      	_entry_data.at(data_index) = y; ++data_index;
+      }
+
       if(_point_type == kPoint3D) {
-	LARCV_INFO() << "TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << " end (" << x << "," << y << "," << z << ")" << std::endl;
+	       LARCV_INFO() << "TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << " end (" << x << "," << y << "," << z << ")" << std::endl;
       }else{
-	LARCV_INFO() << "TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << " end (" << x << "," << y << ")" << std::endl;
+	       LARCV_INFO() << "TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << " end (" << x << "," << y << ")" << std::endl;
       }
     }
 

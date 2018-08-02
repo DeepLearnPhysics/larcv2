@@ -81,5 +81,12 @@ namespace larcv {
   template <class T>
   std::string product_unique_name();
 
+  /// Type of geometrical point from projections
+  enum PointType_t {
+    kPoint3D,   ///< 3D
+    kPointXY,   ///< XY projection (0)
+    kPointYZ,   ///< YZ projection (1)
+    kPointZX    ///< ZX projection (2)
+  };
 }
 #endif
