@@ -150,7 +150,7 @@ namespace larcv {
 
       if(_shape_type == kShower && (pdg_code != 11 && pdg_code != 22 && pdg_code != -11) ) continue;
 
-      if(_shape_type == kShower && ((_point_type == kPoint3D && !meta3d.contains(part.first_step().as_point3d())) || !meta.contains(part.first_step().as_point2d(_point_type)))) continue;
+      if(_shape_type == kShower && ((_point_type == kPoint3D && !meta3d.contains(part.first_step().as_point3d())) || (_point_type != kPoint3D && !meta.contains(part.first_step().as_point2d(_point_type))))) continue;
 
       if(pdg_code > 1000000000) {
       	LARCV_INFO() << "Skipping nucleus TrackID " << track_id << " PDG " << pdg_code << " Energy " << energy << std::endl;
