@@ -28,6 +28,27 @@ PyObject *as_ndarray(const Image2D &img) {
   //return PyArray_FromDimsAndData(2, dim_data, NPY_FLOAT, (char *)&(vec[0]));
 }
 
+PyObject *as_ndarray(const SparseTensor3D& data, bool clear_mem) {
+  SetPyUtil();
+  npy_intp dim_data[3];
+  dim_data[0] = data.meta().num_voxel_x();
+  dim_data[1] = data.meta().num_voxel_y();
+  dim_data[2] = data.meta().num_voxel_z();
+
+  static std::vector<float> local_data;
+  local_data.resize(data.meta().size());
+  for(auto &v : local_data) v = 0.;
+
+  for(auto const& vox : data.as_vector())
+    local_data[vox.id()] = vox.value();
+
+  auto res = PyArray_Transpose(((PyArrayObject*)(PyArray_SimpleNewFromData(3, dim_data, NPY_FLOAT, (char *)&(local_data[0])))),NULL);
+  //return PyArray_FromDimsAndData(2, dim_data, NPY_FLOAT, (char *)&(vec[0]));
+
+  if(clear_mem) local_data.clear();
+  return res;
+}
+
 /*
 void copy_array(PyObject *arrayin, const std::vector<float> &cvec) {
   SetPyUtil();
