@@ -31,9 +31,21 @@ namespace larcv {
     auto const& ev_particle = mgr.get_data<larcv::EventParticle>(_particle_producer);
     auto const& particle_v  = ev_particle.as_vector  ();
 
+    if (particle_v.size() == 0) {
+      LARCV_CRITICAL() << "Input EventParticle not found by producer name "
+                       << _particle_producer << std::endl;
+       throw larbys();
+    }
+
     // Read in Voxel3Ds
     auto const& ev_voxel3d = mgr.get_data<larcv::EventSparseTensor3D>(_voxel3d_producer);
     auto const& voxel3d_v  = ev_voxel3d.as_vector  ();
+
+    if (voxel3d_v.size() == 0) {
+      LARCV_CRITICAL() << "Input EventSparseTensor3D not found by producer name "
+                       << _voxel3d_producer << std::endl;
+       throw larbys();
+    }
 
     // Create output Voxels lables
     auto& ev_voxel3d_output = mgr.get_data<larcv::EventSparseTensor3D>(_output_producer);

@@ -6,8 +6,8 @@ ProcessDriver: {
   EnableFilter:    true
   RandomAccess:    false
   RandomSeed:      0
-  ProcessType:     ["Labeler","Cropper"]
-  ProcessName:     ["Labeler","Cropper"]
+  ProcessType:     ["Cropper","ReSample","Labeler"]
+  ProcessName:     ["Cropper","ReSample","Labeler"]
   # StartEntry: 0
   # NumEntries: 50
 
@@ -21,24 +21,18 @@ ProcessDriver: {
     InputFiles:  []
     InputDirs:   []
 
-    StoreOnlyType: ["particle","sparse3d","sparse3d","cluster3d"]
-    StoreOnlyName: ["mcpartcropped","pmapstruthcropped","pmapscropped","mcpartcropped"]
+    StoreOnlyType: ["particle","sparse3d","cluster3d","sparse3d","sparse3d"]
+    StoreOnlyName: ["mcpartcropped","pmapscropped","mcpartcropped","pmapscroppedresampled","pmapstruth"]
   }
 
   ProcessList: {
-    Labeler: {
-      Verbosity: 2
-      ParticleProducer:   "mcpart"
-      Voxel3DProducer:    "mcpart"
-      OutputProducer:     "pmapstruth"
-    }
 
     Cropper: {
       Verbosity: 0
       PMAPSProducer:      "pmaps"
-      Producers:          ["mcpart","pmapstruth","mcpart","pmaps"]
-      ProductTypes:       ["sparse3d","sparse3d","cluster3d","sparse3d"]
-      OutputProducers:    ["mcpartcropped","pmapstruthcropped","mcpartcropped","pmapscropped"]
+      Producers:          ["mcpart","mcpart","pmaps"]
+      ProductTypes:       ["sparse3d","cluster3d","sparse3d"]
+      OutputProducers:    ["mcpartcropped","mcpartcropped","pmapscropped"]
       OutputNX:           64
       OutputNY:           64
       OutputNZ:           64
@@ -46,5 +40,22 @@ ProcessDriver: {
       ScaleMCY:           10
       ScaleMCZ:           1
     }
+
+    ReSample: {
+      Verbosity: 1
+      PMAPSProducers: ["pmapscropped"]
+      OutputLables:   ["pmapscroppedresampled"]
+      ScaleX:         5    # Downsample by a factor of 5, to get 2x2x2 cm voxels
+      ScaleY:         5    # Downsample by a factor of 5, to get 2x2x2 cm voxels
+      ScaleZ:         0.5  # Upsample by a factor of 2, to get 2x2x2 cm voxels
+    }
+
+    Labeler: {
+      Verbosity: 2
+      ParticleProducer:   "mcpart"
+      Voxel3DProducer:    "pmapscroppedresampled"
+      OutputProducer:     "pmapstruth"
+    }
+
   }
 }

@@ -22,9 +22,9 @@ namespace larcv {
     _output_n_x                 = cfg.get<int>("OutputNX");
     _output_n_y                 = cfg.get<int>("OutputNY");
     _output_n_z                 = cfg.get<int>("OutputNZ");
-    _scale_mc_x                   = cfg.get<int>("ScaleMCX");
-    _scale_mc_y                   = cfg.get<int>("ScaleMCY");
-    _scale_mc_z                   = cfg.get<int>("ScaleMCZ");
+    _scale_mc_x                 = cfg.get<int>("ScaleMCX");
+    _scale_mc_y                 = cfg.get<int>("ScaleMCY");
+    _scale_mc_z                 = cfg.get<int>("ScaleMCZ");
 
 
     if (_producer_names_v.size() != _product_types_v.size() ||
