@@ -36,8 +36,10 @@ PyObject* as_ndarray(const std::vector< double             > &data);
 PyObject* as_ndarray(const Image2D &img);
 /// larcv::Image2D to numpy array converter
 PyObject* as_caffe_ndarray(const Image2D &img);
-/// larcv::VoxelSet to numpy array converter
+/// larcv::VoxelSet to numpy (dense array) array converter
 PyObject* as_ndarray(const SparseTensor3D &data, bool clear_mem=false);
+/// larcv::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/3/4) converter
+void fill_3d_pcloud(const SparseTensor3D &data, PyObject* pyarray, PyObject* select=nullptr);
 /// copy array
 template <class T>
 void _copy_array(PyObject *arrayin, const std::vector<T> &cvec);
