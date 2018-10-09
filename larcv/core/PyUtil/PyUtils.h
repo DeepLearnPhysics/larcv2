@@ -73,7 +73,8 @@ Image2D as_image2d(PyObject *);
 VoxelSet as_tensor2d(PyObject * values, PyObject * indexes);
 
 VoxelSet as_tensor3d(PyObject *, float min_threshold=0);
-
+ 
+VoxelSet as_tensor3d(PyObject* pyarray, const Voxel3DMeta& meta, float min_threshold=0);
 // allows one to avoid some loops in python
 void fill_img_col(Image2D &img, std::vector<short> &adcs, const int col,const float pedestal = 0.0);
                   //const int timedownsampling, const float pedestal = 0.0);

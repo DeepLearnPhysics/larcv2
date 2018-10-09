@@ -248,7 +248,7 @@ void as_flat_arrays(const VoxelSet& tensor, const Voxel3DMeta& meta,
   auto iptr =   (int*)(PyArray_GetPtr(iarr, loc));
   auto vptr = (float*)(PyArray_GetPtr(varr, loc));
 
-  size_t xpos, ypos, zpos;
+  //size_t xpos, ypos, zpos;
 
   for (size_t i = 0; i < voxel_v.size(); ++i) {
     // std::cout << fptr[i] << std::endl;
@@ -459,6 +459,40 @@ VoxelSet as_tensor3d(PyObject* pyarray, float min_threshold) {
       }
     }
   }
+  PyArray_Free(pyarray, (void *)carray);
+
+  return res;
+}
+
+VoxelSet as_tensor3d(PyObject* pyarray, const Voxel3DMeta& meta, float min_threshold) {
+  SetPyUtil();
+  float **carray;
+  // Create C arrays from numpy objects:
+  const int dtype = NPY_FLOAT;
+  PyArray_Descr *descr = PyArray_DescrFromType(dtype);
+  npy_intp dims[2];
+  int ret = PyArray_AsCArray(&pyarray, (void**)&carray, dims, 2, descr);
+  if ( ret < 0) {
+    LARCV_CRITICAL() << "Cannot convert to 2D C-array (return code " << ret << ")" << std::endl;
+    throw larbys();
+  }
+  if (dims[1] != 4) {
+    LARCV_CRITICAL() << "The 2nd dimenstion must be length 4! (length " << dims[1] << ")" << std::endl;
+    throw larbys();
+  }
+  VoxelSet res;
+  double x,y,z;
+  float v;
+  //size_t id = 0;
+  for (int i = 0; i < dims[0]; ++i) {
+    x = (double)(carray[i][0]);
+    y = (double)(carray[i][1]);
+    z = (double)(carray[i][2]);
+    v = (float )(carray[i][3]);
+    if(v <= min_threshold) continue;
+    res.emplace(meta.id(x,y,z),v,true);
+  }
+
   PyArray_Free(pyarray, (void *)carray);
 
   return res;
