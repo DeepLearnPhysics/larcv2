@@ -116,6 +116,64 @@ void fill_3d_pcloud(const SparseTensor3D& data, PyObject* pyarray, PyObject* sel
   return;
 }
 
+void fill_3d_voxels(const SparseTensor3D& data, PyObject* pyarray, PyObject* select) {
+  SetPyUtil();
+
+  int **carray;
+  const int dtype = NPY_INT;
+  PyArray_Descr *descr = PyArray_DescrFromType(dtype);
+  npy_intp dims[2];
+  if (PyArray_AsCArray(&pyarray, (void **)&carray, dims, 2, descr) < 0) {
+    logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+			       "ERROR: cannot convert pyarray to 2D C-array");
+    throw larbys();
+  }
+
+  size_t npts = data.size();
+  int* select_ptr = nullptr;
+  if(select) {
+    auto select_pyptr = (PyArrayObject *)(select);
+    // Check dimension size is 1:
+    if (PyArray_NDIM(select_pyptr) != 1){
+      logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+				 "ERROR: select array must be 1D!");
+      throw larbys();
+    }
+    if(npts < PyArray_SIZE(select_pyptr)) {
+      logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+				 "ERROR: select array size exceeds max data length!");
+      throw larbys();
+    }
+    npts = PyArray_SIZE(select_pyptr);
+    npy_intp loc[1];
+    loc[0] = 0;
+    select_ptr = (int*)(PyArray_GetPtr(select_pyptr,loc));
+  }
+
+  if(npts > data.size() || dims[1] != 3 ) {
+    logger::get("PyUtil").send(larcv::msg::kCRITICAL,__FUNCTION__,__LINE__,
+			       "ERROR: dimension mismatch");
+    throw larbys();
+  }
+
+  auto const& vs = data.as_vector();
+  size_t ix,iy,iz;
+
+  for(size_t i=0; i<npts; ++i) {
+    size_t index = i;
+    if(select_ptr)
+      index = select_ptr[i];
+    
+    auto const& vox = vs.at(index);
+    data.meta().id_to_xyz_index(vox.id(),ix,iy,iz);
+    carray[i][0] = ix;
+    carray[i][1] = iy;
+    carray[i][2] = iz;
+  }
+
+  return;
+}
+
 /*
 void copy_array(PyObject *arrayin, const std::vector<float> &cvec) {
   SetPyUtil();
@@ -494,6 +552,56 @@ VoxelSet as_tensor3d(PyObject* pyarray, const Voxel3DMeta& meta, float min_thres
   }
 
   PyArray_Free(pyarray, (void *)carray);
+
+  return res;
+}
+
+VoxelSet as_tensor3d(PyObject* pos_array, PyObject* val_array, const Voxel3DMeta& meta, float min_threshold) {
+  SetPyUtil();
+  int **iarray;
+  // Create C arrays from numpy objects:
+  const int pos_dtype = NPY_INT;
+  PyArray_Descr *pos_descr = PyArray_DescrFromType(pos_dtype);
+  npy_intp pos_dims[2];
+  int pos_ret = PyArray_AsCArray(&pos_array, (void**)&iarray, pos_dims, 2, pos_descr);
+  if ( pos_ret < 0) {
+    LARCV_CRITICAL() << "Cannot convert to 2D C-array (return code " << pos_ret << ")" << std::endl;
+    throw larbys();
+  }
+  if (pos_dims[1] != 3) {
+    LARCV_CRITICAL() << "The 2nd dimenstion must be length 3! (length " << pos_dims[1] << ")" << std::endl;
+    throw larbys();
+  }
+
+  float *farray;
+  const int val_dtype = NPY_FLOAT;
+  PyArray_Descr *val_descr = PyArray_DescrFromType(val_dtype);
+  npy_intp val_dims[1];
+  int val_ret = PyArray_AsCArray(&val_array, (void*)&farray, val_dims, 1, val_descr);
+  if ( val_ret < 0) {
+    LARCV_CRITICAL() << "Cannot convert to 2D C-array (return code " << val_ret << ")" << std::endl;
+    throw larbys();
+  }
+  if (pos_dims[0] != val_dims[0]) {
+    LARCV_CRITICAL() << "The dimenstion mismatch (" << val_dims[0] << "!=" << pos_dims[0] << ")" << std::endl;
+    throw larbys();
+  }
+
+  VoxelSet res;
+  int ix,iy,iz;
+  float v;
+  //size_t id = 0;
+  for (int i = 0; i < pos_dims[0]; ++i) {
+    ix = (int)(iarray[i][0]);
+    iy = (int)(iarray[i][1]);
+    iz = (int)(iarray[i][2]);
+    v = (float )(farray[i]);
+    if(v <= min_threshold) continue;
+    res.emplace(meta.index(ix,iy,iz),v,true);
+  }
+
+  PyArray_Free(pos_array, (void *)iarray);
+  PyArray_Free(val_array, (void *)farray);
 
   return res;
 }

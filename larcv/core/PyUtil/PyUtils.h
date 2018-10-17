@@ -40,6 +40,8 @@ PyObject* as_caffe_ndarray(const Image2D &img);
 PyObject* as_ndarray(const SparseTensor3D &data, bool clear_mem=false);
 /// larcv::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/3/4) converter
 void fill_3d_pcloud(const SparseTensor3D &data, PyObject* pyarray, PyObject* select=nullptr);
+ /// larcv::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/3/4) converter
+void fill_3d_voxels(const SparseTensor3D &data, PyObject* pyarray, PyObject* select=nullptr);
 /// copy array
 template <class T>
 void _copy_array(PyObject *arrayin, const std::vector<T> &cvec);
@@ -75,6 +77,8 @@ VoxelSet as_tensor2d(PyObject * values, PyObject * indexes);
 VoxelSet as_tensor3d(PyObject *, float min_threshold=0);
  
 VoxelSet as_tensor3d(PyObject* pyarray, const Voxel3DMeta& meta, float min_threshold=0);
+
+ VoxelSet as_tensor3d(PyObject* pos_array, PyObject* val_array, const Voxel3DMeta& meta, float min_threshold=0);
 // allows one to avoid some loops in python
 void fill_img_col(Image2D &img, std::vector<short> &adcs, const int col,const float pedestal = 0.0);
                   //const int timedownsampling, const float pedestal = 0.0);
