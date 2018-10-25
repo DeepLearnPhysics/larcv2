@@ -77,11 +77,11 @@ Image2D CosmicNeutrinoSegLabel::seg_image_creator(
     int pixel_label = 0;
     processes.insert(particle.creation_process());
     interaction_types.insert(particle.nu_interaction_type());
-    if (particle.nu_interaction_type() == _cosmic_label) {
-      pixel_label = 1;
-    }
-    else if (particle.nu_interaction_type() == _neutrino_label){
+    if (particle.nu_interaction_type() == _neutrino_label){
       pixel_label = 2;
+    }
+    else if (particle.nu_interaction_type() == _cosmic_label) {
+      pixel_label = 1;
     }
     // If the label is not zero, go ahead and set the pixels to this label
     // in the output image:
