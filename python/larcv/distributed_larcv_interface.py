@@ -248,6 +248,6 @@ class larcv_interface(object):
     def fetch_minibatch_dims(self, mode):
         # Return a dictionary object with keys 'image', 'label', and others as needed
         # self._dataloaders['train'].fetch_data(keyword_label).dim() as an example
-        return self._dims
+        return self._dims[mode]
 
 
