@@ -228,12 +228,12 @@ class larcv_interface(object):
 
         # If this is the root node, read the data from disk:
         if self._rank == self._root:
+            unscattered_data = {}
             for key in self._data_keys[mode]:
-                unscattered_data = {}
                 unscattered_data[key] = self._dataloaders[mode].fetch_data(self._data_keys[mode][key]).data()
         else:
+            unscattered_data = {}
             for key in self._data_keys[mode]:
-                unscattered_data = {}
                 unscattered_data[key]  = None
 
 
