@@ -14,12 +14,20 @@ if [[ -z $LARCV_BUILDDIR ]]; then
     export LARCV_BUILDDIR=$LARCV_BASEDIR/build
 fi
 
+# Check python version compatibility:
+export LARCV_PYTHON_CONFIG=python-config
+PYVERSION=$(python -c "import sys; print(sys.version_info.major)")
+if [ $PYVERSION -gt 2 ]; then
+    minor=$(python -c "import sys; print(sys.version_info.minor)")
+    export LARCV_PYTHON_CONFIG=python${PYVERSION}.${minor}-config
+fi
+
 export LARCV_COREDIR=$LARCV_BASEDIR/larcv/core
 export LARCV_APPDIR=$LARCV_BASEDIR/larcv/app
 export LARCV_LIBDIR=$LARCV_BUILDDIR/lib
 export LARCV_INCDIR=$LARCV_BUILDDIR/include
 export LARCV_BINDIR=$LARCV_BUILDDIR/bin
-export LARCV_INCLUDES="-I${LARCV_INCDIR} `python3-config --includes` "
+export LARCV_INCLUDES="-I${LARCV_INCDIR} `${LARCV_PYTHON_CONFIG} --includes` "
 export LARCV_LIBS="-L${LARCV_LIBDIR} -llarcv "
 
 # Abort if ROOT not installed. Let's check rootcint for this.
@@ -61,7 +69,7 @@ if [ $LARCV_NUMPY -eq 0 ]; then
     missing+=" Numpy"
 else
     LARCV_INCLUDES="${LARCV_INCLUDES} -I`python -c\"import numpy; print(numpy.get_include())\"`"
-    LARCV_LIBS="-L`python3-config --prefix`/lib/ `python3-config --ldflags` ${LARCV_LIBS}"
+    LARCV_LIBS="-L`${LARCV_PYTHON_CONFIG} --prefix`/lib/ `${LARCV_PYTHON_CONFIG} --ldflags` ${LARCV_LIBS}"
 fi
 if [[ $missing ]]; then
     printf "\033[93mWarning\033[00m ... missing$missing support. Build without them.\n";
