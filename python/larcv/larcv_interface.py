@@ -25,7 +25,7 @@ class larcv_interface(object):
         
         Not much to store here, just a dict of dataloaders and the keys to access their data.
         '''
-        super().__init__()
+        object.__init__(self)
         self._dataloaders = {}
         self._data_keys   = {}
         self._dims        = {}

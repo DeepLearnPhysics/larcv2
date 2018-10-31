@@ -12,7 +12,7 @@ from larcv.dataloader2 import larcv_threadio
 class larcv_interface(object):
 
     def __init__(self, verbose=False, root=0, comm=MPI.COMM_WORLD, distribute_to_root=True):
-        super().__init__()
+        object.__init__(self)
 
         # MPI parameters:
         self._comm = comm
