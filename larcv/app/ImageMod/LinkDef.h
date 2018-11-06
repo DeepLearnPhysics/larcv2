@@ -60,8 +60,12 @@
 #pragma link C++ class larcv::OneParticleTensor+;
 #pragma link C++ class larcv::MCTrackFix+;
 #pragma link C++ class larcv::PPNParticleRemover+;
+#pragma link C++ class larcv::SimCoefficient+;
+#pragma link C++ class larcv::SparcifyImage2D+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
 
 
 

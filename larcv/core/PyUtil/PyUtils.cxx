@@ -174,6 +174,129 @@ void fill_3d_voxels(const SparseTensor3D& data, PyObject* pyarray, PyObject* sel
   return;
 }
 
+void fill_2d_pcloud(const SparseTensor2D& data, PyObject* pyarray, PyObject* select) {
+  SetPyUtil();
+
+  float **carray;
+  const int dtype = NPY_FLOAT;
+  PyArray_Descr *descr = PyArray_DescrFromType(dtype);
+  npy_intp dims[2];
+  if (PyArray_AsCArray(&pyarray, (void **)&carray, dims, 2, descr) < 0) {
+    logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+			       "ERROR: cannot convert pyarray to 2D C-array");
+    throw larbys();
+  }
+
+  size_t npts = data.size();
+  int* select_ptr = nullptr;
+  if(select) {
+    auto select_pyptr = (PyArrayObject *)(select);
+    // Check dimension size is 1:
+    if (PyArray_NDIM(select_pyptr) != 1){
+      logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+				 "ERROR: select array must be 1D!");
+      throw larbys();
+    }
+    if(npts < PyArray_SIZE(select_pyptr)) {
+      logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+				 "ERROR: select array size exceeds max data length!");
+      throw larbys();
+    }
+    npts = PyArray_SIZE(select_pyptr);
+    npy_intp loc[1];
+    loc[0] = 0;
+    select_ptr = (int*)(PyArray_GetPtr(select_pyptr,loc));
+  }
+
+  if(npts > data.size() || (dims[1] != 1 && dims[1] != 2 && dims[1] != 3)) {
+    logger::get("PyUtil").send(larcv::msg::kCRITICAL,__FUNCTION__,__LINE__,
+			       "ERROR: dimension mismatch");
+    throw larbys();
+  }
+
+  auto const& vs = data.as_vector();
+
+  for(size_t i=0; i<npts; ++i) {
+    size_t index = i;
+    if(select_ptr)
+      index = select_ptr[i];
+    
+    auto const& vox = vs.at(index);
+    auto pt = data.meta().position(vox.id());
+    if(dims[1] == 1){
+      carray[i][0] = vox.value();
+    }
+    else if(dims[1] == 2) {
+      carray[i][0] = pt.x;
+      carray[i][1] = pt.y;
+    }
+    if(dims[1] == 3) {
+      carray[i][0] = pt.x;
+      carray[i][1] = pt.y;
+      carray[i][2] = vox.value();
+    }
+  }
+
+  return;
+}
+
+void fill_2d_voxels(const SparseTensor2D& data, PyObject* pyarray, PyObject* select) {
+  SetPyUtil();
+
+  int **carray;
+  const int dtype = NPY_INT;
+  PyArray_Descr *descr = PyArray_DescrFromType(dtype);
+  npy_intp dims[2];
+  if (PyArray_AsCArray(&pyarray, (void **)&carray, dims, 2, descr) < 0) {
+    logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+			       "ERROR: cannot convert pyarray to 2D C-array");
+    throw larbys();
+  }
+
+  size_t npts = data.size();
+  int* select_ptr = nullptr;
+  if(select) {
+    auto select_pyptr = (PyArrayObject *)(select);
+    // Check dimension size is 1:
+    if (PyArray_NDIM(select_pyptr) != 1){
+      logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+				 "ERROR: select array must be 1D!");
+      throw larbys();
+    }
+    if(npts < PyArray_SIZE(select_pyptr)) {
+      logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+				 "ERROR: select array size exceeds max data length!");
+      throw larbys();
+    }
+    npts = PyArray_SIZE(select_pyptr);
+    npy_intp loc[1];
+    loc[0] = 0;
+    select_ptr = (int*)(PyArray_GetPtr(select_pyptr,loc));
+  }
+
+  if(npts > data.size() || dims[1] != 2 ) {
+    logger::get("PyUtil").send(larcv::msg::kCRITICAL,__FUNCTION__,__LINE__,
+			       "ERROR: dimension mismatch");
+    throw larbys();
+  }
+
+  auto const& vs = data.as_vector();
+  size_t row,col;
+
+  for(size_t i=0; i<npts; ++i) {
+    size_t index = i;
+    if(select_ptr)
+      index = select_ptr[i];
+    
+    auto const& vox = vs.at(index);
+    data.meta().index_to_rowcol(vox.id(),row,col);
+    carray[i][0] = row;
+    carray[i][1] = col;
+  }
+
+  return;
+}
+
 /*
 void copy_array(PyObject *arrayin, const std::vector<float> &cvec) {
   SetPyUtil();

@@ -15,6 +15,7 @@ typedef _object PyObject;
 
 #include "larcv/core/DataFormat/Image2D.h"
 #include "larcv/core/DataFormat/Voxel3D.h"
+#include "larcv/core/DataFormat/Voxel2D.h"
 #include "larcv/core/DataFormat/Voxel3DMeta.h"
 
 namespace larcv {
@@ -40,8 +41,12 @@ PyObject* as_caffe_ndarray(const Image2D &img);
 PyObject* as_ndarray(const SparseTensor3D &data, bool clear_mem=false);
 /// larcv::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/3/4) converter
 void fill_3d_pcloud(const SparseTensor3D &data, PyObject* pyarray, PyObject* select=nullptr);
- /// larcv::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/3/4) converter
+/// larcv::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/3/4) converter
 void fill_3d_voxels(const SparseTensor3D &data, PyObject* pyarray, PyObject* select=nullptr);
+ /// larcv::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/2/3) converter
+void fill_2d_pcloud(const SparseTensor2D &data, PyObject* pyarray, PyObject* select=nullptr);
+/// larcv::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/2/3) converter
+void fill_2d_voxels(const SparseTensor2D &data, PyObject* pyarray, PyObject* select=nullptr);
 /// copy array
 template <class T>
 void _copy_array(PyObject *arrayin, const std::vector<T> &cvec);
