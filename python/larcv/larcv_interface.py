@@ -87,13 +87,20 @@ class larcv_interface(object):
         return
 
 
-    def fetch_minibatch_data(self, mode):
+    def fetch_minibatch_data(self, mode, fetch_meta_data=False):
         # Return a dictionary object with keys 'image', 'label', and others as needed
         # self._dataloaders['train'].fetch_data(keyword_label).dim() as an example
+        self._dataloaders[mode].next(store_entries=fetch_meta_data,store_event_ids=fetch_meta_data)
+        
+
         this_data = {}
         for key in self._data_keys[mode]:
             this_data[key] = self._dataloaders[mode].fetch_data(self._data_keys[mode][key]).data()
             this_data[key] = numpy.reshape(this_data[key], self._dims[mode][key])
+
+        if fetch_meta_data:
+            this_data['entries'] = self._dataloaders[mode].fetch_entries()
+            this_data['event_ids'] = self._dataloaders[mode].fetch_event_ids()
 
         return this_data
 
