@@ -100,7 +100,7 @@ bool BatchFillerTensor3D::process(IOManager& mgr) {
 
   if (_num_channel == 1) {
     for (auto const& voxel : voxel_data.as_vector())
-      _entry_data[voxel.id()] += voxel.value();
+      _entry_data[voxel.id()] = voxel.value();
   } else {
     int ch = 0;
     for (auto const& voxel : voxel_data.as_vector()) {

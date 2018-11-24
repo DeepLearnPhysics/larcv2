@@ -122,6 +122,8 @@ namespace larcv {
     //    
     /// Clear everything
     inline virtual void clear_data() { _voxel_v.clear(); }
+    /// Reserve
+    inline void reserve(size_t num) { _voxel_v.reserve(num); }
     /// Thresholding voxels by an upper and lower end values
     void threshold(float min, float max);
     /// Thresholding by only lower end value

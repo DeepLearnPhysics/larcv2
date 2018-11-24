@@ -17,7 +17,7 @@ typedef _object PyObject;
 #include "larcv/core/DataFormat/Voxel3D.h"
 #include "larcv/core/DataFormat/Voxel2D.h"
 #include "larcv/core/DataFormat/Voxel3DMeta.h"
-
+#include "larcv/core/DataFormat/EventVoxel3D.h"
 namespace larcv {
 /// Utility function: call one-time-only numpy module initialization (you don't
 /// have to call)
@@ -83,7 +83,13 @@ VoxelSet as_tensor3d(PyObject *, float min_threshold=0);
  
 VoxelSet as_tensor3d(PyObject* pyarray, const Voxel3DMeta& meta, float min_threshold=0);
 
- VoxelSet as_tensor3d(PyObject* pos_array, PyObject* val_array, const Voxel3DMeta& meta, float min_threshold=0);
+VoxelSet as_tensor3d(PyObject* pos_array, PyObject* val_array, const Voxel3DMeta& meta, float min_threshold=0);
+
+VoxelSet as_tensor3d(const SparseTensor3D& vs, PyObject* val_array, float min_threshold=0);
+
+inline VoxelSet as_tensor3d(const EventSparseTensor3D& vs, PyObject* val_array, float min_threshold=0)
+{ return as_tensor3d( (const SparseTensor3D)vs, val_array, min_threshold); }
+
 // allows one to avoid some loops in python
 void fill_img_col(Image2D &img, std::vector<short> &adcs, const int col,const float pedestal = 0.0);
                   //const int timedownsampling, const float pedestal = 0.0);

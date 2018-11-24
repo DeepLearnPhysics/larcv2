@@ -72,7 +72,7 @@ void fill_3d_pcloud(const SparseTensor3D& data, PyObject* pyarray, PyObject* sel
 				 "ERROR: select array must be 1D!");
       throw larbys();
     }
-    if(npts < PyArray_SIZE(select_pyptr)) {
+    if((int)npts < PyArray_SIZE(select_pyptr)) {
       logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
 				 "ERROR: select array size exceeds max data length!");
       throw larbys();
@@ -139,7 +139,7 @@ void fill_3d_voxels(const SparseTensor3D& data, PyObject* pyarray, PyObject* sel
 				 "ERROR: select array must be 1D!");
       throw larbys();
     }
-    if(npts < PyArray_SIZE(select_pyptr)) {
+    if((int)npts < PyArray_SIZE(select_pyptr)) {
       logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
 				 "ERROR: select array size exceeds max data length!");
       throw larbys();
@@ -197,7 +197,7 @@ void fill_2d_pcloud(const SparseTensor2D& data, PyObject* pyarray, PyObject* sel
 				 "ERROR: select array must be 1D!");
       throw larbys();
     }
-    if(npts < PyArray_SIZE(select_pyptr)) {
+    if((int)npts < PyArray_SIZE(select_pyptr)) {
       logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
 				 "ERROR: select array size exceeds max data length!");
       throw larbys();
@@ -263,7 +263,7 @@ void fill_2d_voxels(const SparseTensor2D& data, PyObject* pyarray, PyObject* sel
 				 "ERROR: select array must be 1D!");
       throw larbys();
     }
-    if(npts < PyArray_SIZE(select_pyptr)) {
+    if((int)npts < PyArray_SIZE(select_pyptr)) {
       logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
 				 "ERROR: select array size exceeds max data length!");
       throw larbys();
@@ -602,9 +602,9 @@ larcv::VoxelSet as_tensor2d(PyObject * values_in, PyObject * indexes_in) {
     throw larbys();
   }
 
-
   // Loop over them simultaneously and add voxels to a voxel set
   VoxelSet res;
+  res.reserve(dims_values[0]);
   for (int i = 0; i < dims_values[0]; ++i){
     res.emplace(carray_indexes[i],carray_values[i],true);
   }
@@ -711,6 +711,7 @@ VoxelSet as_tensor3d(PyObject* pos_array, PyObject* val_array, const Voxel3DMeta
   }
 
   VoxelSet res;
+  res.reserve(pos_dims[0]);
   int ix,iy,iz;
   float v;
   //size_t id = 0;
@@ -724,6 +725,40 @@ VoxelSet as_tensor3d(PyObject* pos_array, PyObject* val_array, const Voxel3DMeta
   }
 
   PyArray_Free(pos_array, (void *)iarray);
+  PyArray_Free(val_array, (void *)farray);
+
+  return res;
+}
+
+VoxelSet as_tensor3d(const SparseTensor3D& vs, PyObject* val_array, float min_threshold) {
+  
+  SetPyUtil();
+  // Create C arrays from numpy objects:
+  float *farray;
+  const int val_dtype = NPY_FLOAT;
+  PyArray_Descr *val_descr = PyArray_DescrFromType(val_dtype);
+  npy_intp val_dims[1];
+  int val_ret = PyArray_AsCArray(&val_array, (void*)&farray, val_dims, 1, val_descr);
+  if ( val_ret < 0) {
+    LARCV_CRITICAL() << "Cannot convert to 2D C-array (return code " << val_ret << ")" << std::endl;
+    throw larbys();
+  }
+  if ((int)(vs.as_vector().size()) != val_dims[0]) {
+    LARCV_CRITICAL() << "The dimenstion mismatch (" << val_dims[0] << "!=" << vs.as_vector().size() << ")" << std::endl;
+    throw larbys();
+  }
+
+  VoxelSet res;
+  res.reserve(vs.as_vector().size());
+  float v;
+  //size_t id = 0;
+  auto const& voxel_v = vs.as_vector();
+  for (size_t i = 0; i < voxel_v.size(); ++i) {
+    v = (float )(farray[i]);
+    if(v <= min_threshold) continue;
+    res.emplace(voxel_v[i].id(),v,true);
+  }
+
   PyArray_Free(val_array, (void *)farray);
 
   return res;
