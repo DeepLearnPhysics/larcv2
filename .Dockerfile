@@ -1,4 +1,5 @@
-FROM deeplearnphysics/ubuntu16.04_deps
+#FROM deeplearnphysics/ubuntu16.04_deps
+FROM deeplearnphysics/base:minimal
 
 MAINTAINER kterao@slac.stanford.edu
 
