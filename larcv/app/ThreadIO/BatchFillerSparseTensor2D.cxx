@@ -110,6 +110,7 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
 
   _num_channels = _slice_v.size();
 
+
   // if (_num_channels != voxel_data.as_vector().size()){
   //   LARCV_CRITICAL() << "Number of requested channels does not match number of available channels." << std::endl;
   //   throw larbys();
@@ -121,13 +122,12 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
   }
   // one time operation: get image dimension
   if (batch_data().dim().empty()) {
-    auto const& voxel_meta = voxel_data.as_vector().front().meta();
     std::vector<int> dim;
-    dim.resize(3);
-    dim[0] = batch_size();
-    dim[1] = _num_channels;
-    dim[2] = _max_voxels;
-    dim[3] = point_dim;
+    dim.resize(4);
+    dim.at(0) = batch_size();
+    dim.at(1) = _num_channels;
+    dim.at(2) = _max_voxels;
+    dim.at(3) = point_dim;
     this->set_dim(dim);
   } else
     this->assert_dimension(voxel_data);
@@ -161,11 +161,11 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
     for (auto const& voxel : voxel_set.as_vector()) {
       int row = meta.index_to_row(voxel.id());
       int col = meta.index_to_col(voxel.id());
-
-      _entry_data[count*(_max_voxels*point_dim) + i*point_dim] = row;
-      _entry_data[count*(_max_voxels*point_dim) + i*point_dim + 1] = col;
+      size_t index = count*(_max_voxels*point_dim) + i*point_dim;
+      _entry_data.at(count*(_max_voxels*point_dim) + i*point_dim) = row;
+      _entry_data.at(count*(_max_voxels*point_dim) + i*point_dim + 1) = col;
       if (_include_values){
-        _entry_data[count*(_max_voxels*point_dim) + i*point_dim + 2] = voxel.value();
+        _entry_data.at(count*(_max_voxels*point_dim) + i*point_dim + 2) = voxel.value();
       }
       i++;
 

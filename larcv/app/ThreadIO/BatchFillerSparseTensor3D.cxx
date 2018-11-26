@@ -116,9 +116,9 @@ bool BatchFillerSparseTensor3D::process(IOManager& mgr) {
     auto const& voxel_meta = voxel_data.meta();
     std::vector<int> dim;
     dim.resize(3);
-    dim[0] = batch_size();
-    dim[1] = _max_voxels;
-    dim[2] = point_dim;
+    dim.at(0) = batch_size();
+    dim.at(1) = _max_voxels;
+    dim.at(2) = point_dim;
     this->set_dim(dim);
   } else
     this->assert_dimension(voxel_data);
@@ -143,14 +143,17 @@ bool BatchFillerSparseTensor3D::process(IOManager& mgr) {
     int i_y = meta.id_to_y_index(voxel.id());
     int i_z = meta.id_to_z_index(voxel.id());
     
-    _entry_data[(_max_voxels*point_dim) + i*point_dim + 0] = i_x;
-    _entry_data[(_max_voxels*point_dim) + i*point_dim + 1] = i_y;
-    _entry_data[(_max_voxels*point_dim) + i*point_dim + 2] = i_z;
+    _entry_data.at(point_dim*i + 0) = i_x;
+    _entry_data.at(point_dim*i + 1) = i_y;
+    _entry_data.at(point_dim*i + 2) = i_z;
     if(_include_values)
-      _entry_data[(_max_voxels*point_dim) + i*point_dim + 3] = voxel.value();
+      _entry_data.at(point_dim*i + 3) = voxel.value();
     i++;
 
-    if (i == _max_voxels) break;
+    if (i == _max_voxels) {
+      LARCV_INFO() << "Truncating the number of voxels!" << std::endl;
+      break;
+    }
   }
 
 
