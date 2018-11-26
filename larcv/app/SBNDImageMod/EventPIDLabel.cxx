@@ -155,28 +155,31 @@ bool EventPIDLabel::process(IOManager& mgr) {
   // kNEventCategories*kNProtonCategories*kNChargedPionCategories*kNNeutralPionCategories
   // categories.  The index is set exclusively, in an 'unraveled' way from the above categories
 
-  // int final_index = npc
-  //                 + kNNeutralPionCategories * cpc
-  //                 + (kNNeutralPionCategories * kNChargedPionCategories) * pc
-  //                 + (kNNeutralPionCategories
-  //                  * kNChargedPionCategories
-  //                  * kNProtonCategories) * _int_type;
+  int final_index = npc
+                  + kNNeutralPionCategories * cpc
+                  + (kNNeutralPionCategories * kNChargedPionCategories) * pc
+                  + (kNNeutralPionCategories
+                   * kNChargedPionCategories
+                   * kNProtonCategories) * _int_type;
 
 
   auto& ev_particle_neutrino_output = mgr.get_data<larcv::EventParticle>(_output_neutrino_id_producer);
   auto& ev_particle_proton_output   = mgr.get_data<larcv::EventParticle>(_output_proton_id_producer);
   auto& ev_particle_chrpion_output  = mgr.get_data<larcv::EventParticle>(_output_chrpion_id_producer);
   auto& ev_particle_ntrpion_output  = mgr.get_data<larcv::EventParticle>(_output_ntrpion_id_producer);
+  auto& ev_particle_all_output      = mgr.get_data<larcv::EventParticle>("all");
 
   ev_particle_neutrino_output.clear();
   ev_particle_proton_output.clear();
   ev_particle_chrpion_output.clear();
   ev_particle_ntrpion_output.clear();
+  ev_particle_all_output.clear();
 
   ev_particle_neutrino_output.set_id(ev_neutrino.run(), ev_neutrino.subrun(), ev_neutrino.event());
   ev_particle_proton_output.set_id(ev_neutrino.run(), ev_neutrino.subrun(), ev_neutrino.event());
   ev_particle_chrpion_output.set_id(ev_neutrino.run(), ev_neutrino.subrun(), ev_neutrino.event());
   ev_particle_ntrpion_output.set_id(ev_neutrino.run(), ev_neutrino.subrun(), ev_neutrino.event());
+  ev_particle_all_output.set_id(ev_neutrino.run(), ev_neutrino.subrun(), ev_neutrino.event());
 
 
 
@@ -195,6 +198,11 @@ bool EventPIDLabel::process(IOManager& mgr) {
   larcv::Particle _output_ntrpion_part;
   _output_ntrpion_part.pdg_code(npc);
   ev_particle_ntrpion_output.append(_output_ntrpion_part);
+
+  larcv::Particle _output_all_part;
+  _output_all_part.pdg_code(final_index);
+  ev_particle_all_output.append(_output_all_part);
+
 
 
   // std::cout << "Category: " << _int_type
