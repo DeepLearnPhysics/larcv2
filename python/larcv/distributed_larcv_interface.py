@@ -250,4 +250,11 @@ class larcv_interface(object):
         # self._dataloaders['train'].fetch_data(keyword_label).dim() as an example
         return self._dims[mode]
 
+    def stop(self):
+        if self._rank == self._root:
+            for mode in self._dataloaders:
+                while self._dataloaders[mode].is_reading():
+                    time.sleep(0.01)
+                self._dataloaders[mode].stop_manager()
+
 

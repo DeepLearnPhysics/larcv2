@@ -64,9 +64,8 @@ class larcv_interface(object):
         io.configure(io_config)
         io.start_manager(minibatch_size)
         io.next()
-        time.sleep(1.0)
         while io.is_reading():
-            time.sleep(0.05)
+            time.sleep(0.001)
         # Save the manager
         self._dataloaders.update({mode : io})
 
@@ -93,7 +92,7 @@ class larcv_interface(object):
         # Return a dictionary object with keys 'image', 'label', and others as needed
         # self._dataloaders['train'].fetch_data(keyword_label).dim() as an example
         while self._dataloaders[mode].is_reading():
-            time.sleep(0.1)
+            time.sleep(0.01)
 
         this_data = {}
         for key in self._data_keys[mode]:
@@ -117,6 +116,6 @@ class larcv_interface(object):
 
         for mode in self._dataloaders:
             while self._dataloaders[mode].is_reading():
-                time.sleep(0.1)
+                time.sleep(0.01)
             self._dataloaders[mode].stop_manager()
 
