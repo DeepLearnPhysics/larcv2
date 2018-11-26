@@ -63,10 +63,12 @@ class larcv_interface(object):
         io = larcv_threadio()
         io.configure(io_config)
         io.start_manager(minibatch_size)
-
+        io.next()
+        time.sleep(1.0)
+        while io.is_reading():
+            time.sleep(0.05)
         # Save the manager
         self._dataloaders.update({mode : io})
-        self._dataloaders[mode].next()
 
         # Store the keys for accessing this datatype:
         self._data_keys[mode] = data_keys
@@ -90,8 +92,8 @@ class larcv_interface(object):
     def fetch_minibatch_data(self, mode, fetch_meta_data=False):
         # Return a dictionary object with keys 'image', 'label', and others as needed
         # self._dataloaders['train'].fetch_data(keyword_label).dim() as an example
-        self._dataloaders[mode].next(store_entries=fetch_meta_data,store_event_ids=fetch_meta_data)
-        
+        while self._dataloaders[mode].is_reading():
+            time.sleep(0.1)
 
         this_data = {}
         for key in self._data_keys[mode]:
@@ -102,6 +104,8 @@ class larcv_interface(object):
             this_data['entries'] = self._dataloaders[mode].fetch_entries()
             this_data['event_ids'] = self._dataloaders[mode].fetch_event_ids()
 
+        self._dataloaders[mode].next(store_event_ids=fetch_meta_data, store_entries=fetch_meta_data)
+
         return this_data
 
     def fetch_minibatch_dims(self, mode):
@@ -109,4 +113,10 @@ class larcv_interface(object):
         # self._dataloaders['train'].fetch_data(keyword_label).dim() as an example
         return self._dims[mode]
 
+    def stop(self):
+
+        for mode in self._dataloaders:
+            while self._dataloaders[mode].is_reading():
+                time.sleep(0.1)
+            self._dataloaders[mode].stop_manager()
 
