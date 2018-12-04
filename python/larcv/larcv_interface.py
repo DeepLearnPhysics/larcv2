@@ -119,3 +119,7 @@ class larcv_interface(object):
                 time.sleep(0.01)
             self._dataloaders[mode].stop_manager()
 
+
+    def size(self, mode):
+        # return the number of images in the specified mode:
+        return self._dataloaders[mode].fetch_n_entries()
