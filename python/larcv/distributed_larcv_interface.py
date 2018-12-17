@@ -38,6 +38,7 @@ class larcv_interface(object):
         self._raw_dims    = {}
         self._raw_dtypes  = {}
 
+        self._datasize    = {}
 
         return
 
@@ -123,7 +124,7 @@ class larcv_interface(object):
 
             # How many worker nodes depends on whether or not we're distributing to the root node:
             n_worker_nodes = self._size if self._distribute_to_root else self._size - 1
-            
+
             if n_raw_batch_size % n_worker_nodes != 0:
                 raise Exception("Requested to broadcast {} images to {} workers, please adjust to distribute evenly".format(
                     n_raw_batch_size, n_worker_nodes))
@@ -140,6 +141,14 @@ class larcv_interface(object):
 
         # And store them:
         self._dims[mode] = dims
+
+        # Broadcast the total size of the dataset:
+        if self._rank == self._root:
+            datasize = self._dataloaders[mode].fetch_n_entries()
+        else:
+            datasize = 0
+
+        self._datasize[mode] = self._comm.bcast(datasize, root = self._root)
 
         # Distribute the counts and displacements necessary for scatterv
         self._counts[mode] = {}
@@ -258,3 +267,5 @@ class larcv_interface(object):
                 self._dataloaders[mode].stop_manager()
 
 
+    def size(self, mode):
+        return self._datasize[mode]
