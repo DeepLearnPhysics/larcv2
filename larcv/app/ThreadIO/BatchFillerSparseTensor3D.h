@@ -59,6 +59,7 @@ namespace larcv {
     std::vector<float>  _entry_data;
     bool _allow_empty;
     bool _include_values;
+    bool _augment;
   };
 
   /**

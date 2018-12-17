@@ -4,7 +4,8 @@
 #include "BatchFillerSparseTensor3D.h"
 #include "larcv/core/DataFormat/EventVoxel3D.h"
 
-#include <random>
+#include <stdlib.h>
+#include <time.h>
 
 namespace larcv {
 
@@ -22,6 +23,10 @@ void BatchFillerSparseTensor3D::configure(const PSet& cfg) {
   // set _max_voxels to n_rows*n_cols*x*2 or so.  It's still a dramatic memory reduction.
   _max_voxels = cfg.get<int>("MaxVoxels", 0);
   _include_values = cfg.get<bool>("IncludeValues", true);
+  _augment = cfg.get<bool>("Augment", true);
+
+  if (_augment)
+    srand(time(NULL));
 
   if (_max_voxels == 0){
     LARCV_CRITICAL() << "Maximum number of voxels must be non zero!" << std::endl;
@@ -138,11 +143,28 @@ bool BatchFillerSparseTensor3D::process(IOManager& mgr) {
   // Check that this projection ID is in the lists of channels:
   bool found = false;
   size_t i = 0;
+  
+  // Get the random x/y/z flipping
+  bool flip_x = false;
+  bool flip_y = false;
+  bool flip_z = false;
+  if (_augment){
+    flip_x = bool(rand() % 2);
+    flip_y = bool(rand() % 2);
+    flip_z = bool(rand() % 2);
+  }
+
+
+
   for (auto const& voxel : voxel_data.as_vector()) {
     int i_x = meta.id_to_x_index(voxel.id());
     int i_y = meta.id_to_y_index(voxel.id());
     int i_z = meta.id_to_z_index(voxel.id());
     
+    if (flip_x) i_x = meta.num_voxel_x() - (i_x + 1);
+    if (flip_y) i_y = meta.num_voxel_y() - (i_y + 1);
+    if (flip_z) i_z = meta.num_voxel_z() - (i_z + 1);
+
     _entry_data.at(point_dim*i + 0) = i_x;
     _entry_data.at(point_dim*i + 1) = i_y;
     _entry_data.at(point_dim*i + 2) = i_z;
