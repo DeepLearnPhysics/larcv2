@@ -1,5 +1,13 @@
 #!/bin/bash
 
+LARCV_VERBOSE=1
+if [[ $# -ne 0 ]]; then
+    if [[ $@ -eq -q ]]; then
+        LARCV_VERBOSE=0
+    fi
+fi
+
+
 # clean up previously set env
 if [[ -z $FORCE_LARCV_BASEDIR ]]; then
     where="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -72,14 +80,18 @@ else
     LARCV_LIBS="-L`${LARCV_PYTHON_CONFIG} --prefix`/lib/ `${LARCV_PYTHON_CONFIG} --ldflags` ${LARCV_LIBS}"
 fi
 if [[ $missing ]]; then
-    printf "\033[93mWarning\033[00m ... missing$missing support. Build without them.\n";
+    if [[ $LARCV_VERBOSE -ne 0 ]]; then
+        printf "\033[93mWarning\033[00m ... missing$missing support. Build without them.\n";
+    fi
 fi
 
-echo
-printf "\033[93mLArCV\033[00m FYI shell env. may useful for external packages:\n"
-printf "    \033[95mLARCV_INCDIR\033[00m   = $LARCV_INCDIR\n"
-printf "    \033[95mLARCV_LIBDIR\033[00m   = $LARCV_LIBDIR\n"
-printf "    \033[95mLARCV_BUILDDIR\033[00m = $LARCV_BUILDDIR\n"
+if [[ $LARCV_VERBOSE -ne 0 ]]; then
+    echo
+    printf "\033[93mLArCV\033[00m FYI shell env. may useful for external packages:\n"
+    printf "    \033[95mLARCV_INCDIR\033[00m   = $LARCV_INCDIR\n"
+    printf "    \033[95mLARCV_LIBDIR\033[00m   = $LARCV_LIBDIR\n"
+    printf "    \033[95mLARCV_BUILDDIR\033[00m = $LARCV_BUILDDIR\n"
+fi
 
 export PATH=$LARCV_BASEDIR/bin:$LARCV_BINDIR:$PATH
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LARCV_LIBDIR
@@ -109,7 +121,11 @@ if [ -z `command -v $LARCV_CXX` ]; then
     fi
 fi
 
-echo
-echo "Finish configuration. To build, type:"
-echo "> make "
-echo
+if [[ $LARCV_VERBOSE -ne 0 ]]; then
+    echo
+    echo "Finish configuration. To build, type:"
+    echo "> make "
+    echo
+fi
+
+unset LARCV_VERBOSE
