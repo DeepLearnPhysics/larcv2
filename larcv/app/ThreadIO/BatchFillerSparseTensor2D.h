@@ -55,6 +55,7 @@ namespace larcv {
 
     std::string _tensor2d_producer;
     size_t _max_voxels;
+    float _unfilled_voxel_value;
     std::vector<size_t> _slice_v;
 
 

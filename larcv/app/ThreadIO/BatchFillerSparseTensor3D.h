@@ -55,6 +55,7 @@ namespace larcv {
 
     std::string _tensor3d_producer;
     size_t _max_voxels;
+    float _unfilled_voxel_value;
 
     std::vector<float>  _entry_data;
     bool _allow_empty;
