@@ -4,7 +4,8 @@ import time
 
 import numpy
 
-from larcv.dataloader2 import larcv_threadio
+from larcv.dataloader2  import larcv_threadio
+from larcv.larcv_writer import larcv_writer
 
 
 class larcv_interface(object):
@@ -30,7 +31,28 @@ class larcv_interface(object):
         self._data_keys   = {}
         self._dims        = {}
         self._verbose     = verbose
+        self._writer      = None
 
+
+    def prepare_writer(self, io_config):
+
+        if self._writer is not None:
+            raise Exception("larcv_interface doesn't yet support multiple writers.")
+
+        # This only supports batch datasize of 1.  We can check that the reading instance
+        # Has only size 1 by looking at the dims.
+
+        key =list(self._data_keys['primary'].items())[0][0]
+        if self._dims['primary'][key][0] != 1:
+            raise Exception("To use the writing interface, please set batch size to 1.")
+
+        # The writer is not an instance of threadIO but rather an instance of larcv_writer.
+
+        # It configures a process to copy input to output and add more information as well.
+
+        self._writer = larcv_writer(io_config)
+
+        pass
 
 
     def prepare_manager(self, mode, io_config, minibatch_size, data_keys):
@@ -63,7 +85,8 @@ class larcv_interface(object):
         io = larcv_threadio()
         io.configure(io_config)
         io.start_manager(minibatch_size)
-        io.next()
+        # Force storing here, since it's not configurable on the first read.
+        io.next(store_event_ids=True, store_entries=True)
         while io.is_reading():
             time.sleep(0.001)
         # Save the manager
@@ -119,7 +142,19 @@ class larcv_interface(object):
                 time.sleep(0.01)
             self._dataloaders[mode].stop_manager()
 
+        if self._writer is not None:
+            self._writer.finalize()
 
     def size(self, mode):
         # return the number of images in the specified mode:
         return self._dataloaders[mode].fetch_n_entries()
+
+
+    def write_output(self, data, datatype, producer, entries, event_ids):
+        if self._writer is None:
+            raise Exception("Trying to write data with no writer configured.  Abort!")
+
+
+        self._writer.write(data=data, datatype=datatype, producer=producer, entries=entries, event_ids=event_ids)
+
+        return
