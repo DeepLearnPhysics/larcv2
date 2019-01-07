@@ -21,6 +21,7 @@ void BatchFillerSparseTensor2D::configure(const PSet& cfg) {
   // Max voxels imposes a limit to make the memory layout regular.  Assuming average sparsity of x% , it's safe to
   // set _max_voxels to n_rows*n_cols*x*2 or so.  It's still a dramatic memory reduction.
   _max_voxels = cfg.get<float>("MaxVoxels", 0);
+  _unfilled_voxel_value = cfg.get<float>("UnfilledVoxelValue", 0.0);
   _slice_v = cfg.get<std::vector<size_t> >("Channels", _slice_v);
   _include_values = cfg.get<bool>("IncludeValues", true);
 
@@ -138,8 +139,8 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
     _entry_data.resize(batch_data().entry_data_size(), 0.);
 
 
-  // Reset all values to 0.0
-  for (auto& v : _entry_data) v = 0.0;
+  // Reset all values to 0.0 (or whatever is specified)
+  for (auto& v : _entry_data) v = _unfilled_voxel_value;
 
 
   for ( auto const& voxel_set : voxel_data.as_vector()){
