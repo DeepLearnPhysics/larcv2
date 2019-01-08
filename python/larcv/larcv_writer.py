@@ -34,7 +34,6 @@ class larcv_writer(object):
         pass
 
     def finalize(self):
-        print (self._io)
         # The purpose of this function is to make sure the output file is persisted to disk:
         self._io.finalize()
 
@@ -46,7 +45,6 @@ class larcv_writer(object):
         Arguments:
             entry {int} -- Desired Entry
         '''
-        print (self._io.get_n_entries_out())
         self._io.save_entry()
         self._io.read_entry(entry)
 

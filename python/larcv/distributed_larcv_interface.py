@@ -228,7 +228,7 @@ class larcv_interface(object):
                 self._dataloaders[mode].stop_manager()
 
 
-    def fetch_minibatch_data(self, mode):
+    def fetch_minibatch_data(self, mode, fetch_meta_data=False):
         '''
         Read data from disk and distribute it to all other workers.
         '''
