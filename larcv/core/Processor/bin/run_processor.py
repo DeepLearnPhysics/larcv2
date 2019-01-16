@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys,commands,os,argparse
+import sys,os,argparse
 
 # This script is a simplification of run_processordb but without the proddb dependence.
 # It incorporates command line arguments but runs stand-alone with just larcv.

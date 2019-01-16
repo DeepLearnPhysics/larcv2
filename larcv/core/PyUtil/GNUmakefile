@@ -12,7 +12,7 @@ HEADERS_DEST = larcv/core/$(PACKAGE_NAME)
 # include options for this package
 INCFLAGS  = -I.                       #Include itself
 INCFLAGS += $(shell larcv-config --includes)
-INCFLAGS += $(shell python-config --includes)
+INCFLAGS += $(shell ${LARCV_PYTHON_CONFIG} --includes)
 INCFLAGS += -I$(shell python -c "import numpy; print(numpy.get_include())")
 INCFLAGS += -I$(LARCV_INCDIR)
 
@@ -23,8 +23,8 @@ OSNAMEMODE      = $(OSNAME)
 
 include $(LARCV_BASEDIR)/Makefile/Makefile.${OSNAME}
 
-LDFLAGS += -L$(shell python-config --prefix)/lib/
-LDFLAGS += $(shell python-config --ldflags)
+LDFLAGS += -L$(shell ${LARCV_PYTHON_CONFIG} --prefix)/lib/
+LDFLAGS += $(shell ${LARCV_PYTHON_CONFIG} --ldflags)
 
 # call the common GNUmakefile
 include $(LARCV_BASEDIR)/Makefile/GNUmakefile.CORE

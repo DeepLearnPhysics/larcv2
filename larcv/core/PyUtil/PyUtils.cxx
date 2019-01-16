@@ -13,7 +13,7 @@ namespace larcv {
 void SetPyUtil() {
   static bool once = false;
   if (!once) {
-    import_array();
+    _import_array();
     once = true;
   }
 }
