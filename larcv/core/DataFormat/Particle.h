@@ -68,6 +68,7 @@ namespace larcv {
     inline double       px         () const { return _px;         }
     inline double       py         () const { return _py;         }
     inline double       pz         () const { return _pz;         }
+    inline double       p          () const { return sqrt(pow(_px,2)+pow(_py,2)+pow(_pz,2)); }
     inline const larcv::Vertex& position() const { return _vtx;   }
     inline double       x          () const { return _vtx.x();    }
     inline double       y          () const { return _vtx.y();    }
