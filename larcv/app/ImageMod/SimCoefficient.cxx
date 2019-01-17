@@ -18,6 +18,8 @@ namespace larcv {
     _output_producer   = cfg.get<std::string>("OutputProducer");
     _cluster_producer  = cfg.get<std::string>("Cluster3DProducer");
     _particle_producer = cfg.get<std::string>("ParticleProducer");
+    _store_pdg = true;
+    _store_pdg = cfg.get<bool>("StorePDG",_store_pdg);
   }
 
   void SimCoefficient::initialize()
@@ -44,7 +46,7 @@ namespace larcv {
       
       int pdg = abs(part_v[i].pdg_code());
       for(auto const& vox : cluster_v[i].as_vector()) {
-	vs_pdg.emplace(vox.id(),(float)pdg,false);
+	if(_store_pdg) vs_pdg.emplace(vox.id(),(float)pdg,false);
 	vs_ctr.emplace(vox.id(),1.,true);
 	vs_cid.emplace(vox.id(),(float)i,false);
       }
@@ -56,10 +58,15 @@ namespace larcv {
       vs_cid.emplace(vox.id(),0.,false);
     }
     */
-    auto& out_pdg = mgr.get_data<larcv::EventSparseTensor3D>(_output_producer + "_pdg");
-    auto& out_cid = mgr.get_data<larcv::EventSparseTensor3D>(_output_producer + "_group");
-    out_pdg.emplace(std::move(vs_pdg),event_cluster.meta());
-    out_cid.emplace(std::move(vs_cid),event_cluster.meta());
+    if(_store_pdg) {
+      auto& out_pdg = mgr.get_data<larcv::EventSparseTensor3D>(_output_producer + "_pdg");
+      auto& out_cid = mgr.get_data<larcv::EventSparseTensor3D>(_output_producer + "_group");
+      out_pdg.emplace(std::move(vs_pdg),event_cluster.meta());
+      out_cid.emplace(std::move(vs_cid),event_cluster.meta());
+    }else{
+      auto& out_cid = mgr.get_data<larcv::EventSparseTensor3D>(_output_producer);
+      out_cid.emplace(std::move(vs_cid),event_cluster.meta());
+    }
     return true;
   }
 

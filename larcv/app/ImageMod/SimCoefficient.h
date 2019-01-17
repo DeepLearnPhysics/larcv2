@@ -45,6 +45,7 @@ namespace larcv {
     std::string _output_producer;
     std::string _cluster_producer;
     std::string _particle_producer;
+    bool _store_pdg;
   };
 
   /**
