@@ -34,7 +34,7 @@ class larcv_interface(object):
         self._writer      = None
 
 
-    def prepare_writer(self, io_config):
+    def prepare_writer(self, io_config, output_file=None):
 
         if self._writer is not None:
             raise Exception("larcv_interface doesn't yet support multiple writers.")
@@ -50,7 +50,7 @@ class larcv_interface(object):
 
         # It configures a process to copy input to output and add more information as well.
 
-        self._writer = larcv_writer(io_config)
+        self._writer = larcv_writer(io_config, output_file)
 
         pass
 
@@ -88,7 +88,8 @@ class larcv_interface(object):
         # Force storing here, since it's not configurable on the first read.
         io.next(store_event_ids=True, store_entries=True)
         while io.is_reading():
-            time.sleep(0.001)
+            time.sleep(0.01)
+
         # Save the manager
         self._dataloaders.update({mode : io})
 
@@ -99,8 +100,6 @@ class larcv_interface(object):
         self._dims[mode] = {}
         for key in self._data_keys[mode]:
             self._dims[mode][key] = self._dataloaders[mode].fetch_data(self._data_keys[mode][key]).dim()
-
-        self._dataloaders.update({ mode : io})
 
         end = time.time()
 
@@ -125,6 +124,7 @@ class larcv_interface(object):
         if fetch_meta_data:
             this_data['entries'] = self._dataloaders[mode].fetch_entries()
             this_data['event_ids'] = self._dataloaders[mode].fetch_event_ids()
+
 
         self._dataloaders[mode].next(store_event_ids=fetch_meta_data, store_entries=fetch_meta_data)
 
