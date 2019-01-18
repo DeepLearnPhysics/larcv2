@@ -49,6 +49,48 @@ PyObject *as_ndarray(const SparseTensor3D& data, bool clear_mem) {
   return res;
 }
 
+PyObject *as_ndarray(const SparseTensor2D& data, bool clear_mem) {
+  SetPyUtil();
+  npy_intp dim_data[2];
+  dim_data[0] = data.meta().cols();
+  dim_data[1] = data.meta().rows();
+
+  static std::vector<float> local_data;
+  local_data.resize(data.meta().size());
+  for(auto &v : local_data) v = 0.;
+
+  for(auto const& vox : data.as_vector()) local_data[vox.id()]=vox.value();
+
+  auto res = PyArray_Transpose(((PyArrayObject*)(PyArray_SimpleNewFromData(2, dim_data, NPY_FLOAT, (char *)&(local_data[0])))),NULL);
+  //return PyArray_FromDimsAndData(2, dim_data, NPY_FLOAT, (char *)&(vec[0]));
+
+  if(clear_mem) local_data.clear();
+  return res;
+}
+
+/*
+PyObject *as_ndarray(const SparseTensor2D& data, bool clear_mem) {
+  SetPyUtil();
+  PyObject* res = PyList_New(data.as_vector().size());
+  for( size_t i=0; i<data.as_vector().size(); ++i) {
+    npy_intp dim_data[2];
+    dim_data[0] = data.meta().cols();
+    dim_data[1] = data.meta().rows();
+
+    static std::vector<float> local_data;
+    local_data.resize(data.meta().size());
+    for(auto &v : local_data) v = 0.;
+
+    for(auto const& vox : data.as_vector()[i])
+      local_data[vox.id()] = vox.value();
+
+    auto ar = PyArray_Transpose(((PyArrayObject*)(PyArray_SimpleNewFromData(2, dim_data, NPY_FLOAT, (char *)&(vec[0])))),NULL);
+    PyList_SetItem(res,Py_ssize_t(i),ar);
+  }
+
+  return res;
+}
+*/
 void fill_3d_pcloud(const SparseTensor3D& data, PyObject* pyarray, PyObject* select) {
   SetPyUtil();
 
