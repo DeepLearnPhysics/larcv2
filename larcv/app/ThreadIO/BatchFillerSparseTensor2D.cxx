@@ -17,6 +17,7 @@ BatchFillerSparseTensor2D::BatchFillerSparseTensor2D(const std::string name)
 void BatchFillerSparseTensor2D::configure(const PSet& cfg) {
   LARCV_DEBUG() << "start" << std::endl;
   _tensor2d_producer = cfg.get<std::string>("Tensor2DProducer");
+  _augment = cfg.get<bool>("Augment", true);
 
   // Max voxels imposes a limit to make the memory layout regular.  Assuming average sparsity of x% , it's safe to
   // set _max_voxels to n_rows*n_cols*x*2 or so.  It's still a dramatic memory reduction.
@@ -142,6 +143,15 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
   // Reset all values to 0.0 (or whatever is specified)
   for (auto& v : _entry_data) v = _unfilled_voxel_value;
 
+  // Get the random x/y/z flipping
+  bool flip_x = false;
+  bool flip_y = false;
+  if (_augment){
+    flip_x = bool(rand() % 2);
+    flip_y = bool(rand() % 2);
+  }
+
+
 
   for ( auto const& voxel_set : voxel_data.as_vector()){
     auto & meta = voxel_set.meta();
@@ -162,6 +172,11 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
     for (auto const& voxel : voxel_set.as_vector()) {
       int row = meta.index_to_row(voxel.id());
       int col = meta.index_to_col(voxel.id());
+
+      if (flip_x) col = meta.cols() - (col + 1);
+      if (flip_y) row = meta.rows() - (row + 1);
+
+
       size_t index = count*(_max_voxels*point_dim) + i*point_dim;
       _entry_data.at(count*(_max_voxels*point_dim) + i*point_dim) = row;
       _entry_data.at(count*(_max_voxels*point_dim) + i*point_dim + 1) = col;

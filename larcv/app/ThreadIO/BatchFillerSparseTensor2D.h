@@ -64,6 +64,7 @@ namespace larcv {
     size_t _num_channels;
     bool _allow_empty;
     bool _include_values;
+    bool _augment;
   };
 
   /**
