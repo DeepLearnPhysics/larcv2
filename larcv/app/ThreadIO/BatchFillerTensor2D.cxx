@@ -122,13 +122,8 @@ bool BatchFillerTensor2D::process(IOManager& mgr) {
     }
     if (!found) continue;
 
-    for (auto const& voxel : voxel_set.as_vector()) {
-      int row = meta.index_to_row(voxel.id());
-      int col = meta.index_to_col(voxel.id());
-      _entry_data[row*(meta.cols()*_num_channels) + col*_num_channels + count] = 1.;
-
-    }
-
+    for (auto const& voxel : voxel_set.as_vector())
+      _entry_data[voxel.id()]=voxel.value();
   }
 
   // record the entry data
