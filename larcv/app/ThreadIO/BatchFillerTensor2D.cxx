@@ -18,6 +18,8 @@ void BatchFillerTensor2D::configure(const PSet& cfg) {
   LARCV_DEBUG() << "start" << std::endl;
   _tensor2d_producer = cfg.get<std::string>("Tensor2DProducer");
 
+  _slice_v.clear();
+  _slice_v.resize(1,0);
   _slice_v = cfg.get<std::vector<size_t> >("Channels", _slice_v);
 
   _voxel_base_value = cfg.get<float>("EmptyVoxelValue",0.);
