@@ -85,13 +85,14 @@ class larcv_interface(object):
         io = larcv_threadio()
         io.configure(io_config)
         io.start_manager(minibatch_size)
+        self._dataloaders.update({mode : io})
         # Force storing here, since it's not configurable on the first read.
-        io.next(store_event_ids=True, store_entries=True)
+        self.next(mode)
+
         while io.is_reading():
             time.sleep(0.01)
 
         # Save the manager
-        self._dataloaders.update({mode : io})
 
         # Store the keys for accessing this datatype:
         self._data_keys[mode] = data_keys
@@ -107,12 +108,19 @@ class larcv_interface(object):
         if self._verbose:
             sys.stdout.write("Time to start {0} IO: {1:.2}s\n".format(mode, end - start))
 
+
         return
+
+
+    def next(self, mode):
+        self._dataloaders[mode].next(store_event_ids=True, store_entries=True)
 
 
     def fetch_minibatch_data(self, mode, fetch_meta_data=False):
         # Return a dictionary object with keys 'image', 'label', and others as needed
         # self._dataloaders['train'].fetch_data(keyword_label).dim() as an example
+        
+        
         while self._dataloaders[mode].is_reading():
             time.sleep(0.01)
 
@@ -124,9 +132,7 @@ class larcv_interface(object):
         if fetch_meta_data:
             this_data['entries'] = self._dataloaders[mode].fetch_entries()
             this_data['event_ids'] = self._dataloaders[mode].fetch_event_ids()
-
-
-        self._dataloaders[mode].next(store_event_ids=fetch_meta_data, store_entries=fetch_meta_data)
+        
 
         return this_data
 
