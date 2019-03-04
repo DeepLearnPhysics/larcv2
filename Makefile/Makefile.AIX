@@ -1,13 +1,64 @@
-CXX		= xlC
-LD              = xlC
-CXXFLAGS        += -std=c++0x -qarch=pwr3 -qmaxmem=-1 -q${OBJECT_MODE} -D_CORE_$(shell uname -s)_
-LDFLAGS       	+= -Wl,-bhalt:5 
-FFLAGS          += -qrealsize=8
-FLDFLAGS        += -lC
-ARFLAGS		= -X${OBJECT_MODE}
-SOMAKER         = g++
-SOFLAGS         = -shared -Wl -g
+#COMPILER:
+CC              = gcc
+CXX             = $(LARCV_CXX)
+#LINKER          = libtool
+#SOMAKER         = libtool 
+LINKER          = $(LARCV_CXX)
+SOMAKER         = $(LARCV_CXX)
+PYTHONFLAGS     = $(shell python-config --includes)
 
-ifeq ($(LARCV_OPENCV),1)
-CXXFLAGS += -DUSE_OPENCV
-endif
+#######"-O" FLAG: (not always ideal with debugging info)
+CFLAGS          += -O3
+CXXFLAGS        += -O3 
+#SOFLAGS         += -O
+#AFLAGS          += -O
+#DLLFLAGS        += -O
+
+#######DEBUG FLAG:  BOTH COMPILER & LINKER
+CFLAGS          += -ggdb
+CXXFLAGS        += -ggdb
+#AFLAGS          += -ggdb
+#SOFLAGS         += -ggdb
+DLLFLAGS        += -ggdb
+
+#######"-Wl" FLAG: BOTH COMPILER & LINKER
+CFLAGS          += -Wall
+#CXXFLAGS        += -Wall -std=c++11 -Wc++11-extensions
+#SOFLAGS         += -Wl #-Wall g++
+#AFLAGS          += -Wall
+DLLFLAGS        += -Wall
+
+#######"-Wl" FLAG: BOTH COMPILER & LINKER
+CFLAGS          += -fPIC
+CXXFLAGS        += -fPIC
+#AFLAGS          += -fPIC
+SOFLAGS         += -fPIC # g++
+DLLFLAGS        += -fPIC
+
+##########
+#COMPILER FLAGS
+##########
+CFLAGS          += -fsigned-char -pipe -DHAVE_LONG_LONG  
+CFLAGS          += -fno-common -O3 -D_CORE_$(shell uname -s)_
+CXXFLAGS        += -fsigned-char -pipe -DHAVE_LONG_LONG -std=c++11
+CXXFLAGS        += -fno-common -O3 -Wno-deprecated -D_CORE_$(shell uname -s)_
+
+
+##########
+#LINKER FLAGS
+##########
+#DYNAMIC LIBRARY
+DLLFLAGS        += -dynamiclib -single_module -undefined dynamic_lookup 
+#STATIC LIBRARY
+AFLAGS          += -static 
+#LOADABLE LIBRARY
+#SOFLAGS         += -dynamic # for libtool
+#ALTERNATIVE: checks symbols at run-time only -> disable for debugging
+#SOFLAGS         += -undefined dynamic_lookup # for libtool
+
+SOFLAGS += -g -shared 
+
+
+
+
+

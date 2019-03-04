@@ -1,5 +1,5 @@
 
-CXX		= $(LARCV_CXX)
+CXX     = $(LARCV_CXX)
 LD              = g++
 LDFLAGS         += -Wl,-rpath,$(LARCV_BASEDIR)/lib
 FFLAGS          += -Wall

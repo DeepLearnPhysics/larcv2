@@ -30,49 +30,19 @@ if [ $PYVERSION -gt 2 ]; then
     export LARCV_PYTHON_CONFIG=python${PYVERSION}.${minor}-config
 fi
 
-export LARCV_COREDIR=$LARCV_BASEDIR/larcv/core
-export LARCV_APPDIR=$LARCV_BASEDIR/larcv/app
+export LARCV_COREDIR=$LARCV_BASEDIR/src/core
+export LARCV_APPDIR=$LARCV_BASEDIR/src/app
 export LARCV_LIBDIR=$LARCV_BUILDDIR/lib
 export LARCV_INCDIR=$LARCV_BUILDDIR/include
 export LARCV_BINDIR=$LARCV_BUILDDIR/bin
 export LARCV_INCLUDES="-I${LARCV_INCDIR} `${LARCV_PYTHON_CONFIG} --includes` "
 export LARCV_LIBS="-L${LARCV_LIBDIR} -llarcv "
 
-# Abort if ROOT not installed. Let's check rootcint for this.
-if [ `command -v rootcling` ]; then
-    export LARCV_ROOT6=1
-else 
-    if [[ -z `command -v rootcint` ]]; then
-	echo
-	echo Looks like you do not have ROOT installed.
-	echo You cannot use LArLite w/o ROOT!
-	echo Aborting.
-	echo
-	return 1;
-    fi
-fi
-
-# Check OpenCV
-export LARCV_OPENCV=1
-if [[ -z $OPENCV_INCDIR ]]; then
-    export LARCV_OPENCV=0
-fi
-if [[ -z $OPENCV_LIBDIR ]]; then
-    export LARCV_OPENCV=0
-fi
-if [ $LARCV_OPENCV -eq 1 ]; then
-    export LARCV_INCLUDES="${LARCV_INCLUDES} -I${OPENCV_INCDIR}"
-    export LARCV_LIBS="-L${OPENCV_LIBDIR} -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs ${LARCV_LIBS}"
-fi
-
 # Check Numpy
 export LARCV_NUMPY=`$LARCV_BASEDIR/bin/check_numpy`
 
 # warning for missing support
 missing=""
-if [ $LARCV_OPENCV -eq 0 ]; then
-    missing+=" OpenCV"
-fi
 if [ $LARCV_NUMPY -eq 0 ]; then
     missing+=" Numpy"
 else
@@ -97,10 +67,6 @@ export PATH=$LARCV_BASEDIR/bin:$LARCV_BINDIR:$PATH
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LARCV_LIBDIR
 export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$LARCV_LIBDIR
 
-if [ $LARCV_OPENCV -eq 1 ]; then
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$OPENCV_LIBDIR
-    export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$OPENCV_LIBDIR
-fi
 
 mkdir -p $LARCV_BUILDDIR;
 mkdir -p $LARCV_LIBDIR;
