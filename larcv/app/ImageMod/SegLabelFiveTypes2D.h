@@ -45,6 +45,7 @@ namespace larcv {
     std::string _cluster2d_producer;
     std::string _particle_producer;
     std::string _output_producer;
+    std::string _sparse2d_producer;
     size_t _min_num_voxel;
   };
 
