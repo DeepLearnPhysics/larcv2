@@ -11,7 +11,6 @@ HEADERS_DEST = larcv/app/$(PACKAGE_NAME)
 
 # include options for this package
 INCFLAGS  = -I.                       #Include itself
-#INCFLAGS += -I$(shell root-config --incdir)
 INCFLAGS += $(shell larcv-config --includes)
 
 # platform-specific options
@@ -21,8 +20,8 @@ OSNAMEMODE      = $(OSNAME)
 
 include $(LARCV_BASEDIR)/Makefile/Makefile.${OSNAME}
 
-#LDFLAGS += $(shell larcv-config --libs)
-LDFLAGS += -L$(LARCV_LIBDIR) -lLArCVBase -lLArCVDataFormat -lLArCVProcessor
+LDFLAGS += $(shell larcv-config --libs)
+#LDFLAGS += -L$(LARCV_LIBDIR) -lLArCVBase -lLArCVDataFormat -lLArCVProcessor
 
 # call the common GNUmakefile
 include $(LARCV_BASEDIR)/Makefile/GNUmakefile.CORE
