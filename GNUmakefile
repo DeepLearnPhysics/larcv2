@@ -2,6 +2,9 @@
 ifndef LARCV_BASEDIR
 ERROR_MESSAGE := $(error LARCV_BASEDIR is not set... run configure.sh!)
 endif
+ifndef LARCV_PYTHON
+ERROR_MESSAGE := $(error LARCV_PYTHON is not set)
+endif
 
 OSNAME          = $(shell uname -s)
 HOST            = $(shell uname -n)
@@ -17,7 +20,7 @@ ifeq ($(LARCV_OPENCV),1)
   CORE_SUBDIRS += CVUtil
 endif
 
-APP_SUBDIRS := Filter ImageAna ImageMod SBNDImageMod ThreadIO NextImageMod #Merger
+APP_SUBDIRS := Filter ImageAna ImageMod SBNDImageMod ThreadIO #NextImageMod #Merger
 
 .phony: all clean
 
@@ -39,11 +42,12 @@ obj:
 	@for i in $(APP_SUBDIRS); do ( echo "" && echo "Compiling $$i..." && cd $(LARCV_APPDIR)/$$i && $(MAKE) ) || exit $$?; done
 
 lib: obj
-	@ echo
-	@ if [ `python ${LARCV_BASEDIR}/bin/libarg.py build` ]; then \
-	    echo Linking library...; \
-	    $(SOMAKER) $(SOFLAGS) $(shell python $(LARCV_BASEDIR)/bin/libarg.py); \
-	  else \
+	@echo
+	@if [ `${LARCV_PYTHON} ${LARCV_BASEDIR}/bin/libarg.py build` ]; then \
+	   echo Linking library...; \
+	   $(SOMAKER) $(SOFLAGS) $(shell ${LARCV_PYTHON} $(LARCV_BASEDIR)/bin/libarg.py); \
+	 else \
 	   echo Nothing to be done for lib...; \
 	fi
+#	@$(SOMAKER) $(SOFLAGS) `$(LARCV_PYTHON) $(LARCV_BASEDIR)/bin/libarg.py`;
 	@echo
