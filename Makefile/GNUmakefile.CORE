@@ -99,6 +99,7 @@ clearCINT:
 .depend: $(SOURCES) $(HEADERS)
 	@rm -f .depend
 	@echo '<< checking dependencies>>'
+	@echo $(CXX) -M $(CXXFLAGS) $(LARCV_BASIC_ROOTINC) $(INCFLAGS) $(SOURCES) > .depend
 	@$(CXX) -M $(CXXFLAGS) $(LARCV_BASIC_ROOTINC) $(INCFLAGS) $(SOURCES) > .depend
 
 -include .depend
