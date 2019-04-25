@@ -29,21 +29,16 @@ main_build: .depend pre_build $(DICT).o $(OBJECTS) $(LARCV_LIBDIR)/$(ROOTMAP) in
 # default rule for making .o files from .cxx files
 $(PACKAGE_BUILDDIR)/%.o: %.cxx %.h
 	@echo '<< compiling' $< '>>'
-	@echo $(CXX) $(CXXFLAGS) $(LARCV_BASIC_ROOTINC) $(INCFLAGS) -DLARCV_NUMPY=$(LARCV_NUMPY) -DLARCV_OPENCV=$(LARCV_OPENCV) -c $< -o $@
 	@$(CXX) $(CXXFLAGS) $(LARCV_BASIC_ROOTINC) $(INCFLAGS) -DLARCV_NUMPY=$(LARCV_NUMPY) -DLARCV_OPENCV=$(LARCV_OPENCV) -c $< -o $@
 $(DICT).o: $(DICT).cxx
 	@echo '<< compiling' $(PACKAGE_NAME)Dict.cxx '>>'
-	@echo $(CXX) $(CXXFLAGS) $(LARCV_BASIC_ROOTINC) $(INCFLAGS) -c $< -o $@
 	@$(CXX) $(CXXFLAGS) $(LARCV_BASIC_ROOTINC) $(INCFLAGS) -c $< -o $@
-	@echo "done"
 ifdef LARCV_ROOT6
 
 # root class dictionary
 $(DICT).cxx: $(HEADERS) LinkDef.h
 	@echo '<< generating dict >>'
-	@echo rootcling -f $(DICT).cxx -s $(LARCV_LIBDIR)/$(SHLIB) -rml liblarcv.so -rmf $(LARCV_LIBDIR)/$(ROOTMAP) $(CINTFLAGS) -c $(LARCV_BASIC_ROOTINC) $(INCFLAGS) $(HEADERS) LinkDef.h
 	@rootcling -f $(DICT).cxx -s $(LARCV_LIBDIR)/$(SHLIB) -rml liblarcv.so -rmf $(LARCV_LIBDIR)/$(ROOTMAP) $(CINTFLAGS) -c $(LARCV_BASIC_ROOTINC) $(INCFLAGS) $(HEADERS) LinkDef.h
-	@echo "done"
 
 # install headers
 install_header: $(OBJECTS) $(DICT).o
@@ -102,7 +97,6 @@ clearCINT:
 .depend: $(SOURCES) $(HEADERS)
 	@rm -f .depend
 	@echo '<< checking dependencies>>'
-	@echo $(CXX) -M $(CXXFLAGS) $(LARCV_BASIC_ROOTINC) $(INCFLAGS) $(SOURCES)
 	@$(CXX) -M $(CXXFLAGS) $(LARCV_BASIC_ROOTINC) $(INCFLAGS) $(SOURCES) > .depend
 
 -include .depend
