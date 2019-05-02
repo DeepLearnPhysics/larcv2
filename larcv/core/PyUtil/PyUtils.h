@@ -81,6 +81,10 @@ Image2D as_image2d(PyObject *);
 
 VoxelSet as_tensor2d(PyObject * values, PyObject * indexes);
 
+VoxelSet as_tensor2d(PyObject* pyarray, const ImageMeta& meta);
+
+VoxelSet as_tensor2d(PyObject* pos_array, PyObject* val_array, const ImageMeta& meta);
+
 VoxelSet as_tensor3d(PyObject *, float min_threshold=0);
  
 VoxelSet as_tensor3d(PyObject* pyarray, const Voxel3DMeta& meta, float min_threshold=0);
