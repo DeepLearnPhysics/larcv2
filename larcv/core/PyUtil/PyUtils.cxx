@@ -697,7 +697,6 @@ VoxelSet as_tensor2d(PyObject* pos_array, PyObject* val_array, const ImageMeta& 
   PyArray_Descr *pos_descr = PyArray_DescrFromType(pos_dtype);
   npy_intp pos_dims[2];
   int pos_ret = PyArray_AsCArray(&pos_array, (void**)&iarray, pos_dims, 2, pos_descr);
-  std::cerr << pos_dims[0] << "  " << pos_dims[1] << std::endl;
   if ( pos_ret < 0) {
     LARCV_CRITICAL() << "Cannot convert to 2D C-array (return code " << pos_ret << ")" << std::endl;
     throw larbys();
@@ -713,7 +712,7 @@ VoxelSet as_tensor2d(PyObject* pos_array, PyObject* val_array, const ImageMeta& 
   npy_intp val_dims[1];
   int val_ret = PyArray_AsCArray(&val_array, (void*)&farray, val_dims, 1, val_descr);
   if ( val_ret < 0) {
-    LARCV_CRITICAL() << "Cannot convert to 2D C-array (return code " << val_ret << ")" << std::endl;
+    LARCV_CRITICAL() << "Cannot convert to 1D C-array (return code " << val_ret << ")" << std::endl;
     throw larbys();
   }
   if (pos_dims[0] != val_dims[0]) {
@@ -826,7 +825,7 @@ VoxelSet as_tensor3d(PyObject* pos_array, PyObject* val_array, const Voxel3DMeta
   npy_intp val_dims[1];
   int val_ret = PyArray_AsCArray(&val_array, (void*)&farray, val_dims, 1, val_descr);
   if ( val_ret < 0) {
-    LARCV_CRITICAL() << "Cannot convert to 2D C-array (return code " << val_ret << ")" << std::endl;
+    LARCV_CRITICAL() << "Cannot convert to 1D C-array (return code " << val_ret << ")" << std::endl;
     throw larbys();
   }
   if (pos_dims[0] != val_dims[0]) {
