@@ -137,7 +137,7 @@ void fill_3d_pcloud(const SparseTensor3D& data, PyObject* pyarray, PyObject* sel
     size_t index = i;
     if(select_ptr)
       index = select_ptr[i];
-    
+
     auto const& vox = vs.at(index);
     auto pt = data.meta().position(vox.id());
     if(dims[1] == 1)
@@ -205,7 +205,7 @@ void fill_3d_voxels(const SparseTensor3D& data, PyObject* pyarray, PyObject* sel
     size_t index = i;
     if(select_ptr)
       index = select_ptr[i];
-    
+
     auto const& vox = vs.at(index);
     data.meta().id_to_xyz_index(vox.id(),ix,iy,iz);
     carray[i][0] = ix;
@@ -262,7 +262,7 @@ void fill_2d_pcloud(const SparseTensor2D& data, PyObject* pyarray, PyObject* sel
     size_t index = i;
     if(select_ptr)
       index = select_ptr[i];
-    
+
     auto const& vox = vs.at(index);
     auto pt = data.meta().position(vox.id());
     if(dims[1] == 1){
@@ -329,7 +329,7 @@ void fill_2d_voxels(const SparseTensor2D& data, PyObject* pyarray, PyObject* sel
     size_t index = i;
     if(select_ptr)
       index = select_ptr[i];
-    
+
     auto const& vox = vs.at(index);
     data.meta().index_to_rowcol(vox.id(),row,col);
     carray[i][0] = row;
@@ -681,7 +681,7 @@ VoxelSet as_tensor2d(PyObject* pyarray, const ImageMeta& meta) {
     x = (double)(carray[i][0]);
     y = (double)(carray[i][1]);
     v = (float )(carray[i][2]);
-    res.emplace(meta.index(x,y),v,true);
+    res.emplace(meta.id(x,y),v,true);
   }
 
   PyArray_Free(pyarray, (void *)carray);
@@ -854,7 +854,7 @@ VoxelSet as_tensor3d(PyObject* pos_array, PyObject* val_array, const Voxel3DMeta
 }
 
 VoxelSet as_tensor3d(const SparseTensor3D& vs, PyObject* val_array, float min_threshold) {
-  
+
   SetPyUtil();
   // Create C arrays from numpy objects:
   float *farray;
