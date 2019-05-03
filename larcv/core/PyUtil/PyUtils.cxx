@@ -657,7 +657,7 @@ larcv::VoxelSet as_tensor2d(PyObject * values_in, PyObject * indexes_in) {
   return res;
 }
 
-VoxelSet as_tensor2d(PyObject* pyarray, const ImageMeta& meta) {
+VoxelSet as_tensor2d(PyObject* pyarray, const ImageMeta& meta, float min_threshold) {
   SetPyUtil();
   float **carray;
   // Create C arrays from numpy objects:
@@ -681,6 +681,7 @@ VoxelSet as_tensor2d(PyObject* pyarray, const ImageMeta& meta) {
     x = (double)(carray[i][0]);
     y = (double)(carray[i][1]);
     v = (float )(carray[i][2]);
+    if(v <= min_threshold) continue;
     res.emplace(meta.id(x,y),v,true);
   }
 
@@ -689,7 +690,7 @@ VoxelSet as_tensor2d(PyObject* pyarray, const ImageMeta& meta) {
   return res;
 }
 
-VoxelSet as_tensor2d(PyObject* pos_array, PyObject* val_array, const ImageMeta& meta) {
+VoxelSet as_tensor2d(PyObject* pos_array, PyObject* val_array, const ImageMeta& meta, float min_threshold) {
   SetPyUtil();
   int **iarray;
   // Create C arrays from numpy objects:
@@ -729,6 +730,7 @@ VoxelSet as_tensor2d(PyObject* pos_array, PyObject* val_array, const ImageMeta& 
     ix = (int)(iarray[i][0]);
     iy = (int)(iarray[i][1]);
     v = (float )(farray[i]);
+    if(v <= min_threshold) continue;
     res.emplace(meta.index(ix,iy),v,true);
   }
 
