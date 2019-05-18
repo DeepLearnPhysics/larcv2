@@ -76,6 +76,10 @@
 #pragma link C++ class larcv::ParticleSet+;
 #pragma link C++ class larcv::EventParticle+;
 
+#pragma link C++ class larcv::Node+;
+#pragma link C++ class larcv::Graph+;
+#pragma link C++ class larcv::EventGraph+;
+
 #pragma link C++ class larcv::Meta+;
 #pragma link C++ class larcv::EventMeta+;
 

@@ -20,11 +20,14 @@ namespace larcv {
   typedef unsigned short MCTIndex_t;
   /// "ID" for a set of elements
   typedef unsigned short InstanceID_t;
+  /// "ID" for a node in a graph
+  typedef size_t NodeID_t;
   /// Invalid rep for InstanceID_t
   static const unsigned short kINVALID_INSTANCEID = kINVALID_USHORT;
   /// Invalid projection id
   static const ProjectionID_t kINVALID_PROJECTIONID = kINVALID_USHORT;
-
+  /// Invalid node NodeID_t
+  static const NodeID_t kINVALID_NODEID = kINVALID_SIZE;
   /// "ID" for Voxel3D
   typedef unsigned long long VoxelID_t;
   /// Invalid Voxel3DID_t definition
