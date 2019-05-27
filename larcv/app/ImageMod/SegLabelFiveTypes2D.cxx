@@ -4,7 +4,7 @@
 #include "SegLabelFiveTypes2D.h"
 #include "larcv/core/DataFormat/EventVoxel2D.h"
 #include "larcv/core/DataFormat/EventParticle.h"
-
+#include <assert.h>
 namespace larcv {
 
   static SegLabelFiveTypes2DProcessFactory __global_SegLabelFiveTypes2DProcessFactory__;
