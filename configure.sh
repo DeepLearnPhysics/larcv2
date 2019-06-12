@@ -24,10 +24,18 @@ fi
 
 # Check python version compatibility:
 export LARCV_PYTHON_CONFIG=python-config
-PYVERSION=$(python -c "import sys; print(sys.version_info.major)")
-if [ $PYVERSION -gt 2 ]; then
-    minor=$(python -c "import sys; print(sys.version_info.minor)")
-    export LARCV_PYTHON_CONFIG=python${PYVERSION}.${minor}-config
+LARCV_PYVERSION=0
+export LARCV_PYTHON=`which python`
+if [ `command -v python` ]; then
+    LARCV_PYVERSION=$($LARCV_PYTHON -c "import sys; print(sys.version_info.major)")
+else
+    export LARCV_PYTHON=`which python3`
+    LARCV_PYVERSION=$($LARCV_PYTHON -c "import sys; print(sys.version_info.major)")
+fi
+if [[ $LARCV_PYVERSION -gt 2 ]]
+then
+    minor=$(python3 -c "import sys; print(sys.version_info.minor)")
+    export LARCV_PYTHON_CONFIG=python${LARCV_PYVERSION}.${minor}-config
 fi
 
 export LARCV_COREDIR=$LARCV_BASEDIR/larcv/core
@@ -52,6 +60,7 @@ else
     fi
 fi
 
+
 # Check OpenCV
 export LARCV_OPENCV=1
 if [[ -z $OPENCV_INCDIR ]]; then
@@ -60,13 +69,14 @@ fi
 if [[ -z $OPENCV_LIBDIR ]]; then
     export LARCV_OPENCV=0
 fi
+
 if [ $LARCV_OPENCV -eq 1 ]; then
     export LARCV_INCLUDES="${LARCV_INCLUDES} -I${OPENCV_INCDIR}"
     export LARCV_LIBS="-L${OPENCV_LIBDIR} -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs ${LARCV_LIBS}"
 fi
 
 # Check Numpy
-export LARCV_NUMPY=`$LARCV_BASEDIR/bin/check_numpy`
+export LARCV_NUMPY=`$LARCV_PYTHON $LARCV_BASEDIR/bin/check_numpy`
 
 # warning for missing support
 missing=""
@@ -76,7 +86,7 @@ fi
 if [ $LARCV_NUMPY -eq 0 ]; then
     missing+=" Numpy"
 else
-    LARCV_INCLUDES="${LARCV_INCLUDES} -I`python -c\"import numpy; print(numpy.get_include())\"`"
+    LARCV_INCLUDES="${LARCV_INCLUDES} -I`$LARCV_PYTHON -c\"import numpy; print(numpy.get_include())\"`"
     LARCV_LIBS="-L`${LARCV_PYTHON_CONFIG} --prefix`/lib/ `${LARCV_PYTHON_CONFIG} --ldflags` ${LARCV_LIBS}"
 fi
 if [[ $missing ]]; then

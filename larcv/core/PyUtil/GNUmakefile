@@ -13,7 +13,7 @@ HEADERS_DEST = larcv/core/$(PACKAGE_NAME)
 INCFLAGS  = -I.                       #Include itself
 INCFLAGS += $(shell larcv-config --includes)
 INCFLAGS += $(shell ${LARCV_PYTHON_CONFIG} --includes)
-INCFLAGS += -I$(shell python -c "import numpy; print(numpy.get_include())")
+INCFLAGS += -I$(shell ${LARCV_PYTHON} -c "import numpy; print(numpy.get_include())")
 INCFLAGS += -I$(LARCV_INCDIR)
 
 # platform-specific options
