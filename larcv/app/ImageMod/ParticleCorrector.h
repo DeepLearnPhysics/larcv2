@@ -46,10 +46,23 @@ namespace larcv {
 
     void finalize();
 
-		bool _correct_energy_deposit;
+    bool _correct_energy_deposit;
     std::string _particle_producer;
     std::string _cluster3d_producer;
     double _voxel_min_value;
+    std::vector<double> _shift_xyz;
+    /**
+       Correct particle positions (first/last step) based on cluster3d information
+       \param BBox3D to consider as frame.
+       \param particle_v Vector of particles.
+       \param cluster3d_v Corresponding vector of clusters (each "cluster" itself is a vector of Point3D)
+       \return Vector of particles whose position has been corrected.
+    */
+    std::vector<larcv::Particle>
+      correct_particle_positions(const larcv::Voxel3DMeta& meta3d,
+				 std::vector<larcv::Particle> particle_v,
+				 std::vector<larcv::VoxelSet> cluster3d_v
+				 );
 
   };
 
@@ -67,19 +80,6 @@ namespace larcv {
     ProcessBase* create(const std::string instance_name) { return new ParticleCorrector(instance_name); }
   };
 
-  /**
-    Correct particle positions (first/last step) based on cluster3d information
-    \param meta3d A BBox3D or Voxel3DMeta to consider as frame.
-    \param particle_v Vector of particles.
-    \param cluster3d_v Corresponding vector of clusters (each "cluster" itself is a vector of Point3D)
-    \return Vector of particles whose position has been corrected.
-  */
-  template <class bbox3d>
-  std::vector<larcv::Particle> correct_particle_positions(
-    bbox3d const& meta3d,
-    std::vector<larcv::Particle> particle_v,
-    std::vector<std::vector<larcv::Point3D> > cluster3d_v
-  );
 }
 
 #endif
