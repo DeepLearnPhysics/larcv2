@@ -16,6 +16,7 @@ namespace larcv {
   void SegLabelFiveTypes::configure(const PSet& cfg)
   {
     _cluster3d_producer = cfg.get<std::string>("Cluster3DProducer");
+    _label3d_producer   = cfg.get<std::string>("Label3DProducer");
     _particle_producer  = cfg.get<std::string>("ParticleProducer");
     _output_producer    = cfg.get<std::string>("OutputProducer");
     _min_num_voxel      = cfg.get<size_t>("MinVoxelCount",0);
@@ -39,7 +40,15 @@ namespace larcv {
       //throw larbys();
       return false;
     }
-
+      
+    // Fill with default value for ghost points if label3d is provided
+    if(!_label3d_producer.empty()) {
+        auto const& tensor3d_v = mgr.get_data<larcv::EventSparseTensor3D>(label_tensor3d).as_vector();
+        ((VoxelSet*)event_tensor3d)->reserve(tensor3d_v.size());
+        for( auto const& vox : tensor3d_v)
+            ((VoxelSet*)event_tensor3d)->emplace(vox.id(),6);
+    }
+    
     // Fill tensor3d
     for(size_t cindex=0; cindex<particle_v.size(); ++cindex) {
       auto const& particle = particle_v[cindex];
@@ -70,8 +79,8 @@ namespace larcv {
           ((VoxelSet*)event_tensor3d)->emplace(vox.id(),class_def,false);
           continue;
         }
-        // prioritize higher class values
-        if(prev_vox.value() >= class_def) continue;
+        // prioritize higher class values, apart from ghosts
+        if(prev_vox.value() >= class_def && prev_vox.value() != 6) continue;
         ((VoxelSet*)event_tensor3d)->emplace(vox.id(),class_def,false);
       }
     }
