@@ -43,7 +43,7 @@ namespace larcv {
       
     // Fill with default value for ghost points if label3d is provided
     if(!_label3d_producer.empty()) {
-        auto const& tensor3d_v = mgr.get_data<larcv::EventSparseTensor3D>(label_tensor3d).as_vector();
+        auto const& tensor3d_v = mgr.get_data<larcv::EventSparseTensor3D>(_label3d_producer).as_vector();
         ((VoxelSet*)event_tensor3d)->reserve(tensor3d_v.size());
         for( auto const& vox : tensor3d_v)
             ((VoxelSet*)event_tensor3d)->emplace(vox.id(),6);
