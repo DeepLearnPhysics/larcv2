@@ -46,7 +46,7 @@ namespace larcv {
         auto const& tensor3d_v = mgr.get_data<larcv::EventSparseTensor3D>(_label3d_producer).as_vector();
         ((VoxelSet*)event_tensor3d)->reserve(tensor3d_v.size());
         for( auto const& vox : tensor3d_v)
-            ((VoxelSet*)event_tensor3d)->emplace(vox.id(),6,false);
+            ((VoxelSet*)event_tensor3d)->emplace(vox.id(),5,false);
     }
     
     // Fill tensor3d
