@@ -16,7 +16,7 @@ namespace larcv {
   void SegLabelFiveTypes::configure(const PSet& cfg)
   {
     _cluster3d_producer = cfg.get<std::string>("Cluster3DProducer");
-    _label3d_producer   = cfg.get<std::string>("Label3DProducer");
+    _label3d_producer   = cfg.get<std::string>("Label3DProducer","");
     _particle_producer  = cfg.get<std::string>("ParticleProducer");
     _output_producer    = cfg.get<std::string>("OutputProducer");
     _min_num_voxel      = cfg.get<size_t>("MinVoxelCount",0);
