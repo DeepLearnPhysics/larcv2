@@ -48,7 +48,7 @@ namespace larcv {
         for( auto const& vox : tensor3d_v)
             ((VoxelSet*)event_tensor3d)->emplace(vox.id(),5,false);
     }
-    
+
     // Fill tensor3d
     for(size_t cindex=0; cindex<particle_v.size(); ++cindex) {
       auto const& particle = particle_v[cindex];
@@ -80,7 +80,7 @@ namespace larcv {
           continue;
         }
         // prioritize higher class values, apart from ghosts
-        if(prev_vox.value() >= class_def && prev_vox.value() != 6) continue;
+        if(prev_vox.value() >= class_def && prev_vox.value() != 5) continue;
         ((VoxelSet*)event_tensor3d)->emplace(vox.id(),class_def,false);
       }
     }
