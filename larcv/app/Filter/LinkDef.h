@@ -9,13 +9,13 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class larcv::QSumFilter+;
-#pragma link C++ class larcv::MCSingleParticleFilter+;
-#pragma link C++ class larcv::VtxInRegion+;
-#pragma link C++ class larcv::EmptyImageFilter+;
-#pragma link C++ class larcv::ParticleCountFilter+;
-#pragma link C++ class larcv::EventIDFilter+;
-#pragma link C++ class larcv::EmptyTensorFilter+;
+//#pragma link C++ class larcv::QSumFilter+;
+//#pragma link C++ class larcv::MCSingleParticleFilter+;
+//#pragma link C++ class larcv::VtxInRegion+;
+//#pragma link C++ class larcv::EmptyImageFilter+;
+//#pragma link C++ class larcv::ParticleCountFilter+;
+//#pragma link C++ class larcv::EventIDFilter+;
+//#pragma link C++ class larcv::EmptyTensorFilter+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
