@@ -16,6 +16,7 @@ namespace larcv {
   void SegLabelFiveTypes::configure(const PSet& cfg)
   {
     _cluster3d_producer = cfg.get<std::string>("Cluster3DProducer");
+    _tensor3d_producer   = cfg.get<std::string>("Tensor3DProducer","");
     _particle_producer  = cfg.get<std::string>("ParticleProducer");
     _output_producer    = cfg.get<std::string>("OutputProducer");
     _min_num_voxel      = cfg.get<size_t>("MinVoxelCount",0);
@@ -38,6 +39,14 @@ namespace larcv {
       << " but EventParticle has " << particle_v.size() << " particles!" << std::endl;
       //throw larbys();
       return false;
+    }
+      
+    // Fill with default values (5) if tensor3d is provided
+    if(!_tensor3d_producer.empty()) {
+        auto const& tensor3d_v = mgr.get_data<larcv::EventSparseTensor3D>(_tensor3d_producer).as_vector();
+        ((VoxelSet*)event_tensor3d)->reserve(tensor3d_v.size());
+        for( auto const& vox : tensor3d_v)
+            ((VoxelSet*)event_tensor3d)->emplace(vox.id(),5,false);
     }
 
     // Fill tensor3d
@@ -70,8 +79,8 @@ namespace larcv {
           ((VoxelSet*)event_tensor3d)->emplace(vox.id(),class_def,false);
           continue;
         }
-        // prioritize higher class values
-        if(prev_vox.value() >= class_def) continue;
+        // prioritize higher class values, apart from ghosts
+        if(prev_vox.value() >= class_def && prev_vox.value() != 5) continue;
         ((VoxelSet*)event_tensor3d)->emplace(vox.id(),class_def,false);
       }
     }
