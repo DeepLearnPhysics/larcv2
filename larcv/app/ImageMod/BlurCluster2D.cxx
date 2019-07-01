@@ -75,7 +75,8 @@ namespace larcv {
       for (size_t projection=0; projection<ev_cluster2d.as_vector().size(); ++projection) {
 	
 	auto const& input_cluster2d = ev_cluster2d.as_vector()[projection];
-	
+	LARCV_INFO() << "Input cluster " << cluster2d_producer.c_str() 
+		     << " with " << input_cluster2d.as_vector().size() << " clusters " << std::endl;
 	auto const& meta = input_cluster2d.meta();
 	for (size_t xshift = 0; xshift <= _numvox_v[0]; ++xshift) {
 	  for (size_t yshift = 0; yshift <= _numvox_v[1]; ++yshift) {
@@ -103,6 +104,8 @@ namespace larcv {
 	LARCV_INFO() << "scale_sum: " << scale_sum << std::endl;
 	
 	larcv::VoxelSetArray vsa_output;
+        std::vector<VoxelSet> vs_v;
+	larcv::Point2D pt;
 	for(size_t cluster_index=0; cluster_index<input_cluster2d.as_vector().size(); ++cluster_index) {
 	  
 	  auto const& cluster = input_cluster2d.as_vector()[cluster_index];
@@ -119,9 +122,10 @@ namespace larcv {
 	      double ymax = pos.y + (_numvox_v[1] + 0.5) * meta.pixel_height();
 	      int y_ctr = 0;
 	      while (ypos < ymax) {
-		auto const id = meta.index(meta.row(ypos),meta.col(xpos));
-		if (id != kINVALID_VOXELID) {
-		  
+		pt.x = xpos;
+		pt.y = ypos;
+		if (meta.contains(pt)) {
+		  auto const id = meta.index(meta.row(ypos),meta.col(xpos));
 		  int xindex = std::abs(((int)(_numvox_v[0])) - x_ctr);
 		  int yindex = std::abs(((int)(_numvox_v[1])) - y_ctr);
 		  
@@ -154,10 +158,17 @@ namespace larcv {
 		       << res_data.sum() << " ... " 
 		       << "After: vox count = " << res_data_threshold.as_vector().size() << " charge = " << res_data_threshold.sum() << std::endl;
 	
-	  vsa_output.emplace(std::move(res_data));
+	  //vsa_output.emplace(std::move(res_data));
+          vs_v.emplace_back(std::move(res_data));
 	}
+        vsa_output.emplace(std::move(vs_v));
+        LARCV_INFO() << "Output cluster count: " << vsa_output.size() << std::endl;
 	larcv::ClusterPixel2D cp2d_output(std::move(vsa_output),meta);
 	ev_output->emplace(std::move(cp2d_output));
+      }
+      LARCV_INFO() << "Output projection counts: " << ev_output->as_vector().size() << std::endl;
+      for(auto const& cluster2d_v : ev_output->as_vector()) {
+        LARCV_INFO() << "  Cluster count: " << cluster2d_v.as_vector().size() << std::endl;
       }
     }
     return true;    
