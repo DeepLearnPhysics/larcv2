@@ -73,7 +73,7 @@ namespace larcv {
     for(size_t i=0; i<particle_v.size(); ++i) {
       auto particle  = particle_v[i];
       auto const& vs = cluster3d_v[i].as_vector();
-      if(vs.size()<1) continue;
+      //if(vs.size()<1) continue;
       
       auto first_step = particle.first_step().as_point3d();
       auto last_step  = particle.last_step().as_point3d();
