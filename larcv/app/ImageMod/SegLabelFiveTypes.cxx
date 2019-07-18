@@ -12,7 +12,7 @@ namespace larcv {
   SegLabelFiveTypes::SegLabelFiveTypes(const std::string name)
     : ProcessBase(name)
   {}
-    
+
   void SegLabelFiveTypes::configure(const PSet& cfg)
   {
     _cluster3d_producer = cfg.get<std::string>("Cluster3DProducer");
@@ -40,7 +40,7 @@ namespace larcv {
       //throw larbys();
       return false;
     }
-      
+
     // Fill with default values (5) if tensor3d is provided
     if(!_tensor3d_producer.empty()) {
         auto const& tensor3d_v = mgr.get_data<larcv::EventSparseTensor3D>(_tensor3d_producer).as_vector();
@@ -79,8 +79,8 @@ namespace larcv {
           ((VoxelSet*)event_tensor3d)->emplace(vox.id(),class_def,false);
           continue;
         }
-        // prioritize higher class values, apart from ghosts
-        if(prev_vox.value() >= class_def && prev_vox.value() != 5) continue;
+        // prioritize lower class values, apart from ghosts
+        if(prev_vox.value() <= class_def && class_def != 5) continue;
         ((VoxelSet*)event_tensor3d)->emplace(vox.id(),class_def,false);
       }
     }
@@ -88,8 +88,8 @@ namespace larcv {
     if(_min_num_voxel<1) return true;
 
     if(event_tensor3d->as_vector().size() < _min_num_voxel) {
-      LARCV_NORMAL() << "Skipping event " << event_tensor3d->event_key() 
-		     << " due to voxel count (" << event_tensor3d->as_vector().size() 
+      LARCV_NORMAL() << "Skipping event " << event_tensor3d->event_key()
+		     << " due to voxel count (" << event_tensor3d->as_vector().size()
 		     << " < " << _min_num_voxel << ")" << std::endl;
       return false;
     }
