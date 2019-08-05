@@ -50,12 +50,18 @@ namespace larcv {
       , _parent_pdg       (0)
       , _ancestor_trackid (kINVALID_UINT)
       , _ancestor_pdg     (0)
+      , _ancestor_process ("")
+      , _parent_process   ("")
+      , _parent_id(kINVALID_INSTANCEID)
+      , _children_id()
+      , _group_id(kINVALID_INSTANCEID)
+      , _interaction_id(kINVALID_INSTANCEID)
     {}
 
     /// Default destructor
     ~Particle(){}
     /// particle's ID getter
-    inline ParticleIndex_t id      () const { return _id;         }
+    inline InstanceID_t id         () const { return _id;         }
     // origin/generator info getter
     inline ShapeType_t  shape      () const { return _shape;      }
     inline MCSTIndex_t  mcst_index () const { return _mcst_index; }
@@ -94,6 +100,9 @@ namespace larcv {
     inline double       parent_y        () const { return _parent_vtx.y(); }
     inline double       parent_z        () const { return _parent_vtx.z(); }
     inline double       parent_t        () const { return _parent_vtx.t(); }
+    inline const std::string& parent_creation_process() const { return _parent_process; }
+    inline InstanceID_t parent_id       () const { return _parent_id;      }
+    inline const std::vector<larcv::InstanceID_t>& children_id() const { return _children_id; }
 
     // ancestor info getter
     inline unsigned int ancestor_track_id () const { return _ancestor_trackid; }
@@ -103,6 +112,11 @@ namespace larcv {
     inline double       ancestor_y        () const { return _ancestor_vtx.y(); }
     inline double       ancestor_z        () const { return _ancestor_vtx.z(); }
     inline double       ancestor_t        () const { return _ancestor_vtx.t(); }
+    inline const std::string& ancestor_creation_process() const { return _ancestor_process; }
+
+    // group ID
+    inline InstanceID_t group_id()       const { return _group_id;       }
+    inline InstanceID_t interaction_id() const { return _interaction_id; }
 
     //
     // Setters
@@ -140,17 +154,24 @@ namespace larcv {
     inline void parent_pdg_code (int code)           { _parent_pdg = code;  }
     inline void parent_position (const larcv::Vertex& vtx) { _parent_vtx = vtx; }
     inline void parent_position (double x, double y, double z, double t) { _parent_vtx = Vertex(x,y,z,t); }
+    inline void parent_creation_process(const std::string& proc) { _parent_process = proc; }
+    inline void parent_id       (InstanceID_t id)    { _parent_id = id; }
+    inline void children_id     (InstanceID_t id)    { _children_id.push_back(id); }
+    inline void children_id     (const std::vector<larcv::InstanceID_t>& id_v) { _children_id = id_v; }
     // ancestor info setter
     inline void ancestor_track_id (unsigned int id )   { _ancestor_trackid = id;}
     inline void ancestor_pdg_code (int code)           { _ancestor_pdg = code;  }
     inline void ancestor_position (const larcv::Vertex& vtx) { _ancestor_vtx = vtx; }
     inline void ancestor_position (double x, double y, double z, double t) { _ancestor_vtx = Vertex(x,y,z,t); }
-
+    inline void ancestor_creation_process(const std::string& proc) { _ancestor_process = proc; }
+    // group id setter
+    inline void group_id(InstanceID_t id)       { _group_id = id;       }
+    inline void interaction_id(InstanceID_t id) { _interaction_id = id; }
     std::string dump() const;
-
+    
   private:
 
-    InstanceID_t   _id; ///< "ID" of this particle
+    InstanceID_t   _id; ///< "ID" of this particle in ParticleSet collection
     /// index number in the origin MCShower/MCTrack container array (kINVALID_USHORT if neither)
     MCSTIndex_t  _mcst_index;
     ///< index number in the origin MCTruth container array (kINVALID_USHORT if MCShower/MCTrack)
@@ -176,14 +197,18 @@ namespace larcv {
 
     unsigned int _parent_trackid; ///< Geant4 track id of the parent particle
     int          _parent_pdg;     ///< PDG code of the parent particle
-    Vertex       _parent_vtx; ///< (x,y,z,t) of parent's vertex information
+    Vertex       _parent_vtx;     ///< (x,y,z,t) of parent's vertex information
 
     unsigned int _ancestor_trackid; ///< Geant4 track id of the ancestor particle
     int          _ancestor_pdg;     ///< PDG code of the ancestor particle
-    Vertex       _ancestor_vtx; ///< (x,y,z,t) of ancestor's vertex information
+    Vertex       _ancestor_vtx;     ///< (x,y,z,t) of ancestor's vertex information
+    std::string  _ancestor_process; ///< string identifier of the ancestor particle's creation process from Geant4
 
-    //std::vector<float> _type_score_v;
-
+    std::string  _parent_process; ///< string identifier of the parent particle's creation process from Geant4
+    InstanceID_t _parent_id;      ///< "ID" of the parent particle in ParticleSet collection
+    std::vector<larcv::InstanceID_t> _children_id; ///< "ID" of the children particles in ParticleSet collection
+    InstanceID_t _group_id;       ///< "ID" to group multiple particles together (for clustering purpose)
+    InstanceID_t _interaction_id; ///< "ID" to group multiple particles per interaction
   };
 
   /**
