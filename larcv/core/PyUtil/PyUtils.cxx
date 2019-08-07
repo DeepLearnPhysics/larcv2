@@ -595,10 +595,10 @@ larcv::VoxelSet as_tensor2d(PyObject * values_in, PyObject * indexes_in) {
   PyArrayObject *indexes = (PyArrayObject *)(indexes_in);
 
   // Dtype needs to be float32, uint64:
-  const int dtype_values = NPY_FLOAT32;
+  const int dtype_values = NPY_FLOAT;
   PyArray_Descr *descr_values = PyArray_DescrFromType(dtype_values);
 
-  const int dtype_indexes = NPY_UINT64;
+  const int dtype_indexes = NPY_INT;
   PyArray_Descr *descr_indexes = PyArray_DescrFromType(dtype_indexes);
 
   // Each of values, indexes should come in as a 1D array.
@@ -669,8 +669,8 @@ VoxelSet as_tensor2d(PyObject* pyarray, const ImageMeta& meta, float min_thresho
     LARCV_CRITICAL() << "Cannot convert to 2D C-array (return code " << ret << ")" << std::endl;
     throw larbys();
   }
-  if (dims[1] != 3) {
-    LARCV_CRITICAL() << "The 2nd dimenstion must be length 3! (length " << dims[1] << ")" << std::endl;
+  if (dims[1] != 2) {
+    LARCV_CRITICAL() << "The 2nd dimenstion must be length 2! (length " << dims[1] << ")" << std::endl;
     throw larbys();
   }
   VoxelSet res;
