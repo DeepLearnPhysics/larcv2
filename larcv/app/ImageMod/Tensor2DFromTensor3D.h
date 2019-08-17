@@ -43,7 +43,7 @@ namespace larcv {
 
   private:
     void configure_labels(const PSet& cfg);
-    enum PoolType_t {kMaxPool,kSumPool};
+    enum PoolType_t {kMaxPool,kSumPool,kMinPool};
     std::vector<std::string> _tensor3d_producer_v;
     std::vector<std::string> _output_producer_v;
     std::vector<bool> _xy_v, _yz_v, _zx_v;

@@ -137,46 +137,43 @@ namespace larcv {
           LARCV_DEBUG() << "(x,y) = (" << pos.x << "," << pos.y << ")" << std::endl
                         << meta_xy.dump() << std::endl;
           size_t id = meta_xy.index(meta_xy.row(pos.y), meta_xy.col(pos.x));
-          switch (pool_type) {
-          case kSumPool:
+	  if(pool_type == kSumPool)
             vs_xy.emplace(id, vox.value(), true);
-            break;
-          case kMaxPool:
-            auto const& orig_vox = vs_xy.find(id);
-            if (orig_vox.id() == kINVALID_VOXELID || orig_vox.value() < vox.value())
-              vs_xy.emplace(id, vox.value(), false);
-            break;
-          }
+	  else {
+	    auto const& orig_vox = vs_xy.find(id);
+	    if(orig_vox.id() == kINVALID_VOXELID ||
+	       (pool_type == kMaxPool && orig_vox.value() < vox.value()) ||
+	       (pool_type == kMinPool && orig_vox.value() > vox.value()))
+	      vs_xy.emplace(id, vox.value(), false);
+	  }
         }
         if (yz) {
           LARCV_DEBUG() << "(y,z) = (" << pos.y << "," << pos.z << ")" << std::endl
                         << meta_yz.dump() << std::endl;
           size_t id = meta_yz.index(meta_yz.row(pos.z), meta_yz.col(pos.y));
-          switch (pool_type) {
-          case kSumPool:
+	  if(pool_type == kSumPool)
             vs_yz.emplace(id, vox.value(), true);
-            break;
-          case kMaxPool:
-            auto const& orig_vox = vs_yz.find(id);
-            if (orig_vox.id() == kINVALID_VOXELID || orig_vox.value() < vox.value())
-              vs_yz.emplace(id, vox.value(), false);
-            break;
-          }
+	  else {
+	    auto const& orig_vox = vs_yz.find(id);
+	    if(orig_vox.id() == kINVALID_VOXELID ||
+	       (pool_type == kMaxPool && orig_vox.value() < vox.value()) ||
+	       (pool_type == kMinPool && orig_vox.value() > vox.value()))
+	      vs_yz.emplace(id, vox.value(), false);
+	  }
         }
         if (zx) {
           LARCV_DEBUG() << "(z,x) = (" << pos.z << "," << pos.x << ")" << std::endl
                         << meta_zx.dump() << std::endl;
           size_t id = meta_zx.index(meta_zx.row(pos.x), meta_zx.col(pos.z));
-          switch (pool_type) {
-          case kSumPool:
+	  if(pool_type == kSumPool)
             vs_zx.emplace(id, vox.value(), true);
-            break;
-          case kMaxPool:
-            auto const& orig_vox = vs_zx.find(id);
-            if (orig_vox.id() == kINVALID_VOXELID || orig_vox.value() < vox.value())
-              vs_zx.emplace(id, vox.value(), false);
-            break;
-          }
+	  else {
+	    auto const& orig_vox = vs_zx.find(id);
+	    if(orig_vox.id() == kINVALID_VOXELID ||
+	       (pool_type == kMaxPool && orig_vox.value() < vox.value()) ||
+	       (pool_type == kMinPool && orig_vox.value() > vox.value()))
+	      vs_zx.emplace(id, vox.value(), false);
+	  }
         }
       }
 
