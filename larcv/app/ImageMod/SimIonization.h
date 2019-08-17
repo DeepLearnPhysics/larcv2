@@ -41,9 +41,10 @@ namespace larcv {
 
     void finalize();
 
-  private:
     double Recombination(double dedx) const;
     double Lifetime(double x) const;
+
+  private:
 
     std::string _cluster3d_producer;
     std::string _output_producer;
@@ -51,7 +52,7 @@ namespace larcv {
     double _alpha;
     double _beta;
     double _efield;
-
+    double _threshold;
     double _elifetime;
     double _vdrift;
   };
