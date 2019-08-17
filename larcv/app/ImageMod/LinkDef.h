@@ -64,6 +64,7 @@
 #pragma link C++ class larcv::SparcifyImage2D+;
 #pragma link C++ class larcv::SegLabelFiveTypes+;
 #pragma link C++ class larcv::XYZ2PixelCoordinate+;
+#pragma link C++ class larcv::SimIonization+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
