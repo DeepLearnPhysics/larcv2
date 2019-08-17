@@ -154,7 +154,9 @@ namespace larcv {
     { for(auto& vox : _voxel_v) vox *= factor; return (*this); }
     inline VoxelSet& operator /= (float factor)
     { for(auto& vox : _voxel_v) vox /= factor; return (*this); }
-
+    inline VoxelSet& operator =  (float value)
+    { for(auto& vox : _voxel_v) vox.set(vox.id(), value); return (*this); }
+    
   private:
     /// Instance ID
     InstanceID_t _id;
