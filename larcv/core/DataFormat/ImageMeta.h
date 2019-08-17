@@ -60,6 +60,14 @@ namespace larcv {
       , _unit(unit)
     { update(y_row_count, x_column_count); }
 
+    ImageMeta(const ImageMeta& meta)
+      : BBox2D(meta)
+      , _image_id(meta._image_id)
+      , _col_count(meta._col_count)
+      , _row_count(meta._row_count)
+      , _unit(meta._unit)
+    {}
+
     ImageMeta(const BBox2D& box,
               size_t y_row_count = 0, size_t x_column_count = 0,
               DistanceUnit_t unit = kUnitUnknown)

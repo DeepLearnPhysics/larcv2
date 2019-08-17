@@ -14,17 +14,12 @@ ENV LARCV_BINDIR="${LARCV_BUILDDIR}/bin"
 ENV LARCV_ROOT6=1
 ENV LARCV_CXX=g++
 
-# without numpy
-#ENV LARCV_NUMPY=0
-#ENV LARCV_INCLUDES="-I${LARCV_INCDIR} "
-#ENV LARCV_LIBS="-L${LARCV_LIBDIR} -llarcv"
-
 # with numpy
 ENV LARCV_NUMPY=1
-ENV LARCV_INCLUDES="-I${LARCV_INCDIR} -I/usr/include/python2.7 -I/usr/include/x86_64-linux-gnu/python2.7"
-ENV LARCV_LIBS="-L/usr/lib/ -L/usr/lib/python2.7/config-x86_64-linux-gnu -L/usr/lib"
-ENV LARCV_LIBS="${LARCV_LIBS} -lpthread -ldl -lutil -lm -lpython2.7 -Xlinker -export-dynamic -Wl,-O1 -Wl,-Bsymbolic-functions"
-ENV LARCV_LIBS="${LARCV_LIBS} -L${LARCV_LIBDIR} -llarcv"
+ENV LARCV_INCLUDES="-I/app/larcv2/build/include -I/usr/include/python3.6m -I/usr/local/lib/python3.6/dist-packages/numpy/core/include"
+ENV LARCV_LIBS="-L/usr/lib/ -L/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu -L/usr/lib -lpython3.6m -lpthread -ldl -lutil -lm -Xlinker -export-dynamic -Wl,-O1 -Wl,-Bsymbolic-functions -L/app/larcv2/build/lib -llarcv"
+ENV LARCV_PYTHON=/usr/bin/python3
+ENV LARCV_PYTHON_CONFIG=python3.6-config
 
 # set bin and lib path
 ENV PATH=${LARCV_BASEDIR}/bin:${LARCV_BINDIR}:${PATH}
