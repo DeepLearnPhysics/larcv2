@@ -34,7 +34,7 @@ namespace larcv {
     // Sanity check: length of event_particle +1 should be same as length of event_cluster3d
     auto const& cluster3d_v = event_cluster3d.as_vector();
     auto const& particle_v  = event_particle.as_vector();
-    if((particle_v.size()+1) != cluster3d_v.size()) {
+    if((particle_v.size() != cluster3d_v.size()) && (particle_v.size()+1) != cluster3d_v.size()) {
       LARCV_CRITICAL() << "Logic error: input EventClusterVoxel3D has " << cluster3d_v.size() << " clusters"
       << " but EventParticle has " << particle_v.size() << " particles!" << std::endl;
       //throw larbys();
