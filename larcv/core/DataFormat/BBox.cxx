@@ -61,7 +61,12 @@ namespace larcv {
 
   bool BBox2D::contains(const Point2D& point) const
   {
-    return point.x >= this->min_x() && point.y >= this->min_y() && point.x <= this->max_x() && point.y <= this->max_y();
+    return this->contains(point.x, point.y);
+  }
+
+  bool BBox2D::contains(double x, double y) const
+  {
+    return x >= this->min_x() && y >= this->min_y() && x <= this->max_x() && y <= this->max_y();
   }
 
   std::string BBox2D::dump() const
@@ -151,8 +156,15 @@ namespace larcv {
 
   bool BBox3D::contains(const Point3D& point) const
   {
-    return point.x >= this->min_x() && point.y >= this->min_y() && point.z >= this->min_z() && point.x <= this->max_x() && point.y <= this->max_y() && point.z <= this->max_z();
+    return this->contains(point.x, point.y, point.z);
   }
+
+
+  bool BBox3D::contains(double x, double y, double z) const
+  {
+    return x >= this->min_x() && y >= this->min_y() && z >= this->min_z() && x <= this->max_x() && y <= this->max_y() && z <= this->max_z();
+  }
+
 
   std::string BBox3D::dump() const
   {

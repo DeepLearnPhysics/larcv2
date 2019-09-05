@@ -42,7 +42,8 @@ namespace larcv {
   {
     _part_v = part_v;
     for(size_t i=0; i<_part_v.size(); ++i)
-      _part_v[i].id(i);
+      if(_part_v.back().id() == kINVALID_INSTANCEID)
+	_part_v[i].id(i);
   }
 
   void ParticleSet::append(const larcv::Particle& part)

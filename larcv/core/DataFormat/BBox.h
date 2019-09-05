@@ -64,7 +64,7 @@ namespace larcv {
     BBox2D overlap(const BBox2D& box) const;
     BBox2D inclusive(const BBox2D& box) const;
     bool contains(const Point2D& point) const;
-
+    bool contains(double x, double y) const;
   private:
     ProjectionID_t _id; ///< ProjectionID_t identifies types of 2D projections to which BBox belongs
     Point2D _p1; ///< bottom-left point coordinate (x1,y1) where x1<x2 and y1<y2
@@ -115,6 +115,7 @@ namespace larcv {
     BBox3D overlap(const BBox3D& box) const;
     BBox3D inclusive(const BBox3D& box) const;
     bool contains(const Point3D& point) const;
+    bool contains(double x, double y, double z) const;
 
     std::string dump() const;
 
