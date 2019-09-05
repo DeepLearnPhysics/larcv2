@@ -137,6 +137,9 @@ namespace larcv {
     void insert(const Voxel& vox);
     /// Emplace a new voxel. Same logic as VoxelSet::add but consumes removable reference.
     void emplace(Voxel&& vox, const bool add);
+    /// Paint by a single value
+    inline void paint(float value)
+    { for(auto& vox : _voxel_v) vox.set(vox.id(), value); }
     /// Emplace a new voxel from id & value
     inline void emplace(VoxelID_t id, float value, const bool add) 
     { emplace(Voxel(id,value),add); }
@@ -155,7 +158,7 @@ namespace larcv {
     inline VoxelSet& operator /= (float factor)
     { for(auto& vox : _voxel_v) vox /= factor; return (*this); }
     inline VoxelSet& operator =  (float value)
-    { for(auto& vox : _voxel_v) vox.set(vox.id(), value); return (*this); }
+    { paint(value); return (*this); }
     
   private:
     /// Instance ID

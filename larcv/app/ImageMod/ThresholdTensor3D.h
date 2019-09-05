@@ -45,6 +45,8 @@ namespace larcv {
 
     void configure_labels(const PSet& cfg);
 
+    float _paint_value;
+
     std::vector<std::string> _target_producer_v;
     std::vector<std::string> _output_producer_v;
 

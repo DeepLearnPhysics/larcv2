@@ -57,6 +57,9 @@ namespace larcv {
       LARCV_CRITICAL() << "MaxThresholdList size mismatch with other input parameters!" << std::endl;
       throw larbys();
     }
+
+    _paint_value = cfg.get<float>("PaintValue",larcv::kINVALID_FLOAT);
+
   }
 
   void ThresholdTensor3D::initialize()
@@ -91,6 +94,8 @@ namespace larcv {
       auto const& voxel_value_min = _voxel_value_min_v[producer_index];
       auto const& voxel_value_max = _voxel_value_max_v[producer_index];
       ev_output.threshold(voxel_value_min, voxel_value_max);
+      if(_paint_value != larcv::kINVALID_FLOAT) ev_output.paint(_paint_value);
+	
     }
     return true;
   }

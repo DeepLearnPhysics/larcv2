@@ -34,7 +34,7 @@ namespace larcv {
 
     auto const& cluster3d_v = event_cluster3d.as_vector ();
     auto particle_v  = event_particle.as_vector  ();
-    if((particle_v.size()+1) != cluster3d_v.size()) {
+    if((particle_v.size()+1) != cluster3d_v.size() && particle_v.size() != cluster3d_v.size()) {
       LARCV_CRITICAL() << "Size of particles " << particle_v.size() << " mismatch w/ " << cluster3d_v.size() << std::endl;
       throw larbys();
     }
