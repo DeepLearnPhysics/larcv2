@@ -12,7 +12,7 @@ namespace larcv {
   SegLabelFiveTypes2D::SegLabelFiveTypes2D(const std::string name)
     : ProcessBase(name)
   {}
-    
+
   void SegLabelFiveTypes2D::configure(const PSet& cfg)
   {
     _cluster2d_producer = cfg.get<std::string>("Cluster2DProducer");
@@ -41,13 +41,14 @@ namespace larcv {
     
     // For convenience, treat list of particles using std::vector
     auto const& particle_v  = event_particle.as_vector();
+    assert(event_cluster2d.as_vector().size() == event_sparse2d.as_vector().size()); // this might be added by mistake RanItay
 
     // Loop over set of clusters, each set represent 2D projection
     //for(auto const& cluster2d_v : event_cluster2d.as_vector()) {
     for(size_t i=0; i<event_cluster2d.as_vector().size(); ++i) {
       auto const& cluster2d_v = event_cluster2d.as_vector()[i];
       // Goal: fill EventSparseTensor2D for THIS projection
-      //  - Need meta 
+      //  - Need meta
       //  - Need VoxelSet (sparse matrix data for this projection)
       auto meta = cluster2d_v.meta();
       VoxelSet vs;
@@ -92,8 +93,8 @@ namespace larcv {
             vs.emplace(vox.id(),class_def,false);
             continue;
           }
-          // prioritize higher class values
-          if(prev_vox.value() >= class_def) continue;
+          // prioritize lower class values
+          if(prev_vox.value() <= class_def) continue;
             vs.emplace(vox.id(),class_def,false);
         }
       }
@@ -117,8 +118,8 @@ namespace larcv {
 
 
     if(_min_num_voxel > 0  && min_num_voxel < _min_num_voxel ) {
-      LARCV_NORMAL() << "Skipping event " << event_tensor2d->event_key() 
-		     << " due to voxel count (" << min_num_voxel 
+      LARCV_NORMAL() << "Skipping event " << event_tensor2d->event_key()
+		     << " due to voxel count (" << min_num_voxel
 		     << " < " << _min_num_voxel << ")" << std::endl;
       return false;
     }

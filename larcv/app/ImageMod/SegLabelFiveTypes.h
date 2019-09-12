@@ -43,7 +43,7 @@ namespace larcv {
 
   private:
     std::string _cluster3d_producer;
-    std::string _label3d_producer;
+    std::string _tensor3d_producer;
     std::string _particle_producer;
     std::string _output_producer;
     size_t _min_num_voxel;

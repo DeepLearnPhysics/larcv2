@@ -92,6 +92,10 @@ namespace larcv {
     /// 2D length unit
     inline DistanceUnit_t unit () const { return _unit; }
 
+    /// Overload the inherited id() but make sure it can be accessed
+    using BBox2D::id;
+    /// Given a position, returns pixel ID
+    size_t id( const double x, const double y ) const { return index(row(y), col(x)); }
     /// Provide 1-D array index from row and column
     size_t index( size_t row, size_t col ) const;
     /// Provide absolute coordinate of the center of a specified pixel index

@@ -48,20 +48,24 @@ namespace larcv {
   void ParticleSet::append(const larcv::Particle& part)
   {
     _part_v.push_back(part);
-    _part_v.back().id(_part_v.size()-1);
+    if(_part_v.back().id() == kINVALID_INSTANCEID)
+      _part_v.back().id(_part_v.size()-1);
   }
 
   void ParticleSet::emplace_back(larcv::Particle&& part)
   {
     _part_v.emplace_back(std::move(part));
-    _part_v.back().id(_part_v.size()-1);
+    if(_part_v.back().id() == kINVALID_INSTANCEID)
+      _part_v.back().id(_part_v.size()-1);
   }
 
   void ParticleSet::emplace(std::vector<larcv::Particle>&& part_v)
   {
     _part_v = std::move(part_v);
-    for(size_t i=0; i<_part_v.size(); ++i)
-      _part_v[i].id(i);
+    for(size_t i=0; i<_part_v.size(); ++i) {
+      if(_part_v[i].id() == kINVALID_INSTANCEID)
+	_part_v[i].id(i);
+    }
   }
 }
 
