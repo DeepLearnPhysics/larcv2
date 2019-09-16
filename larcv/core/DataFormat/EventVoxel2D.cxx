@@ -17,26 +17,33 @@ namespace larcv {
   const larcv::ClusterPixel2D&
   EventClusterPixel2D::cluster_pixel_2d(const ProjectionID_t id) const
   {
-    if(id >= _cluster_v.size()) {
-      std::cerr << "EventClusterPixel2D does not hold any ClusterPixel2D for ProjectionID_t " << id << std::endl;
-      throw larbys();
+    for(auto const& cluster : _cluster_v) {
+      if(cluster.meta().id()!=id) continue;
+      return cluster;
     }
-    return _cluster_v[id];
+
+    std::cerr << "EventClusterPixel2D does not hold any ClusterPixel2D for ProjectionID_t " << id << std::endl;
+    throw larbys();
   }
 
   void EventClusterPixel2D::emplace(larcv::ClusterPixel2D&& clusters)
   {
-    if(_cluster_v.size() <= clusters.meta().id())
-      _cluster_v.resize(clusters.meta().id()+1);
-    _cluster_v[clusters.meta().id()] = std::move(clusters);
+    for(size_t i=0;i<_cluster_v.size();++i) {
+      if(_cluster_v[i].meta().id() != clusters.meta().id()) continue;
+      _cluster_v[i] = clusters;
+      return;
+    }
+    _cluster_v.emplace_back(clusters);
   }
 
   void EventClusterPixel2D::set(const larcv::ClusterPixel2D& clusters) 
   {
-    if(_cluster_v.size() <= clusters.meta().id())
-      _cluster_v.resize(clusters.meta().id()+1);
-    _cluster_v[clusters.meta().id()] = clusters;
-    
+    for(size_t i=0;i<_cluster_v.size();++i) {
+      if(_cluster_v[i].meta().id() != clusters.meta().id()) continue;
+      _cluster_v[i] = clusters;
+      return;
+    }
+    _cluster_v.push_back(clusters);    
   }
   
   void EventClusterPixel2D::emplace(larcv::VoxelSetArray&& clusters, larcv::ImageMeta&& meta)
@@ -58,25 +65,33 @@ namespace larcv {
   const larcv::SparseTensor2D&
   EventSparseTensor2D::sparse_tensor_2d(const ProjectionID_t id) const
   {
-    if(id >= _tensor_v.size()) {
-      std::cerr << "EventSparseTensor2D does not hold any SparseTensor2D for ProjectionID_t " << id << std::endl;
-      throw larbys();
+    for(auto const& tensor : _tensor_v) {
+      if(tensor.meta().id() != id) continue;
+      return tensor;
     }
-    return _tensor_v[id];
+
+    std::cerr << "EventSparseTensor2D does not hold any SparseTensor2D for ProjectionID_t " << id << std::endl;
+    throw larbys();
   }
 
   void EventSparseTensor2D::emplace(larcv::SparseTensor2D&& cluster)
   {
-    if(_tensor_v.size() <= cluster.meta().id())
-      _tensor_v.resize(cluster.meta().id()+1);
-    _tensor_v[cluster.meta().id()] = std::move(cluster);
+    for(size_t i=0; i<_tensor_v.size(); ++i) {
+      if(_tensor_v[i].meta().id() != cluster.meta().id()) continue;
+      _tensor_v[i] = cluster;
+      return;
+    }
+    _tensor_v.emplace_back(cluster);
   }
 
   void EventSparseTensor2D::set(const larcv::SparseTensor2D& cluster) 
   {
-    if(_tensor_v.size() <= cluster.meta().id())
-      _tensor_v.resize(cluster.meta().id()+1);
-    _tensor_v[cluster.meta().id()] = cluster;
+    for(size_t i=0; i<_tensor_v.size(); ++i) {
+      if(_tensor_v[i].meta().id() != cluster.meta().id()) continue;
+      _tensor_v[i] = cluster;
+      return;
+    }
+    _tensor_v.push_back(cluster);
   }
   
   void EventSparseTensor2D::emplace(larcv::VoxelSet&& cluster, larcv::ImageMeta&& meta)
