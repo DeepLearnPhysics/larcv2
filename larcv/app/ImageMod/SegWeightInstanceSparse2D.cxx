@@ -22,9 +22,9 @@ namespace larcv {
 
 		_projection_v = cfg.get<std::vector<size_t> >("ProjectionID");
 
-		_weight_max = cfg.get<unsigned int>("WeightMax");
+		_weight_max = cfg.get<double>("WeightMax");
 
-		_weight_min = cfg.get<unsigned int>("WeightMin");
+		_weight_min = cfg.get<double>("WeightMin");
 
 
 		if (_cluster2d_producer.empty()) {
@@ -81,14 +81,15 @@ namespace larcv {
 
 			// compute weights 
 			size_t vox_counts=0;
-			double max_weight=0;
 			std::vector<double> weights_v(cluster2d_v.size(),0.);
 			for(size_t cluster_idx=0; cluster_idx<cluster2d_v.size(); ++cluster_idx) {
 				size_t cluster_size = cluster2d_v.as_vector()[cluster_idx].size();
 				if(cluster_size<1) continue;
 				double weight = 1./ (double)(cluster_size);
-				max_weight = std::max(max_weight,weight);
 				weights_v[cluster_idx] = std::max(std::min(_weight_max,weight),_weight_min);
+				LARCV_INFO() << "Cluster " << cluster_idx
+					     << " size " << cluster_size
+					     << " weights " << weights_v[cluster_idx] << std::endl;
 				vox_counts += cluster_size;
 			}
 			out_vs.reserve(vox_counts);
@@ -147,6 +148,7 @@ namespace larcv {
 
 		for(size_t i=0; i<out_vs_v.size(); ++i)
 			event_output_v.emplace(std::move(out_vs_v[i]),std::move(out_meta_v[i]));
+
 		return true;
 	}
 
