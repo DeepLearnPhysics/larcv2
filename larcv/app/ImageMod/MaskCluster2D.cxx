@@ -1,17 +1,17 @@
-#ifndef __MaskTensor2D_CXX__
-#define __MaskTensor2D_CXX__
+#ifndef __MaskCluster2D_CXX__
+#define __MaskCluster2D_CXX__
 
-#include "MaskTensor2D.h"
+#include "MaskCluster2D.h"
 #include "larcv/core/DataFormat/EventVoxel2D.h"
 namespace larcv {
 
-  static MaskTensor2DProcessFactory __global_MaskTensor2DProcessFactory__;
+  static MaskCluster2DProcessFactory __global_MaskCluster2DProcessFactory__;
 
-  MaskTensor2D::MaskTensor2D(const std::string name)
+  MaskCluster2D::MaskCluster2D(const std::string name)
     : ProcessBase(name)
   {}
 
-  void MaskTensor2D::configure_labels(const PSet& cfg)
+  void MaskCluster2D::configure_labels(const PSet& cfg)
   {
     _target_producer_v.clear();
     _output_producer_v.clear();
@@ -19,7 +19,7 @@ namespace larcv {
     _output_producer_v    = cfg.get<std::vector<std::string> >("OutputProducerList",    _output_producer_v    );
     _reference_producer_v = cfg.get<std::vector<std::string> >("ReferenceProducerList", _reference_producer_v );
     if (_target_producer_v.empty()) {
-      auto target_producer    = cfg.get<std::string>("Tensor2DProducer",  "");
+      auto target_producer    = cfg.get<std::string>("Cluster2DProducer",  "");
       auto output_producer    = cfg.get<std::string>("OutputProducer",    "");
       auto reference_producer = cfg.get<std::string>("ReferenceProducer", "");
       if (!target_producer.empty()) {
@@ -33,17 +33,17 @@ namespace larcv {
       _output_producer_v.resize(_target_producer_v.size(), "");
     }
     else if (_output_producer_v.size() != _target_producer_v.size()) {
-      LARCV_CRITICAL() << "Tensor2DProducer and OutputProducer must have the same array length!" << std::endl;
+      LARCV_CRITICAL() << "Cluster2DProducer and OutputProducer must have the same array length!" << std::endl;
       throw larbys();
     }
 
     if (_reference_producer_v.size() != _target_producer_v.size()) {
-      LARCV_CRITICAL() << "Tensor2DProducer and OutputProducer must have the same array length!" << std::endl;
+      LARCV_CRITICAL() << "Cluster2DProducer and OutputProducer must have the same array length!" << std::endl;
       throw larbys();
     }
   }
 
-  void MaskTensor2D::configure(const PSet& cfg)
+  void MaskCluster2D::configure(const PSet& cfg)
   {
     configure_labels(cfg);
 
@@ -58,10 +58,10 @@ namespace larcv {
 
   }
 
-  void MaskTensor2D::initialize()
+  void MaskCluster2D::initialize()
   {}
 
-  bool MaskTensor2D::process(IOManager& mgr)
+  bool MaskCluster2D::process(IOManager& mgr)
   {
     for (size_t producer_index = 0; producer_index < _target_producer_v.size(); ++producer_index) {
 
@@ -70,54 +70,52 @@ namespace larcv {
       auto output_producer = _output_producer_v[producer_index];
       if (output_producer.empty()) output_producer = target_producer + "_masked";
 
-      auto const& ev_target = mgr.get_data<larcv::EventSparseTensor2D>(target_producer);
+      auto const& ev_target = mgr.get_data<larcv::EventClusterPixel2D>(target_producer);
       auto const& ev_ref = mgr.get_data<larcv::EventSparseTensor2D>(reference_producer);
 
-      if(ev_target.as_vector().size() != ev_ref.as_vector().size()) {
-	LARCV_CRITICAL() << "Target tensor2d count ("
-			 << target_producer << "," << ev_target.as_vector().size()
-			 << ") != reference tensor2d count (" 
-			 << reference_producer << "," << ev_ref.as_vector().size() << ")" << std::endl;
-	throw larcv::larbys();
-      }
+      std::vector<larcv::ClusterPixel2D> vsa2d_v(ev_target.as_vector().size());
 
-      std::vector<larcv::SparseTensor2D> tensor2d_v;
+      for(size_t data_idx=0; data_idx<ev_target.as_vector().size(); ++data_idx) {
 
-      for(size_t i=0; i<ev_target.as_vector().size(); ++i) {
+	auto const& vsa_target = ev_target.as_vector()[data_idx];
+	auto const& vs_ref    = ev_ref.as_vector()[data_idx];
+	auto meta = vsa_target.meta();
 
-	auto const& target_vs = ev_target.as_vector()[i];
-	auto const& ref_vs    = ev_ref.as_vector()[i];
-
-	auto target_meta = target_vs.meta();
-	auto ref_meta    = ref_vs.meta();
-	if(ref_meta != target_meta) {
+	auto& vsa_out = vsa2d_v[data_idx];
+	vsa_out.meta(meta);
+	vsa_out.resize(vsa_target.as_vector().size());
+	
+	if(vs_ref.meta() != vsa_target.meta()) {
 	  LARCV_CRITICAL() << "Target (" << target_producer 
 			   << ") vs. Reference (" << reference_producer
 			   << ") has incompatible meta!" << std::endl;
 	  throw larbys();
 	}
 	
-	larcv::VoxelSet vs;
 	auto const& value_min = _value_min_v[producer_index];
-	for(auto const& vox : target_vs.as_vector()) {
-	  auto const& ref_vox = ref_vs.find(vox.id());
-	  if (ref_vox.id() == kINVALID_VOXELID) continue;
-	  if (ref_vox.value() < value_min) continue;
-	  vs.emplace(vox.id(), vox.value(), false);
+
+	for(size_t vs_idx=0; vs_idx<vsa_target.as_vector().size(); ++vs_idx) {
+	  auto const& target = vsa_target.as_vector()[vs_idx];
+	  auto& vs_out = vsa_out.writeable_voxel_set(vs_idx);
+
+	  for(auto const& vox : target.as_vector()) {
+	    auto const& ref_vox = vs_ref.find(vox.id());
+	    if (ref_vox.id() == kINVALID_VOXELID) continue;
+	    if (ref_vox.value() < value_min) continue;
+	    vs_out.emplace(vox.id(), vox.value(), false);
+	  }
 	}
-	larcv::ImageMeta meta(target_meta);
-	larcv::SparseTensor2D tensor2d(std::move(vs),std::move(meta));
-	tensor2d_v.emplace_back(std::move(tensor2d));
       }
 
-      auto& ev_output = mgr.get_data<larcv::EventSparseTensor2D>(output_producer);
-      for(auto const& tensor2d : tensor2d_v)
-	ev_output.emplace(std::move(tensor2d));
+      auto ev_output = (EventClusterPixel2D*)(mgr.get_data("cluster2d",output_producer));
+      ev_output->clear();
+      for(size_t data_idx=0; data_idx<vsa2d_v.size(); ++data_idx)
+	ev_output->emplace(std::move(vsa2d_v[data_idx]));
     }
     return true;
   }
 
-  void MaskTensor2D::finalize()
+  void MaskCluster2D::finalize()
   {}
 
 }
