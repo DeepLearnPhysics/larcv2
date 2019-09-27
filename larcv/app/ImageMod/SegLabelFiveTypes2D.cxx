@@ -41,7 +41,7 @@ namespace larcv {
     
     // For convenience, treat list of particles using std::vector
     auto const& particle_v  = event_particle.as_vector();
-    assert(event_cluster2d.as_vector().size() == event_sparse2d.as_vector().size()); // this might be added by mistake RanItay
+//    assert(event_cluster2d.as_vector().size() == event_sparse2d.as_vector().size()); // this might be added by mistake RanItay
 
     // Loop over set of clusters, each set represent 2D projection
     //for(auto const& cluster2d_v : event_cluster2d.as_vector()) {
