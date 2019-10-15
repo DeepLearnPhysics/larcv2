@@ -7,7 +7,7 @@ namespace larcv {
 
   Image2D::Image2D(size_t row_count, size_t col_count)
     : _img(row_count * col_count, 0.)
-    , _meta(col_count, row_count, row_count, col_count, 0., 0.)
+    , _meta(0., 0., col_count, row_count, row_count, col_count)
   {}
 
   Image2D::Image2D(const ImageMeta& meta)
