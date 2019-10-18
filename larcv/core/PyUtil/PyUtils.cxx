@@ -334,8 +334,8 @@ void fill_2d_voxels(const SparseTensor2D& data, PyObject* pyarray, PyObject* sel
 
     auto const& vox = vs.at(index);
     data.meta().index_to_rowcol(vox.id(),row,col);
-    carray[i][0] = row;
-    carray[i][1] = col;
+    carray[i][0] = col;
+    carray[i][1] = row;
   }
   PyArray_Free(pyarray,  (void *)carray);
   return;
