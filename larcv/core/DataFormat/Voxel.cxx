@@ -195,6 +195,11 @@ namespace larcv {
 
   void VoxelSetArray::emplace(larcv::VoxelSet&& voxel_v)
   {
+    if(voxel_v.id() == larcv::kINVALID_INSTANCEID) {
+      _voxel_vv.emplace_back(std::move(voxel_v));
+      _voxel_vv.back().id(_voxel_vv.size()-1);
+      return;
+    }
     if(voxel_v.id() >= _voxel_vv.size()) {
       size_t orig_size = _voxel_vv.size();
       _voxel_vv.resize(voxel_v.id()+1);
@@ -206,6 +211,11 @@ namespace larcv {
 
   void VoxelSetArray::insert(const larcv::VoxelSet& voxel_v)
   {
+    if(voxel_v.id() == larcv::kINVALID_INSTANCEID) {
+      _voxel_vv.push_back(voxel_v);
+      _voxel_vv.back().id(_voxel_vv.size()-1);
+      return;
+    }
     if(voxel_v.id() >= _voxel_vv.size()) {
       size_t orig_size = _voxel_vv.size();
       _voxel_vv.resize(voxel_v.id()+1);

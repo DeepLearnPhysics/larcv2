@@ -79,7 +79,7 @@ namespace larcv {
         auto recomb_factor = this->Recombination(dedx);
         auto lifetime_factor = this->Lifetime( (meta.pos_x(vox_in.id()) - meta.min_x()) );
 	float vox_value = vox_in.value() * recomb_factor * lifetime_factor;
-	if(vox_value < 0 || isnan(vox_value)) {
+	if(vox_value < 0 || std::isnan(vox_value)) {
 	  LARCV_ERROR() << "Invalid voxel value ignored: de=" << vox_in.value() << " dx=" << vox_dx.value()
 			<< " recomb=" << recomb_factor << " lifetime="<<lifetime_factor << std::endl;
 	  ++invalid_ctr;
