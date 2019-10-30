@@ -15,10 +15,11 @@ namespace larcv {
 
   void ParticleCorrector::configure(const PSet& cfg)
   {
-    _correct_energy_deposit = cfg.get<bool>    ( "CorrectEnergyDeposit", true);
-    _particle_producer  = cfg.get<std::string> ( "ParticleProducer"        );
-    _cluster3d_producer = cfg.get<std::string> ( "Cluster3DProducer"       );
-    _voxel_min_value = cfg.get<double>         ( "VoxelMinValue"           );
+    _correct_energy_deposit = cfg.get<bool>        ( "CorrectEnergyDeposit", true        );
+    _particle_producer      = cfg.get<std::string> ( "ParticleProducer"                  );
+    _output_producer        = cfg.get<std::string> ( "OutputProducer", _particle_producer);
+    _cluster3d_producer     = cfg.get<std::string> ( "Cluster3DProducer"                 );
+    _voxel_min_value         = cfg.get<double>     ( "VoxelMinValue"                     );
     _shift_xyz.clear();
     _shift_xyz.resize(3,0.);
     _shift_xyz = cfg.get<std::vector<double> > ( "ShiftXYZ", _shift_xyz);
@@ -53,8 +54,8 @@ namespace larcv {
     std::vector<Particle> out_particle_v = correct_particle_positions(meta3d, particle_v, cluster3d_v);
 
     // create output
-    auto& out_particle  = mgr.get_data< EventParticle       > (  _particle_producer  );
-    out_particle.emplace  ( std::move(out_particle_v)              );
+    auto& out_particle  = mgr.get_data< EventParticle > ( _output_producer  );
+    out_particle.emplace  ( std::move(out_particle_v) );
 
     return true;
   }
@@ -91,7 +92,7 @@ namespace larcv {
       
       if( abs(particle.pdg_code()) == 11 || particle.pdg_code() == 22) correctEnd = false;
       
-      LARCV_INFO() << "PDG: " << particle.pdg_code()
+      LARCV_INFO() << "Index " << i << " ID " << particle.id() << " PDG: " << particle.pdg_code()
 		   << " start: (" << first_step.x << "," << first_step.y << "," << first_step.z << ") ..." 
 		   << " end: (" << last_step.x << "," << last_step.y << "," << last_step.z << ") ..."
 		   << std::endl;
@@ -132,7 +133,7 @@ namespace larcv {
       // Correct starting point
       if (correctStart && i_best_start > -1) {
 	auto const pt = meta3d.position(vs[i_best_start].id());
-        LARCV_INFO() << "Correcting PDG " << particle.pdg_code() << " START"
+        LARCV_INFO() << "  Correcting PDG " << particle.pdg_code() << " START"
 		     << " XYZ (" << pt.x << "," << pt.y << "," << pt.z << ")" << std::endl;
         particle.first_step(pt.x, pt.y, pt.z, particle.first_step().t());
       }
@@ -145,7 +146,7 @@ namespace larcv {
       // Correct end point
       if (correctEnd && i_best_end > -1) {
 	auto const pt = meta3d.position(vs[i_best_end].id());
-        LARCV_INFO() << "Correcting PDG " << particle.pdg_code() << " END"
+        LARCV_INFO() << "  Correcting PDG " << particle.pdg_code() << " END"
 		     << " XYZ (" << pt.x << "," << pt.y << "," << pt.z << ")" << std::endl;
         particle.last_step(pt.x, pt.y, pt.z, particle.last_step().t());
       }

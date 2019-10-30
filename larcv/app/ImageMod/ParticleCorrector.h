@@ -48,6 +48,7 @@ namespace larcv {
 
     bool _correct_energy_deposit;
     std::string _particle_producer;
+    std::string _output_producer;
     std::string _cluster3d_producer;
     double _voxel_min_value;
     std::vector<double> _shift_xyz;
