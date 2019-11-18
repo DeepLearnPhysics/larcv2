@@ -38,19 +38,22 @@ namespace larcv {
         throw larbys();
       }
       switch(_pool_type) {
-        case kSumPool:
-        for(auto const& vox : ev_tensor3d.as_vector())
+      case kSumPool:
+	for(auto const& vox : ev_tensor3d.as_vector())
           vs.add(vox);
         break;
-        case kMaxPool:
+      case kMaxPool:
+      case kMinPool:
         for(auto const& vox : ev_tensor3d.as_vector()) {
           auto const& exist_vox = vs.find(vox.id());
           if(exist_vox.id() == kINVALID_VOXELID) {
             vs.add(vox);
             continue;
           }
-          if(vox.value() > exist_vox.value())
+          if(_pool_type == kMaxPool && vox.value() > exist_vox.value())
             vs.emplace(vox.id(),vox.value(),false);
+	  else if(_pool_type == kMinPool && vox.value() < exist_vox.value())
+	    vs.emplace(vox.id(),vox.value(),false);
         }
         break;
       }
