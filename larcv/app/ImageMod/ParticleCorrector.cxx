@@ -20,6 +20,9 @@ namespace larcv {
     _output_producer        = cfg.get<std::string> ( "OutputProducer", _particle_producer);
     _cluster3d_producer     = cfg.get<std::string> ( "Cluster3DProducer"                 );
     _voxel_min_value         = cfg.get<double>     ( "VoxelMinValue"                     );
+		_skip_semantic_label.clear();
+		_skip_semantic_label.resize(0, 0);
+		_skip_semantic_label    = cfg.get<std::vector<int> > ( "SkipSemanticLabel", _skip_semantic_label);
     _shift_xyz.clear();
     _shift_xyz.resize(3,0.);
     _shift_xyz = cfg.get<std::vector<double> > ( "ShiftXYZ", _shift_xyz);
@@ -73,9 +76,12 @@ namespace larcv {
     float size_voxel = (meta3d.size_voxel_x() + meta3d.size_voxel_y() + meta3d.size_voxel_z())/3.;
     for(size_t i=0; i<particle_v.size(); ++i) {
       auto particle  = particle_v[i];
+			// Skip if semantic label is in _skip_semantic_label
+			if (std::find(_skip_semantic_label.begin(), _skip_semantic_label.end(), particle.semantic_label()) != _skip_semantic_label.end()) continue;
+
       auto const& vs = cluster3d_v[i].as_vector();
       //if(vs.size()<1) continue;
-      
+
       auto first_step = particle.first_step().as_point3d();
       auto last_step  = particle.last_step().as_point3d();
       first_step.x += _shift_xyz[0];
@@ -89,14 +95,14 @@ namespace larcv {
 
       bool correctStart = true;
       bool correctEnd = true;
-      
+
       if( abs(particle.pdg_code()) == 11 || particle.pdg_code() == 22) correctEnd = false;
-      
+
       LARCV_INFO() << "Index " << i << " ID " << particle.id() << " PDG: " << particle.pdg_code()
-		   << " start: (" << first_step.x << "," << first_step.y << "," << first_step.z << ") ..." 
+		   << " start: (" << first_step.x << "," << first_step.y << "," << first_step.z << ") ..."
 		   << " end: (" << last_step.x << "," << last_step.y << "," << last_step.z << ") ..."
 		   << std::endl;
-      
+
       // Check for cluster vs boundaries
       int i_best_start = -1;
       int i_best_end = -1;
@@ -106,7 +112,7 @@ namespace larcv {
       for(size_t j=0; j<vs.size(); ++j) {
 	if(vs[j].value() < _voxel_min_value) continue;
 	auto point3d = meta3d.position(vs[j].id());
-	
+
 	//double distance_start = point3d.distance(particle.position().as_point3d());
 	if(correctStart) {
 	  double distance_start = point3d.distance(first_step);
