@@ -59,11 +59,15 @@ namespace larcv {
     kPoolMax      ///< max channel
   };
 
-  /// Object appearance type in LArTPC  
+  /// Object appearance type in LArTPC, used for semantic type classification
   enum ShapeType_t {
-    kShapeShower,  ///< Shower
-    kShapeTrack,   ///< Track
-    kShapeUnknown  ///< LArbys
+    kShapeShower,    ///< Shower
+    kShapeTrack,     ///< Track
+    kShapeMichel,    ///< Michel
+    kShapeDelta,     ///< Delta ray
+    kShapeLEScatter, ///< low energy scattering (e.g. low-E compton)
+    kShapeGhost,     ///< ghost 3d point
+    kShapeUnknown    ///< LArbys
   };
 
   /// "ID" of MCParticles in terms of its G4 track ID (unless mixing multiple MC samples)

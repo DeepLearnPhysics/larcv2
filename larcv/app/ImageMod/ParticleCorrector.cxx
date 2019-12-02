@@ -19,10 +19,9 @@ namespace larcv {
     _particle_producer      = cfg.get<std::string> ( "ParticleProducer"                  );
     _output_producer        = cfg.get<std::string> ( "OutputProducer", _particle_producer);
     _cluster3d_producer     = cfg.get<std::string> ( "Cluster3DProducer"                 );
-    _voxel_min_value         = cfg.get<double>     ( "VoxelMinValue"                     );
-		_skip_semantic_label.clear();
-		_skip_semantic_label.resize(0, 0);
-		_skip_semantic_label    = cfg.get<std::vector<int> > ( "SkipSemanticLabel", _skip_semantic_label);
+    _voxel_min_value        = cfg.get<double>     ( "VoxelMinValue"                     );
+    _skip_semantic_label.clear();
+    _skip_semantic_label    = cfg.get<std::vector<int> > ( "SkipSemanticLabel", _skip_semantic_label);
     _shift_xyz.clear();
     _shift_xyz.resize(3,0.);
     _shift_xyz = cfg.get<std::vector<double> > ( "ShiftXYZ", _shift_xyz);
@@ -76,8 +75,8 @@ namespace larcv {
     float size_voxel = (meta3d.size_voxel_x() + meta3d.size_voxel_y() + meta3d.size_voxel_z())/3.;
     for(size_t i=0; i<particle_v.size(); ++i) {
       auto particle  = particle_v[i];
-			// Skip if semantic label is in _skip_semantic_label
-			if (std::find(_skip_semantic_label.begin(), _skip_semantic_label.end(), particle.semantic_label()) != _skip_semantic_label.end()) continue;
+      // Skip if semantic label is in _skip_semantic_label
+      if (std::find(_skip_semantic_label.begin(), _skip_semantic_label.end(), (int)(particle.shape())) != _skip_semantic_label.end()) continue;
 
       auto const& vs = cluster3d_v[i].as_vector();
       //if(vs.size()<1) continue;
