@@ -2,7 +2,7 @@
  * \file ThresholdCluster3D.h
  *
  * \ingroup ImageMod
- * 
+ *
  * \brief Class def header for a class ThresholdCluster3D
  *
  * @author kazuhiro
@@ -26,10 +26,10 @@ namespace larcv {
   class ThresholdCluster3D : public ProcessBase {
 
   public:
-    
+
     /// Default constructor
     ThresholdCluster3D(const std::string name="ThresholdCluster3D");
-    
+
     /// Default destructor
     ~ThresholdCluster3D(){}
 
@@ -51,6 +51,8 @@ namespace larcv {
     std::vector<float> _voxel_value_min_v;
     std::vector<float> _voxel_value_max_v;
 
+		bool _exclude_inf;
+		bool _exclude_nan;
   };
 
   /**
@@ -70,5 +72,5 @@ namespace larcv {
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 
