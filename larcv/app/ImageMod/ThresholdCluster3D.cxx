@@ -91,20 +91,17 @@ namespace larcv {
       }
 
       ev_output = ev_cluster3D;
-			if (_exclude_inf || _exclude_nan) {
+			if (_exclude_inf || _exclude_nan || _exclude_invalid) {
 				larcv::VoxelSetArray cluster_v;
-				for (auto& cluster : ev_output.as_vector()) {
-					larcv::VoxelSet vox_v;
-					vox_v.reserve(cluster.as_vector().size());
-					for (auto& v : cluster.as_vector()) {
-						if (_exclude_inf && std::isinf(v.value())) continue;
-						if (_exclude_nan && std::isnan(v.value())) continue;
-						vox_v.insert(v);
-					}
-					cluster_v.insert(std::move(vox_v));
+				for (auto const& vs : ev_cluster3D.as_vector()) {
+					larcv::VoxelSet vs_copy = vs;
+          vs_copy.clear_invalid(_exclude_invalid, _exclude_nan, _exclude_inf);
+					cluster_v.emplace(std::move(vs_copy));
 				}
-				ev_output.emplace(std::move(cluster_v), ev_output.meta());
-			}
+				ev_output.emplace(std::move(cluster_v), ev_cluster3D.meta());
+			}else{
+        ev_output = ev_cluster3D;
+      }
       auto const& voxel_value_min = _voxel_value_min_v[producer_index];
       auto const& voxel_value_max = _voxel_value_max_v[producer_index];
       ev_output.threshold(voxel_value_min, voxel_value_max);

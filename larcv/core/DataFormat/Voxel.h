@@ -119,9 +119,11 @@ namespace larcv {
 
     //
     // Write-access
-    //    
+    //
     /// Clear everything
     inline virtual void clear_data() { _voxel_v.clear(); }
+    /// Clear "invalid" values
+    void clear_invalid(bool clear_invalid_float=true, bool clear_nan=true, bool clear_inf=true);
     /// Reserve
     inline void reserve(size_t num) { _voxel_v.reserve(num); }
     /// Thresholding voxels by an upper and lower end values
@@ -141,7 +143,7 @@ namespace larcv {
     inline void paint(float value)
     { for(auto& vox : _voxel_v) vox.set(vox.id(), value); }
     /// Emplace a new voxel from id & value
-    inline void emplace(VoxelID_t id, float value, const bool add) 
+    inline void emplace(VoxelID_t id, float value, const bool add)
     { emplace(Voxel(id,value),add); }
     /// InstanceID_t setter
     inline void id(const InstanceID_t id) { _id = id; }
@@ -159,7 +161,7 @@ namespace larcv {
     { for(auto& vox : _voxel_v) vox /= factor; return (*this); }
     inline VoxelSet& operator =  (float value)
     { paint(value); return (*this); }
-    
+
   private:
     /// Instance ID
     InstanceID_t _id;
@@ -213,7 +215,7 @@ namespace larcv {
     /// Resize voxel array
     inline void resize(const size_t num)
     { _voxel_vv.resize(num); for(size_t i=0; i<num; ++i) _voxel_vv[i].id(i); }
-    /// Access non-const reference of a specific VoxelSet 
+    /// Access non-const reference of a specific VoxelSet
     larcv::VoxelSet& writeable_voxel_set(const InstanceID_t id);
     /// Move an arrray of VoxelSet. Each element's InstanceID_t gets updated
     void emplace(std::vector<larcv::VoxelSet>&& voxel_vv);
@@ -235,4 +237,3 @@ namespace larcv {
 
 #endif
 /** @} */ // end of doxygen group
-

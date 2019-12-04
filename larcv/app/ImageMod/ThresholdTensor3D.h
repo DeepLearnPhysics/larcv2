@@ -48,6 +48,7 @@ namespace larcv {
     float _paint_value;
 		bool _exclude_inf;
 		bool _exclude_nan;
+    bool _exclude_invalid;
 
     std::vector<std::string> _target_producer_v;
     std::vector<std::string> _output_producer_v;
@@ -75,4 +76,3 @@ namespace larcv {
 
 #endif
 /** @} */ // end of doxygen group
-

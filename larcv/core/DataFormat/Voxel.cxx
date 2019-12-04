@@ -3,6 +3,7 @@
 
 #include "Voxel.h"
 #include <iostream>
+#include <cmath>
 
 namespace larcv {
 
@@ -17,6 +18,21 @@ namespace larcv {
     }
     return val;
   }
+
+  void VoxelSet::clear_invalid(bool clear_invalid_float, bool clear_nan, bool clear_inf)
+  {
+    if(!clear_invalid_float && !clear_nan && !clear_inf) return;
+    std::vector<larcv::Voxel> vox_v;
+    vox_v.reserve(_voxel_v.size());
+    for(auto const& vox : _voxel_v) {
+      if (clear_inf && std::isinf(vox.value())) continue;
+      if (clear_nan && std::isnan(vox.value())) continue;
+      if (clear_invalid_float && vox.value() == larcv::kINVALID_FLOAT) continue;
+      vox_v.push_back(vox);
+    }
+    _voxel_v = std::move(vox_v);
+  }
+
 
   float VoxelSet::min() const
   {
@@ -37,7 +53,7 @@ namespace larcv {
     }
     _voxel_v = std::move(vox_v);
   }
-  
+
   void VoxelSet::threshold_min(float min)
   {
     std::vector<larcv::Voxel> vox_v;
@@ -48,7 +64,7 @@ namespace larcv {
     }
     _voxel_v = std::move(vox_v);
   }
-  
+
   void VoxelSet::threshold_max(float max)
   {
     std::vector<larcv::Voxel> vox_v;
@@ -142,9 +158,9 @@ namespace larcv {
   { float res=0.; for(auto const& vox_v : _voxel_vv) res+=vox_v.sum(); return res;}
 
   float VoxelSetArray::mean() const
-  { 
-    size_t vox_ctr = 0; 
-    for(auto const& vox_v : _voxel_vv) vox_ctr += vox_v.size(); 
+  {
+    size_t vox_ctr = 0;
+    for(auto const& vox_v : _voxel_vv) vox_ctr += vox_v.size();
     return (vox_ctr<1 ? 0. : this->sum() / (float)vox_ctr);
   }
 

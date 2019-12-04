@@ -42,6 +42,7 @@ namespace larcv {
 
 		_exclude_inf = cfg.get<bool>("ExcludeInf", true);
 		_exclude_nan = cfg.get<bool>("ExcludeNan", true);
+    _exclude_invalid = cfg.get<bool>("ExcludeInvalid", true);
 
     _voxel_value_min_v = cfg.get<std::vector<float> >("MinThresholdList", _voxel_value_min_v);
     if (_voxel_value_min_v.empty()) {
@@ -94,16 +95,7 @@ namespace larcv {
       }
 
       ev_output = ev_tensor3d;
-			if (_exclude_inf || _exclude_nan) {
-				larcv::VoxelSet vox_v;
-				vox_v.reserve(ev_output.as_vector().size());
-				for(auto& v : ev_output.as_vector()) {
-					if (_exclude_inf && std::isinf(v.value())) continue;
-					if (_exclude_nan && std::isnan(v.value())) continue;
-					vox_v.insert(v);
-				}
-				ev_output.emplace(std::move(vox_v), ev_output.meta());
-			}
+      ev_output.clear_invalid(_exclude_invalid, _exclude_nan, _exclude_inf);
       auto const& voxel_value_min = _voxel_value_min_v[producer_index];
       auto const& voxel_value_max = _voxel_value_max_v[producer_index];
       ev_output.threshold(voxel_value_min, voxel_value_max);

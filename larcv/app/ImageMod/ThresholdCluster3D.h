@@ -53,6 +53,8 @@ namespace larcv {
 
 		bool _exclude_inf;
 		bool _exclude_nan;
+    bool _exclude_invalid;
+
   };
 
   /**
@@ -73,4 +75,3 @@ namespace larcv {
 
 #endif
 /** @} */ // end of doxygen group
-
