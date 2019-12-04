@@ -2,7 +2,7 @@
  * \file ThresholdTensor3D.h
  *
  * \ingroup ImageMod
- * 
+ *
  * \brief Class def header for a class ThresholdTensor3D
  *
  * @author kazuhiro
@@ -26,10 +26,10 @@ namespace larcv {
   class ThresholdTensor3D : public ProcessBase {
 
   public:
-    
+
     /// Default constructor
     ThresholdTensor3D(const std::string name="ThresholdTensor3D");
-    
+
     /// Default destructor
     ~ThresholdTensor3D(){}
 
@@ -46,6 +46,8 @@ namespace larcv {
     void configure_labels(const PSet& cfg);
 
     float _paint_value;
+		bool _exclude_inf;
+		bool _exclude_nan;
 
     std::vector<std::string> _target_producer_v;
     std::vector<std::string> _output_producer_v;
@@ -72,5 +74,5 @@ namespace larcv {
 }
 
 #endif
-/** @} */ // end of doxygen group 
+/** @} */ // end of doxygen group
 

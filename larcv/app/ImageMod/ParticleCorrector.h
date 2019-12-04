@@ -48,9 +48,11 @@ namespace larcv {
 
     bool _correct_energy_deposit;
     std::string _particle_producer;
+    std::string _output_producer;
     std::string _cluster3d_producer;
     double _voxel_min_value;
     std::vector<double> _shift_xyz;
+		std::vector<int> _skip_semantic_label;
     /**
        Correct particle positions (first/last step) based on cluster3d information
        \param BBox3D to consider as frame.

@@ -40,6 +40,9 @@ namespace larcv {
   {
     configure_labels(cfg);
 
+		_exclude_inf = cfg.get<bool>("ExcludeInf", true);
+		_exclude_nan = cfg.get<bool>("ExcludeNan", true);
+
     _voxel_value_min_v = cfg.get<std::vector<float> >("MinThresholdList", _voxel_value_min_v);
     if (_voxel_value_min_v.empty()) {
       auto voxel_value_min = cfg.get<float>("MinThreshold", 0.);
@@ -88,6 +91,20 @@ namespace larcv {
       }
 
       ev_output = ev_cluster3D;
+			if (_exclude_inf || _exclude_nan) {
+				larcv::VoxelSetArray cluster_v;
+				for (auto& cluster : ev_output.as_vector()) {
+					larcv::VoxelSet vox_v;
+					vox_v.reserve(cluster.as_vector().size());
+					for (auto& v : cluster.as_vector()) {
+						if (_exclude_inf && std::isinf(v.value())) continue;
+						if (_exclude_nan && std::isnan(v.value())) continue;
+						vox_v.insert(v);
+					}
+					cluster_v.insert(std::move(vox_v));
+				}
+				ev_output.emplace(std::move(cluster_v), ev_output.meta());
+			}
       auto const& voxel_value_min = _voxel_value_min_v[producer_index];
       auto const& voxel_value_max = _voxel_value_max_v[producer_index];
       ev_output.threshold(voxel_value_min, voxel_value_max);

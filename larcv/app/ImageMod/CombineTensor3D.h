@@ -41,7 +41,7 @@ namespace larcv {
 
     void finalize();
 
-    enum PoolType_t {kMaxPool,kSumPool};
+    enum PoolType_t {kMinPool,kMaxPool,kSumPool};
 
   private:
     std::string _output_producer;

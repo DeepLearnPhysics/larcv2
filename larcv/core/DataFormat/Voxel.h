@@ -93,7 +93,7 @@ namespace larcv {
   class VoxelSet {
   public:
     /// Default ctor
-    VoxelSet() {}
+  VoxelSet() : _id(larcv::kINVALID_INSTANCEID) {}
     /// Default dtor
     virtual ~VoxelSet() {}
 

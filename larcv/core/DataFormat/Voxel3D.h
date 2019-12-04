@@ -48,7 +48,7 @@ namespace larcv {
     {*((VoxelSet*)this) = std::move(vs); this->meta(meta);}
     /// Set the whole voxel set w/ meta
     inline void set(const VoxelSet& vs, const Voxel3DMeta& meta)
-    {*((VoxelSet*)this) = vs; this->meta(meta);} 
+    {*((VoxelSet*)this) = vs; this->meta(meta);}
     /// Clear everything
     inline void clear_data() { VoxelSet::clear_data(); _meta = Voxel3DMeta(); }
     /// Meta setter

@@ -168,7 +168,7 @@ namespace larcv {
     inline void group_id(InstanceID_t id)       { _group_id = id;       }
     inline void interaction_id(InstanceID_t id) { _interaction_id = id; }
     std::string dump() const;
-    
+
   private:
 
     InstanceID_t   _id; ///< "ID" of this particle in ParticleSet collection

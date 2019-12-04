@@ -111,7 +111,7 @@ namespace larcv {
       }
 
       auto& ev_output = mgr.get_data<larcv::EventSparseTensor2D>(output_producer);
-      for(size_t i=0; i<tensor2d_v.size(); ++i)
+      for(size_t i=0; i<tensor2d_v.size(); ++i) 
 	ev_output.emplace(std::move(tensor2d_v[i]));
     }
     return true;
