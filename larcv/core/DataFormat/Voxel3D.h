@@ -46,6 +46,9 @@ namespace larcv {
     /// Emplace the whole voxel set w/ meta
     inline void emplace(VoxelSet&& vs, const Voxel3DMeta& meta)
     {*((VoxelSet*)this) = std::move(vs); this->meta(meta);}
+    /// Emplace a new voxel from id & value
+    inline void emplace(VoxelID_t id, float value, const bool add)
+    { VoxelSet::emplace(id, value, add); }
     /// Set the whole voxel set w/ meta
     inline void set(const VoxelSet& vs, const Voxel3DMeta& meta)
     {*((VoxelSet*)this) = vs; this->meta(meta);}
@@ -53,10 +56,12 @@ namespace larcv {
     inline void clear_data() { VoxelSet::clear_data(); _meta = Voxel3DMeta(); }
     /// Meta setter
     void meta(const larcv::Voxel3DMeta& meta);
+    /// Returns a const reference to voxel closest to a voxel with specified id. if no such voxel within distance, return invalid voxel.
+    const Voxel& close(VoxelID_t id, double distance, const larcv::Voxel3DMeta& meta) const;
 
   private:
     larcv::Voxel3DMeta _meta;
-    
+
   };
 
   /**
@@ -92,10 +97,9 @@ namespace larcv {
 
   private:
     larcv::Voxel3DMeta _meta;
-  };  
+  };
 
 }
 
 #endif
 /** @} */ // end of doxygen group
-

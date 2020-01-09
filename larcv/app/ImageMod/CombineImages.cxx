@@ -14,9 +14,9 @@ namespace larcv {
 
   void CombineImages::configure(const PSet& cfg)
   {
-    _producer_v = cfg.get<std::vector<std::string> >("ImageProducers");
-    _nplanes    = cfg.get<size_t>("NPlanes");
-    _out_producer = cfg.get<std::string>("OutputProducer");
+    _producer_v     = cfg.get<std::vector<std::string> >("ImageProducers");
+    _nplanes        = cfg.get<size_t>("NPlanes");
+    _out_producer   = cfg.get<std::string>("OutputProducer");
   }
 
   void CombineImages::initialize()

@@ -10,12 +10,13 @@ namespace larcv {
   CombineTensor3D::CombineTensor3D(const std::string name)
     : ProcessBase(name)
   {}
-    
+
   void CombineTensor3D::configure(const PSet& cfg)
   {
     _output_producer = cfg.get<std::string>("OutputProducer");
     _tensor3d_producer_v = cfg.get<std::vector<std::string> >("Tensor3DProducers");
     _pool_type = (PoolType_t)(cfg.get<unsigned short>("PoolType",(unsigned short)kSumPool));
+    _fuzzy_distance = cfg.get<double>("FuzzyDistance", -1.);
     if(_tensor3d_producer_v.empty()) {
       LARCV_CRITICAL() << "Tensor3DProducers parameter cannot be empty" << std::endl;
       throw larbys();
@@ -27,12 +28,16 @@ namespace larcv {
 
   bool CombineTensor3D::process(IOManager& mgr)
   {
-    larcv::VoxelSet vs;
+    //larcv::VoxelSet vs;
+    larcv::SparseTensor3D vs;
     Voxel3DMeta meta;
 
     for(auto const& producer : _tensor3d_producer_v) {
       auto const& ev_tensor3d = mgr.get_data<larcv::EventSparseTensor3D>(producer);
-      if(!meta.valid()) meta = ev_tensor3d.meta();
+      if(!meta.valid()) {
+        meta = ev_tensor3d.meta();
+        vs.meta(meta);
+      }
       if(meta != ev_tensor3d.meta()) {
         LARCV_CRITICAL() << "Producer " << producer << " has incompatible Voxel3DMeta" << std::endl;
         throw larbys();
@@ -45,7 +50,7 @@ namespace larcv {
       case kMaxPool:
       case kMinPool:
         for(auto const& vox : ev_tensor3d.as_vector()) {
-          auto const& exist_vox = vs.find(vox.id());
+          auto const& exist_vox = (_fuzzy_distance <= 0.) ? vs.find(vox.id()) : vs.close(vox.id(), _fuzzy_distance, meta);
           if(exist_vox.id() == kINVALID_VOXELID) {
             vs.add(vox);
             continue;

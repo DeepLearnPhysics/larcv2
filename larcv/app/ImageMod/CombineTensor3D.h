@@ -2,7 +2,7 @@
  * \file CombineTensor3D.h
  *
  * \ingroup ImageMod
- * 
+ *
  * \brief Class def header for a class CombineTensor3D
  *
  * @author kazuhiro
@@ -26,10 +26,10 @@ namespace larcv {
   class CombineTensor3D : public ProcessBase {
 
   public:
-    
+
     /// Default constructor
     CombineTensor3D(const std::string name="CombineTensor3D");
-    
+
     /// Default destructor
     ~CombineTensor3D(){}
 
@@ -47,6 +47,7 @@ namespace larcv {
     std::string _output_producer;
     std::vector<std::string> _tensor3d_producer_v;
     PoolType_t _pool_type;
+    double _fuzzy_distance;
   };
 
   /**
@@ -66,5 +67,4 @@ namespace larcv {
 }
 
 #endif
-/** @} */ // end of doxygen group 
-
+/** @} */ // end of doxygen group

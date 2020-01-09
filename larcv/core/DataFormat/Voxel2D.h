@@ -40,6 +40,8 @@ namespace larcv {
     //
     /// Access ImageMeta of specific projection
     inline const larcv::ImageMeta& meta() const { return _meta; }
+    /// Returns a const reference to voxel closest to a voxel with specified id. if no such voxel within distance, return invalid voxel.
+    const Voxel& close(VoxelID_t id, double distance, const larcv::ImageMeta& meta) const;
 
     //
     // Write-access
@@ -51,7 +53,7 @@ namespace larcv {
 
   private:
     larcv::ImageMeta _meta;
-    
+
   };
 
   /**
@@ -87,10 +89,9 @@ namespace larcv {
 
   private:
     larcv::ImageMeta _meta;
-  };  
+  };
 
 }
 
 #endif
 /** @} */ // end of doxygen group
-
