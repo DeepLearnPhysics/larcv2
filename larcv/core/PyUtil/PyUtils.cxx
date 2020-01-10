@@ -101,11 +101,111 @@ PyObject *as_ndarray(const SparseTensor2D& data, bool clear_mem) {
 
 /*
 assume the following shapes:
+- pyarray list of length M, each element is a subset of points
+- fragmentation (M, 3)
+*/
+PyObject *  local_pca(PyObject * pyarray) {
+    omp_set_num_threads(NUM_THREADS);
+    //std::cout << "NUM_THREADS " << NUM_THREADS << std::endl;
+    SetPyUtil();
+
+    if (!PyList_Check(pyarray)) {
+        logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+    			       "ERROR: pyarray needs to be a Python list");
+        throw larbys();
+    }
+
+    int num_samples = PyList_Size(pyarray);
+
+    // float **cfragmentation;
+    const int dtype = NPY_FLOAT;
+    PyArray_Descr *descr = PyArray_DescrFromType(dtype);
+    // npy_intp dims_fragmentation[2];
+    // if (PyArray_AsCArray(&fragmentation, (void **)&cfragmentation, dims_fragmentation, 2, descr) < 0) {
+    //   logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+  	// 		       "ERROR: cannot convert fragmentation to 2D C-array");
+    //   throw larbys();
+    // }
+    //
+    // if(dims_fragmentation[1] != 3 || dims_fragmentation[0] != num_samples) {
+    //     logger::get("PyUtil").send(larcv::msg::kCRITICAL,__FUNCTION__,__LINE__,
+    //     		       "ERROR: dimension mismatch");
+    //     throw larbys();
+    // }
+
+    float cfragmentation[num_samples][3];
+
+    for (Py_ssize_t i = 0; i < num_samples; ++i) {
+        PyObject * segment = PyList_GetItem(pyarray, i);
+
+        float **coords;
+        npy_intp dims[2];
+        if (PyArray_AsCArray(&segment, (void **)&coords, dims, 2, descr) < 0) {
+          logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+      			       "ERROR: cannot convert element to 2D C-array");
+          throw larbys();
+        }
+
+        if (dims[1] != 3) {
+            logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
+        			       "ERROR: array dimension 1 is not 3");
+            throw larbys();
+        }
+
+        int nfrag = dims[0];
+        float mean[3];
+        for (size_t k = 0; k < nfrag; ++k) {
+            mean[0] += coords[k][0];
+            mean[1] += coords[k][1];
+            mean[2] += coords[k][2];
+        }
+        mean[0] /= nfrag;
+        mean[1] /= nfrag;
+        mean[2] /= nfrag;
+
+        // Compute local PCA
+        // covariance matrix
+        double M[3][3];
+        for (size_t i1 = 0; i1 < 3; ++i1) {
+            for (size_t i2 = 0; i2 < 3; ++i2) {
+                M[i1][i2] = 0.;
+                for (size_t k = 0; k < nfrag; ++k) {
+                    M[i1][i2] = M[i1][i2] + (coords[k][i1]-mean[i1]) * (coords[k][i2]-mean[i2]);
+                }
+            }
+        }
+        // eigenvectors of cov matrix
+        double eigenvectors[3][3];
+        double eigenvalues[3];
+        eigen_decomposition(M, eigenvectors, eigenvalues);
+        //std::cout << eigenvalues[0] << " " << eigenvalues[1] << " " << eigenvalues[2] << std::endl;
+        size_t best_idx;
+        if (eigenvalues[1] > eigenvalues[0]) {
+            best_idx = (eigenvalues[2] > eigenvalues[1]) ? 2 : 1;
+        }
+        else {
+            best_idx = (eigenvalues[2] > eigenvalues[0]) ? 2 : 0;
+        }
+        cfragmentation[i][0] = eigenvectors[0][best_idx];
+        cfragmentation[i][1] = eigenvectors[1][best_idx];
+        cfragmentation[i][2] = eigenvectors[2][best_idx];
+
+        //PyArray_Free(segment,  (void *)coords);
+    }
+    npy_intp coordsDim[2];
+    coordsDim[0] = num_samples;
+    coordsDim[1] = 3;
+    PyObject * fragmentation = PyArray_SimpleNewFromData(2, coordsDim, dtype, cfragmentation);
+    //PyList_Free(pyarray,  (void *)carray);
+    return fragmentation;
+}
+/*
+assume the following shapes:
 - pyarray (N, 3) where N is total number of points
 - samples_idx (M,) where M is total number of samples
 - fragmentation (M, 3)
 */
-void fragment(PyObject * pyarray, PyObject * samples_idx, PyObject * fragmentation, double threshold) {
+PyObject * fragment(PyObject * pyarray, PyObject * samples_idx, double threshold) {
     omp_set_num_threads(NUM_THREADS);
     //std::cout << "NUM_THREADS " << NUM_THREADS << std::endl;
     SetPyUtil();
@@ -139,22 +239,13 @@ void fragment(PyObject * pyarray, PyObject * samples_idx, PyObject * fragmentati
     }
     int num_samples = dim_samples[0];
 
-    float **cfragmentation;
-    npy_intp dims_fragmentation[2];
-    if (PyArray_AsCArray(&fragmentation, (void **)&cfragmentation, dims_fragmentation, 2, descr) < 0) {
-      logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
-  			       "ERROR: cannot convert fragmentation to 2D C-array");
-      throw larbys();
-    }
-
-    if(dims_fragmentation[1] != 3 || dims_fragmentation[0] != num_samples) {
+    auto start = high_resolution_clock::now();
+    PyObject * segments = PyList_New(num_samples);
+    if (!segments) {
         logger::get("PyUtil").send(larcv::msg::kCRITICAL,__FUNCTION__,__LINE__,
-        		       "ERROR: dimension mismatch");
+        		       "ERROR: unable to create list");
         throw larbys();
     }
-
-    auto start = high_resolution_clock::now();
-
     for (size_t i = 0; i < num_samples; ++i) {
     // #pragma omp parallel num_threads(NUM_THREADS)
     // {
@@ -180,46 +271,20 @@ void fragment(PyObject * pyarray, PyObject * samples_idx, PyObject * fragmentati
         }
         int nfrag = fragment_idx.size();
         if (nfrag <= 0) continue;
+
         float coords[nfrag][3];
-        float mean[3];
         for (size_t k = 0; k < nfrag; ++k) {
             auto j = fragment_idx[k];
             coords[k][0] = carray[j][0];
             coords[k][1] = carray[j][1];
             coords[k][2] = carray[j][2];
-            mean[0] += carray[j][0];
-            mean[1] += carray[j][1];
-            mean[2] += carray[j][2];
         }
-        mean[0] /= nfrag;
-        mean[1] /= nfrag;
-        mean[2] /= nfrag;
-        // Compute local PCA
-        // covariance matrix
-        double M[3][3];
-        for (size_t i1 = 0; i1 < 3; ++i1) {
-            for (size_t i2 = 0; i2 < 3; ++i2) {
-                M[i1][i2] = 0.;
-                for (size_t k = 0; k < nfrag; ++k) {
-                    M[i1][i2] = M[i1][i2] + (coords[k][i1]-mean[i1]) * (coords[k][i2]-mean[i2]);
-                }
-            }
-        }
-        // eigenvectors of cov matrix
-        double eigenvectors[3][3];
-        double eigenvalues[3];
-        eigen_decomposition(M, eigenvectors, eigenvalues);
-        //std::cout << eigenvalues[0] << " " << eigenvalues[1] << " " << eigenvalues[2] << std::endl;
-        size_t best_idx;
-        if (eigenvalues[1] > eigenvalues[0]) {
-            best_idx = (eigenvalues[2] > eigenvalues[1]) ? 2 : 1;
-        }
-        else {
-            best_idx = (eigenvalues[2] > eigenvalues[0]) ? 2 : 0;
-        }
-        cfragmentation[i][0] = eigenvectors[0][best_idx];
-        cfragmentation[i][1] = eigenvectors[1][best_idx];
-        cfragmentation[i][2] = eigenvectors[2][best_idx];
+
+        npy_intp coordsDim[2];
+        coordsDim[0] = nfrag;
+        coordsDim[1] = 3;
+        PyObject * coordsPyArray = PyArray_SimpleNewFromData(2, coordsDim, dtype, coords);
+        PyList_SET_ITEM(segments, i, coordsPyArray);
         }
     //}
     //}
@@ -229,7 +294,7 @@ void fragment(PyObject * pyarray, PyObject * samples_idx, PyObject * fragmentati
 
     PyArray_Free(pyarray,  (void *)carray);
     PyArray_Free(samples_idx,  (void *)csamples);
-    return;
+    return segments;
 }
 
 
