@@ -3,10 +3,10 @@ CXX		= $(LARCV_CXX)
 LD              = g++
 LDFLAGS         += -Wl,-rpath,$(LARCV_BASEDIR)/lib
 FFLAGS          += -Wall
-FLDFLAGS        += -lstdc++ -shared 
-CXXFLAGS        += -g -O3 -std=c++0x -W -Wall -Wno-deprecated -fPIC -D_CORE_$(shell uname -s)_
+FLDFLAGS        += -lstdc++ -shared
+CXXFLAGS        += -g -O3 -std=c++0x -fopenmp -W -Wall -Wno-deprecated -fPIC -D_CORE_$(shell uname -s)_
 SOMAKER         = g++
-SOFLAGS         = -g -fPIC -shared
+SOFLAGS         = -g -fPIC -fopenmp -shared
 
 ifeq ($(LARCV_OPENCV),1)
 CXXFLAGS += -DUSE_OPENCV
