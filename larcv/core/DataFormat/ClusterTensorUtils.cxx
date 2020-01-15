@@ -89,7 +89,7 @@ namespace larcv {
     return res;
   }
 
-  larcv::VoxelSet generate_semantics(const EventClusterVoxel3D& clusters, const EventParticle& particles) {
+  larcv::EventSparseTensor3D generate_semantics(const EventClusterVoxel3D& clusters, const EventParticle& particles) {
 
     auto const& cluster_v  = clusters.as_vector();
     auto const& particle_v = particles.as_vector();
@@ -118,11 +118,16 @@ namespace larcv {
     for(auto const& idx : part_idx_v) {
       auto const& vs = cluster_v[idx].as_vector();
       auto const& particle = particle_v[idx];
+      float semantic = particle.shape();
+      if(particle.pdg_code()==2212) semantic = larcv::kShapeUnknown;
+      
       for(auto const& vox : vs)
-	res.emplace(vox.id(),(float)(particle.shape()),false);
+	res.emplace(vox.id(),semantic,false);
     }
 
-    return res;
+    larcv::EventSparseTensor3D tensor3d;
+    tensor3d.emplace(std::move(res),clusters.meta());
+    return tensor3d;
   }
 
   

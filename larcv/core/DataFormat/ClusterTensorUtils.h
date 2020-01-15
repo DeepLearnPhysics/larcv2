@@ -40,7 +40,7 @@ namespace larcv {
   FlatTensorContents as_flat_arrays(const VoxelSet& tensor, const Voxel3DMeta& meta);
 
   /// DO NOT USE THIS
-  larcv::VoxelSet generate_semantics(const EventClusterVoxel3D& clusters, const EventParticle& particles);
+  larcv::EventSparseTensor3D generate_semantics(const EventClusterVoxel3D& clusters, const EventParticle& particles);
 
 }
 #endif
