@@ -94,13 +94,13 @@ namespace larcv {
         }
       }
 
-      ev_output = ev_tensor3d;
+      if(target_producer != output_producer)
+	ev_output.set((VoxelSet)ev_tensor3d,ev_tensor3d.meta());
       ev_output.clear_invalid(_exclude_invalid, _exclude_nan, _exclude_inf);
       auto const& voxel_value_min = _voxel_value_min_v[producer_index];
       auto const& voxel_value_max = _voxel_value_max_v[producer_index];
       ev_output.threshold(voxel_value_min, voxel_value_max);
       if(_paint_value != larcv::kINVALID_FLOAT) ev_output.paint(_paint_value);
-
     }
     return true;
   }

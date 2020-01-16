@@ -89,6 +89,47 @@ namespace larcv {
     return res;
   }
 
+  larcv::EventSparseTensor3D generate_semantics(const EventClusterVoxel3D& clusters, const EventParticle& particles) {
+
+    auto const& cluster_v  = clusters.as_vector();
+    auto const& particle_v = particles.as_vector();
+    
+    larcv::VoxelSet res;
+    size_t total_size=0;
+    for(auto const& vs : cluster_v) total_size += vs.size();
+    res.reserve(total_size);
+
+    std::vector<size_t> part_idx_v;
+    part_idx_v.reserve(particle_v.size());
+    // create a reverse-ordered shape type
+    std::vector<larcv::ShapeType_t> ordered_type_v = {larcv::kShapeLEScatter,
+						      larcv::kShapeDelta,
+						      larcv::kShapeMichel,
+						      larcv::kShapeTrack,
+						      larcv::kShapeShower};
+    // loop over shape type + loop over particles to order particles in the reverse of preferred semantics
+    for(auto const& shape_type : ordered_type_v) {
+      for(size_t idx=0; idx<particle_v.size(); ++idx)
+	if(particle_v[idx].shape() == shape_type) part_idx_v.push_back(idx);
+    }
+
+    // now loop over index + paint the voxels with semantic types.
+    // later particle type override the semantic type
+    for(auto const& idx : part_idx_v) {
+      auto const& vs = cluster_v[idx].as_vector();
+      auto const& particle = particle_v[idx];
+      float semantic = particle.shape();
+      if(particle.pdg_code()==2212) semantic = larcv::kShapeUnknown;
+      
+      for(auto const& vox : vs)
+	res.emplace(vox.id(),semantic,false);
+    }
+
+    larcv::EventSparseTensor3D tensor3d;
+    tensor3d.emplace(std::move(res),clusters.meta());
+    return tensor3d;
+  }
+
   
 }
 #endif
