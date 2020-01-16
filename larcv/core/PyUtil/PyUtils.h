@@ -45,6 +45,7 @@ PyObject* as_ndarray(const SparseTensor2D &data, bool clear_mem=false);
 PyObject* fragment(PyObject * pyarray, PyObject * samples_idx, double threshold);
 /// compute local PCA
 PyObject * local_pca(PyObject * pyarray);
+void test_openmp();
 /// larcv::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/3/4) converter
 void fill_3d_pcloud(const SparseTensor3D &data, PyObject* pyarray, PyObject* select=nullptr);
 /// larcv::VoxelSet to 2D numpy point cloud array (NUM_POINTS,1/3/4) converter

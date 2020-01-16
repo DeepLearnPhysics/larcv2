@@ -2,18 +2,16 @@
 #define __LARCV_PYUTILS_CXX__
 
 #include "PyUtils.h"
+//#include <omp.h>
+//#define NUM_THREADS 4
 #include "larcv/core/Base/larcv_logger.h"
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 //#include <numpy/ndarrayobject.h>
 #include "numpy/arrayobject.h"
 #include <cassert>
-
-#include "eigen.h"
-#include <omp.h>
-#define NUM_THREADS 1
-#include <chrono>
-
-using namespace std::chrono;
+//#include <chrono>
+//using namespace std::chrono;
+#include "utils.h"
 
 namespace larcv {
 
@@ -105,7 +103,7 @@ assume the following shapes:
 - fragmentation (M, 3)
 */
 PyObject *  local_pca(PyObject * pyarray) {
-    omp_set_num_threads(NUM_THREADS);
+    //omp_set_num_threads(NUM_THREADS);
     //std::cout << "NUM_THREADS " << NUM_THREADS << std::endl;
     SetPyUtil();
 
@@ -117,21 +115,8 @@ PyObject *  local_pca(PyObject * pyarray) {
 
     int num_samples = PyList_Size(pyarray);
 
-    // float **cfragmentation;
     const int dtype = NPY_FLOAT;
     PyArray_Descr *descr = PyArray_DescrFromType(dtype);
-    // npy_intp dims_fragmentation[2];
-    // if (PyArray_AsCArray(&fragmentation, (void **)&cfragmentation, dims_fragmentation, 2, descr) < 0) {
-    //   logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
-  	// 		       "ERROR: cannot convert fragmentation to 2D C-array");
-    //   throw larbys();
-    // }
-    //
-    // if(dims_fragmentation[1] != 3 || dims_fragmentation[0] != num_samples) {
-    //     logger::get("PyUtil").send(larcv::msg::kCRITICAL,__FUNCTION__,__LINE__,
-    //     		       "ERROR: dimension mismatch");
-    //     throw larbys();
-    // }
 
     float cfragmentation[num_samples][3];
 
@@ -153,61 +138,43 @@ PyObject *  local_pca(PyObject * pyarray) {
         }
 
         int nfrag = dims[0];
-        float mean[3];
-        for (size_t k = 0; k < nfrag; ++k) {
-            mean[0] += coords[k][0];
-            mean[1] += coords[k][1];
-            mean[2] += coords[k][2];
-        }
-        mean[0] /= nfrag;
-        mean[1] /= nfrag;
-        mean[2] /= nfrag;
-
-        // Compute local PCA
-        // covariance matrix
-        double M[3][3];
-        for (size_t i1 = 0; i1 < 3; ++i1) {
-            for (size_t i2 = 0; i2 < 3; ++i2) {
-                M[i1][i2] = 0.;
-                for (size_t k = 0; k < nfrag; ++k) {
-                    M[i1][i2] = M[i1][i2] + (coords[k][i1]-mean[i1]) * (coords[k][i2]-mean[i2]);
-                }
-            }
-        }
-        // eigenvectors of cov matrix
-        double eigenvectors[3][3];
-        double eigenvalues[3];
-        eigen_decomposition(M, eigenvectors, eigenvalues);
-        //std::cout << eigenvalues[0] << " " << eigenvalues[1] << " " << eigenvalues[2] << std::endl;
-        size_t best_idx;
-        if (eigenvalues[1] > eigenvalues[0]) {
-            best_idx = (eigenvalues[2] > eigenvalues[1]) ? 2 : 1;
-        }
-        else {
-            best_idx = (eigenvalues[2] > eigenvalues[0]) ? 2 : 0;
-        }
-        cfragmentation[i][0] = eigenvectors[0][best_idx];
-        cfragmentation[i][1] = eigenvectors[1][best_idx];
-        cfragmentation[i][2] = eigenvectors[2][best_idx];
-
+        pca(coords, nfrag, cfragmentation[i]);
         //PyArray_Free(segment,  (void *)coords);
     }
     npy_intp coordsDim[2];
     coordsDim[0] = num_samples;
     coordsDim[1] = 3;
-    PyObject * fragmentation = PyArray_SimpleNewFromData(2, coordsDim, dtype, cfragmentation);
+    //PyObject * fragmentation = PyArray_SimpleNewFromData(2, coordsDim, dtype, cfragmentation);
+		PyObject * fragmentation = PyArray_SimpleNew(2, coordsDim, dtype);
+		memcpy(PyArray_DATA((PyArrayObject*) fragmentation), cfragmentation, sizeof(cfragmentation));
     //PyList_Free(pyarray,  (void *)carray);
     return fragmentation;
 }
+
+// void test_openmp() {
+//     SetPyUtil();
+//     PyEval_InitThreads();
+//     //Py_Initialize();
+//     Py_BEGIN_ALLOW_THREADS;
+//     //omp_set_num_threads(NUM_THREADS);
+//     #pragma omp parallel num_threads(NUM_THREADS)
+//     //for (size_t i = 0; i < num_samples; ++i)
+//     {
+//         PyGILState_STATE state = PyGILState_Ensure();
+//         std::cout << omp_get_thread_num() << " hello" << std::endl;
+//         PyGILState_Release(state);
+//     }
+//     Py_END_ALLOW_THREADS;
+// }
+
 /*
 assume the following shapes:
-- pyarray (N, 3) where N is total number of points
-- samples_idx (M,) where M is total number of samples
-- fragmentation (M, 3)
+- pyarray (N, 3) where N is total number of points (coordinates)
+- samples_idx (M,) where M is total number of samples, indices of points from which to sample
+  These points must belong to pyarray, and the indices are indexing pyarray first dimension.
+- threshold: distance that defines samples.
 */
 PyObject * fragment(PyObject * pyarray, PyObject * samples_idx, double threshold) {
-    omp_set_num_threads(NUM_THREADS);
-    //std::cout << "NUM_THREADS " << NUM_THREADS << std::endl;
     SetPyUtil();
 
     float **carray;
@@ -239,39 +206,23 @@ PyObject * fragment(PyObject * pyarray, PyObject * samples_idx, double threshold
     }
     int num_samples = dim_samples[0];
 
-    auto start = high_resolution_clock::now();
+    std::vector< std::vector<int> > all_fragments = sample(carray, csamples, npts, num_samples, threshold);
+    assert(all_fragments.size() == num_samples);
+
+    //auto start = high_resolution_clock::now();
     PyObject * segments = PyList_New(num_samples);
     if (!segments) {
         logger::get("PyUtil").send(larcv::msg::kCRITICAL,__FUNCTION__,__LINE__,
         		       "ERROR: unable to create list");
         throw larbys();
     }
-    for (size_t i = 0; i < num_samples; ++i) {
-    // #pragma omp parallel num_threads(NUM_THREADS)
-    // {
-    //     size_t thread_id = omp_get_thread_num();
-    //     size_t num_threads = omp_get_num_threads();
-    //     size_t num_pts = num_samples / num_threads;
-    //     size_t start_pt = num_pts * thread_id;
-    //     if(thread_id+1 == num_threads) num_pts += (num_samples % num_threads);
-    //     //std::cout << num_pts << " " << start_pt << std::endl;
-    //     //std::cout << "Running with threads " << num_threads << std::endl;
-    //
-    //     for (size_t i = start_pt; i < start_pt + num_pts; ++i) {
-        double x = carray[csamples[i]][0];
-        double y = carray[csamples[i]][1];
-        double z = carray[csamples[i]][2];
-        std::vector<int> fragment_idx;
-        // Find all points in this fragment around the sample point
-        for (size_t j = 0; j < npts; ++j) {
-            double distance = std::sqrt(std::pow(carray[j][0]-x, 2) + std::pow(carray[j][1]-y, 2) + std::pow(carray[j][2]-z, 2));
-            if (distance <= threshold) {
-                fragment_idx.push_back(j);
-            }
-        }
-        int nfrag = fragment_idx.size();
-        if (nfrag <= 0) continue;
 
+    // Store that vector of vector back into python list of numpy array
+    for (size_t i = 0; i < num_samples; ++i)
+    {
+        std::vector<int> fragment_idx = all_fragments[i];
+        int nfrag = fragment_idx.size();
+        //std::cout << i << " " << nfrag << std::endl;
         float coords[nfrag][3];
         for (size_t k = 0; k < nfrag; ++k) {
             auto j = fragment_idx[k];
@@ -283,13 +234,19 @@ PyObject * fragment(PyObject * pyarray, PyObject * samples_idx, double threshold
         npy_intp coordsDim[2];
         coordsDim[0] = nfrag;
         coordsDim[1] = 3;
-        PyObject * coordsPyArray = PyArray_SimpleNewFromData(2, coordsDim, dtype, coords);
-        PyList_SET_ITEM(segments, i, coordsPyArray);
-        }
-    //}
-    //}
-    auto end = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(end - start);
+
+        //PyObject * coordsPyArray = PyArray_SimpleNewFromData(2, coordsDim, dtype, coords);
+				PyObject * coordsPyArray = PyArray_SimpleNew(2, coordsDim, dtype);
+				memcpy(PyArray_DATA((PyArrayObject *) coordsPyArray), coords, sizeof(coords));
+        //PyList_SET_ITEM(segments, i, coordsPyArray);
+        if (PyList_SetItem(segments, i, coordsPyArray) < 0) {
+            logger::get("PyUtil").send(larcv::msg::kCRITICAL,__FUNCTION__,__LINE__,
+            		       "ERROR: unable to edit list");
+            throw larbys();
+        };
+    }
+    //auto end = high_resolution_clock::now();
+    //auto duration = duration_cast<microseconds>(end - start);
     //std::cout << "Duration = " << duration.count()*0.001 << "ms" << std::endl;
 
     PyArray_Free(pyarray,  (void *)carray);
