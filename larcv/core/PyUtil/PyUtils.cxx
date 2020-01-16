@@ -11,7 +11,7 @@
 #include <cassert>
 //#include <chrono>
 //using namespace std::chrono;
-#include "utils.h"
+#include "larcv/core/DataFormat/utils.h"
 
 namespace larcv {
 
@@ -115,15 +115,15 @@ PyObject *  local_pca(PyObject * pyarray) {
 
     int num_samples = PyList_Size(pyarray);
 
-    const int dtype = NPY_FLOAT;
+    const int dtype = NPY_DOUBLE;
     PyArray_Descr *descr = PyArray_DescrFromType(dtype);
 
-    float cfragmentation[num_samples][3];
+    double cfragmentation[num_samples][3];
 
     for (Py_ssize_t i = 0; i < num_samples; ++i) {
         PyObject * segment = PyList_GetItem(pyarray, i);
 
-        float **coords;
+        double **coords;
         npy_intp dims[2];
         if (PyArray_AsCArray(&segment, (void **)&coords, dims, 2, descr) < 0) {
           logger::get("PyUtil").send(larcv::msg::kCRITICAL, __FUNCTION__, __LINE__,
@@ -138,7 +138,7 @@ PyObject *  local_pca(PyObject * pyarray) {
         }
 
         int nfrag = dims[0];
-        pca(coords, nfrag, cfragmentation[i]);
+				larcv::compute_pca(coords, nfrag, cfragmentation[i]);
         //PyArray_Free(segment,  (void *)coords);
     }
     npy_intp coordsDim[2];
@@ -177,8 +177,8 @@ assume the following shapes:
 PyObject * fragment(PyObject * pyarray, PyObject * samples_idx, double threshold) {
     SetPyUtil();
 
-    float **carray;
-    const int dtype = NPY_FLOAT;
+    double **carray;
+    const int dtype = NPY_DOUBLE;
     PyArray_Descr *descr = PyArray_DescrFromType(dtype);
     npy_intp dims[2];
     if (PyArray_AsCArray(&pyarray, (void **)&carray, dims, 2, descr) < 0) {
@@ -223,7 +223,7 @@ PyObject * fragment(PyObject * pyarray, PyObject * samples_idx, double threshold
         std::vector<int> fragment_idx = all_fragments[i];
         int nfrag = fragment_idx.size();
         //std::cout << i << " " << nfrag << std::endl;
-        float coords[nfrag][3];
+        double coords[nfrag][3];
         for (size_t k = 0; k < nfrag; ++k) {
             auto j = fragment_idx[k];
             coords[k][0] = carray[j][0];

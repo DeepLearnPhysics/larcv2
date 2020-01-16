@@ -3,13 +3,15 @@
 #include "utils.h"
 #include "eigen.h"
 
-std::vector< std::vector<int> > sample(float ** carray, int * csamples, int npts, int num_samples, double threshold) {
+namespace larcv {
+
+std::vector< std::vector<int> > sample(double ** carray, int * csamples, int npts, int num_samples, double threshold) {
     std::vector< std::vector<int> > all_fragments;
     for (size_t i = 0; i < num_samples; ++i)
     {
-        float x = carray[csamples[i]][0];
-        float y = carray[csamples[i]][1];
-        float z = carray[csamples[i]][2];
+        double x = carray[csamples[i]][0];
+        double y = carray[csamples[i]][1];
+        double z = carray[csamples[i]][2];
         std::vector<int> fragment_idx;
         // Find all points in this fragment around the sample point
         for (size_t j = 0; j < npts; ++j) {
@@ -25,8 +27,8 @@ std::vector< std::vector<int> > sample(float ** carray, int * csamples, int npts
     return all_fragments;
 }
 
-void pca(float ** coords, int nfrag, float * output) {
-    float mean[3];
+void compute_pca(double ** coords, int nfrag, double * output) {
+    double mean[3];
     for (size_t k = 0; k < nfrag; ++k) {
         mean[0] += coords[k][0];
         mean[1] += coords[k][1];
@@ -63,5 +65,5 @@ void pca(float ** coords, int nfrag, float * output) {
     output[1] = eigenvectors[1][best_idx];
     output[2] = eigenvectors[2][best_idx];
 }
-
+}
 #endif
