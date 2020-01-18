@@ -57,8 +57,9 @@ namespace larcv {
     /// Meta setter
     void meta(const larcv::Voxel3DMeta& meta);
     /// Returns a const reference to voxel closest to a voxel with specified id. if no such voxel within distance, return invalid voxel.
-    const Voxel& close(VoxelID_t id, double distance, const larcv::Voxel3DMeta& meta) const;
-		Point3D pca() const;
+    const Voxel& close(VoxelID_t id, double distance) const;
+    /// Compute PCA of this set of voxels
+	Point3D pca() const;
 
   private:
     larcv::Voxel3DMeta _meta;
