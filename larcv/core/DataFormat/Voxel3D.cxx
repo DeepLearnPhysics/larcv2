@@ -58,6 +58,30 @@ namespace larcv {
 		return this->find(final_vox);
 	}
 
+	bool SparseTensor3D::within(VoxelID_t id, double distance) const {
+		const std::vector<larcv::Voxel>& voxel_v = this->as_vector();
+		if(voxel_v.empty())
+	      return false;
+
+		const Point3D pt = _meta.position(id);
+  		int threshold = (int) std::ceil(distance);
+  		VoxelID_t max = _meta.id(std::min(pt.x + threshold, _meta.max_x()), std::min(pt.y + threshold, _meta.max_y()), std::min(pt.z + threshold, _meta.max_z()));
+  		VoxelID_t min = _meta.id(std::max(pt.x - threshold, _meta.min_x()), std::max(pt.y - threshold, _meta.min_y()), std::max(pt.z - threshold, _meta.min_z()));
+  		Voxel vox_max(max,0.);
+  		Voxel vox_min(min,0.);
+  		auto iter_max = std::lower_bound(voxel_v.begin(), voxel_v.end(), vox_max);
+  		auto iter_min = std::lower_bound(voxel_v.begin(), voxel_v.end(), vox_min);
+
+  		for (auto& i = iter_min; i != iter_max; ++i) {
+  			const Point3D current_point = _meta.position((*i).id());
+  			double d = pt.distance(current_point);
+  			if (d < distance) {
+  				return true;
+  			}
+  		}
+		return false;
+	}
+
 	Point3D SparseTensor3D::pca() const {
 		size_t npts = this->size();
 		//float coords[npts][3];

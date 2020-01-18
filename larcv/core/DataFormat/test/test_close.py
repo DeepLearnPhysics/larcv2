@@ -1,3 +1,4 @@
+# Simple test to run on SparseTensor3D::close and SparseTensor3D::within
 from larcv import larcv
 import numpy as np
 
@@ -33,3 +34,9 @@ assert p.x == 1.5
 assert p.y == 1.5
 assert p.z == 1.5
 print(v, p.x, p.y, p.z)
+
+# Also test SparseTensor3D::within
+b = tensor1.within(meta.id(example2[1, 0], example2[1, 1], example2[1, 2]), 1.5)
+assert b == True
+b2 = tensor1.within(meta.id(example2[1, 0], example2[1, 1], example2[1, 2]), 0.9)
+assert b2 == False
