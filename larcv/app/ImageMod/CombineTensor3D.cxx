@@ -50,7 +50,7 @@ namespace larcv {
       case kMaxPool:
       case kMinPool:
         for(auto const& vox : ev_tensor3d.as_vector()) {
-          auto const& exist_vox = (_fuzzy_distance <= 0.) ? vs.find(vox.id()) : vs.close(vox.id(), _fuzzy_distance, meta);
+          auto const& exist_vox = (_fuzzy_distance <= 0.) ? vs.find(vox.id()) : vs.close(vox.id(), _fuzzy_distance);
           if(exist_vox.id() == kINVALID_VOXELID) {
             vs.add(vox);
             continue;
