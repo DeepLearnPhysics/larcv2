@@ -105,6 +105,23 @@ namespace larcv {
     }
   }
 
+  const size_t VoxelSet::index(VoxelID_t id) const
+  {
+    if(_voxel_v.empty() ||
+       id < _voxel_v.front().id() ||
+       id > _voxel_v.back().id())
+      return kINVALID_SIZE;
+
+    Voxel vox(id,0.);
+    // Else do log(N) search
+    auto iter = std::lower_bound(_voxel_v.begin(), _voxel_v.end(), vox);
+    if( (*iter).id() == id ) return (iter - _voxel_v.begin());
+    else {
+      //std::cout << "Returning invalid voxel since lower_bound had an id " << (*iter).id() << std::endl;
+      return kINVALID_SIZE;
+    }
+  }
+
   void VoxelSet::emplace(Voxel&& vox, const bool add)
   {
     // In case it's empty or greater than the last one
