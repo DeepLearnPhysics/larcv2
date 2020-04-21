@@ -107,7 +107,7 @@ namespace larcv {
     /// Returns a const reference to a voxel with specified id. if not present, invalid voxel is returned.
     const Voxel& find(VoxelID_t id) const;
     /// Returns the index of specified voxel id in the storage array
-    const size_t VoxelSet::index(VoxelID_t id) const
+    size_t index(VoxelID_t id) const;
     /// Sum of contained voxel values
     inline float sum() const { float res=0.; for(auto const& vox : _voxel_v) res+=vox.value(); return res;}
     /// Mean of contained voxel values

@@ -105,7 +105,7 @@ namespace larcv {
     }
   }
 
-  const size_t VoxelSet::index(VoxelID_t id) const
+  size_t VoxelSet::index(VoxelID_t id) const
   {
     if(_voxel_v.empty() ||
        id < _voxel_v.front().id() ||
