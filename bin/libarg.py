@@ -19,9 +19,11 @@ else:
     libs+= commands.getoutput('root-config --libs').split()
 
 if 'PYTHON_LIB' in os.environ:
-    libs+= [" -L{} -lpython{}.{}".format(os.environ["PYTHON_LIB"].strip(), 
-        sys.version_info.major, 
-        sys.version_info.minor)]
+    python_linked = sum(['lpython' in val for val in libs]) > 0
+    if not python_linked:
+        libs+= [" -L{} -lpython{}.{}".format(os.environ["PYTHON_LIB"].strip(), 
+                                             sys.version_info.major, 
+                                             sys.version_info.minor)]
 
 objs_list=[]
 dict_list=[]
