@@ -96,8 +96,12 @@ namespace larcv {
 		}
 
 		double output[3];
-		std::cout << "starting" << std::endl;
 		compute_pca(coords, npts, output);
+
+    // coords: free me please!
+    for (size_t i = 0; i < npts; ++i) free(coords[i]);
+    free(coords);
+
 		return Point3D(output[0], output[1], output[2]);
 	}
 
