@@ -3,7 +3,7 @@
 
 #include "Voxel3D.h"
 #include <iostream>
-#include "utils.h"
+#include <algorithm>
 
 namespace larcv {
 	SparseTensor3D::SparseTensor3D(VoxelSet&& vs, Voxel3DMeta meta)
@@ -104,6 +104,30 @@ namespace larcv {
 
 		return Point3D(output[0], output[1], output[2]);
 	}
+
+  PCA_3D SparseTensor3D::fit_pca(bool store_spread, bool use_true_coord)
+  {
+    PCA_3D::Points_t points(this->size());
+
+    // fill (x,y,z) from voxel id or xyz
+		for (size_t i = 0; i < points.size; ++i) {
+			Voxel v = this->as_vector()[i];
+      if (use_true_coord) {
+        Point3D p = this->meta().position(v.id());
+        points.xyz[i][0] = p.x;
+        points.xyz[i][1] = p.y;
+        points.xyz[i][2] = p.z;
+      }
+      else {
+        size_t ix, iy, iz;
+        this->meta().id_to_xyz_index(v.id(), ix, iy, iz);
+        points.xyz[i][0] = ix;
+        points.xyz[i][1] = iy;
+        points.xyz[i][2] = iz;
+      }
+		}
+    return PCA_3D(points, store_spread);
+  }
 
 	void ClusterVoxel3D::meta(const larcv::Voxel3DMeta& meta)
 	{
