@@ -17,7 +17,7 @@ namespace larcv {
     , _elifetime(10000.)
     , _vdrift(1.114)
   {}
-    
+
   void SimIonization::configure(const PSet& cfg)
   {
     _cluster3d_producer = cfg.get<std::string>("Cluster3DProducer");
@@ -47,32 +47,32 @@ namespace larcv {
   bool SimIonization::process(IOManager& mgr)
   {
     auto const& event_cluster3d = mgr.get_data<larcv::EventClusterVoxel3D>(_cluster3d_producer);
-    auto const& event_dx = mgr.get_data<larcv::EventClusterVoxel3D>(_cluster3d_producer + "_dx");
+    auto const& event_dedx = mgr.get_data<larcv::EventClusterVoxel3D>(_cluster3d_producer + "_dedx");
     auto const meta = event_cluster3d.meta();
 
     std::vector<larcv::VoxelSet> vs_v;
     vs_v.resize(event_cluster3d.as_vector().size());
     for(size_t index=0; index<event_cluster3d.as_vector().size()-1; ++index){
       auto const& vs_in = event_cluster3d.as_vector()[index].as_vector();
-      auto const& vs_dx = event_dx.as_vector().at(index).as_vector();
-      if(vs_in.size() != vs_dx.size()) {
+      auto const& vs_dedx = event_dedx.as_vector().at(index).as_vector();
+      if(vs_in.size() != vs_dedx.size()) {
         LARCV_ERROR() << "cluster voxel count " << vs_in.size()
-			 << " != dx voxel count " << vs_dx.size() << std::endl;
+			 << " != dx voxel count " << vs_dedx.size() << std::endl;
 	return false;
       }
       size_t invalid_ctr=0;
       auto& vs_out = vs_v[index];
       for(size_t vindex=0; vindex<vs_in.size(); ++vindex) {
         auto const& vox_in = vs_in[vindex];
-	auto const& vox_dx = vs_dx[vindex];
-	if(vox_in.value()<_threshold || vox_dx.value() < 0.0001) continue;
-	double dedx = vox_in.value() / vox_dx.value();
-	if(vox_in.id() != vox_dx.id()) {
+	auto const& vox_dedx = vs_dedx[vindex];
+	if(vox_in.value()<_threshold) continue;
+	double dedx = vox_dedx.value();
+	if(vox_in.id() != vox_dedx.id()) {
 	  LARCV_ERROR() << "Unmatched voxel id for de and dx! " << std::endl;
 	  return false;
 	}
 	if(dedx < 1.0) {
-	  LARCV_INFO() << "Ignoring voxel " << vox_in.value() << " / " << vox_dx.value() << " dedx=" << dedx << std::endl;
+	  LARCV_INFO() << "Ignoring voxel " << vox_in.value() << " MeV with dedx=" << dedx << std::endl;
 	  ++invalid_ctr;
 	  continue;
 	}
@@ -80,7 +80,7 @@ namespace larcv {
         auto lifetime_factor = this->Lifetime( (meta.pos_x(vox_in.id()) - meta.min_x()) );
 	float vox_value = vox_in.value() * recomb_factor * lifetime_factor;
 	if(vox_value < 0 || std::isnan(vox_value)) {
-	  LARCV_ERROR() << "Invalid voxel value ignored: de=" << vox_in.value() << " dx=" << vox_dx.value()
+	  LARCV_ERROR() << "Invalid voxel value ignored: de=" << vox_in.value() << " dedx=" << dedx
 			<< " recomb=" << recomb_factor << " lifetime="<<lifetime_factor << std::endl;
 	  ++invalid_ctr;
 	  continue;
