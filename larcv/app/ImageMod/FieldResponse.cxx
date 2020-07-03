@@ -32,8 +32,8 @@ namespace larcv {
 
     // Loop over input tensor elements and do something
     for(auto const& vox : input_tensor3d.as_vector())
-      vs.emplace(vox.id(), _voxel_value);
-
+        vs.emplace(vox.id(), _voxel_value,true);
+ 
     // store output
     auto& output_tensor3d = mgr.get_data<larcv::EventSparseTensor3D>("field_response");
     output_tensor3d.emplace(std::move(vs),input_tensor3d.meta());

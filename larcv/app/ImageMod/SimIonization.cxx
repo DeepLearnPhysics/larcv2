@@ -47,27 +47,27 @@ namespace larcv {
   bool SimIonization::process(IOManager& mgr)
   {
     auto const& event_cluster3d = mgr.get_data<larcv::EventClusterVoxel3D>(_cluster3d_producer);
-    auto const& event_dedx = mgr.get_data<larcv::EventClusterVoxel3D>(_cluster3d_producer + "_dedx");
+    auto const& event_dx = mgr.get_data<larcv::EventClusterVoxel3D>(_cluster3d_producer + "_dx");
     auto const meta = event_cluster3d.meta();
 
     std::vector<larcv::VoxelSet> vs_v;
     vs_v.resize(event_cluster3d.as_vector().size());
-    for(size_t index=0; index<event_cluster3d.as_vector().size()-1; ++index){
+    for(size_t index=0; index<event_cluster3d.as_vector().size(); ++index){
       auto const& vs_in = event_cluster3d.as_vector()[index].as_vector();
-      auto const& vs_dedx = event_dedx.as_vector().at(index).as_vector();
-      if(vs_in.size() != vs_dedx.size()) {
+      auto const& vs_dx = event_dx.as_vector().at(index).as_vector();
+      if(vs_in.size() != vs_dx.size()) {
         LARCV_ERROR() << "cluster voxel count " << vs_in.size()
-			 << " != dx voxel count " << vs_dedx.size() << std::endl;
+			 << " != dx voxel count " << vs_dx.size() << std::endl;
 	return false;
       }
       size_t invalid_ctr=0;
       auto& vs_out = vs_v[index];
       for(size_t vindex=0; vindex<vs_in.size(); ++vindex) {
         auto const& vox_in = vs_in[vindex];
-	auto const& vox_dedx = vs_dedx[vindex];
-	if(vox_in.value()<_threshold) continue;
-	double dedx = vox_dedx.value();
-	if(vox_in.id() != vox_dedx.id()) {
+	auto const& vox_dx = vs_dx[vindex];
+	if(vox_in.value()<_threshold || vox_dx.value() < 0.0001) continue;
+	double dedx = vox_in.value() / vox_dx.value();
+	if(vox_in.id() != vox_dx.id()) {
 	  LARCV_ERROR() << "Unmatched voxel id for de and dx! " << std::endl;
 	  return false;
 	}
