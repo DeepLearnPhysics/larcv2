@@ -55,6 +55,7 @@ namespace larcv {
     double _threshold;
     double _elifetime;
     double _vdrift;
+    double _work_function;
   };
 
   /**
