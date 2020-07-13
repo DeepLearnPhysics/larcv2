@@ -3,6 +3,7 @@
 
 #include "BlurCluster3D.h"
 #include "larcv/core/DataFormat/EventVoxel3D.h"
+#include <algorithm>
 
 namespace larcv {
 
@@ -41,10 +42,10 @@ namespace larcv {
   void BlurCluster3D::configure(const PSet& cfg)
   {
     configure_labels(cfg);
-    _sigma_v   = cfg.get<std::vector<double> >("SigmaXYZ");
+    auto sigma_v = cfg.get<std::vector<double> >("SigmaXYZ");
     _numvox_v  = cfg.get<std::vector<size_t> >("NumVoxelsXYZ");
     _normalize = cfg.get<bool>("Normalize", true);
-    if (_sigma_v.size() != 3) {
+    if (sigma_v.size() != 3) {
       LARCV_CRITICAL() << "SigmaXYZ parameter must be length 3 floating point vector!" << std::endl;
       throw larbys();
     }
@@ -52,6 +53,10 @@ namespace larcv {
       LARCV_CRITICAL() << "NumVoxelsXYZ parameter must be length 3 unsigned integer vector!" << std::endl;
       throw larbys();
     }
+
+    // precalculate sigma ** 2
+    std::transform(sigma_v.cbegin(), sigma_v.cend(), std::back_inserter(_sigma2_v),
+                   [](double v) { return v * v; });
 
     // create smearing matrix
     _scale_vvv.resize(_numvox_v[0] + 1);
@@ -96,9 +101,9 @@ namespace larcv {
         for (size_t yshift = 0; yshift <= _numvox_v[1]; ++yshift) {
           for (size_t zshift = 0; zshift <= _numvox_v[2]; ++zshift) {
 
-            double val = exp( - pow(xshift * meta.size_voxel_x(), 2) / (2. * _sigma_v[0])
-              - pow(yshift * meta.size_voxel_y(), 2) / (2. * _sigma_v[1])
-              - pow(zshift * meta.size_voxel_z(), 2) / (2. * _sigma_v[2]) );
+            double val = exp( - pow(xshift * meta.size_voxel_x(), 2) / (2. * _sigma2_v[0])
+              - pow(yshift * meta.size_voxel_y(), 2) / (2. * _sigma2_v[1])
+              - pow(zshift * meta.size_voxel_z(), 2) / (2. * _sigma2_v[2]) );
             _scale_vvv[xshift][yshift][zshift] = val;
           }
         }
