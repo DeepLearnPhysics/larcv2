@@ -16,6 +16,7 @@
 
 #include "Voxel.h"
 #include "Voxel3DMeta.h"
+#include "utils.h"
 namespace larcv {
 
   /**
@@ -61,7 +62,8 @@ namespace larcv {
     /// Whether a voxel belongs to this VoxelSet or not, within some distance threshold
     bool within(VoxelID_t id, double distance) const;
     /// Compute PCA of this set of voxels
-	Point3D pca() const;
+  	Point3D pca() const;
+    PCA_3D fit_pca(bool store_spread=true, bool use_true_coord=false);
 
   private:
     larcv::Voxel3DMeta _meta;
