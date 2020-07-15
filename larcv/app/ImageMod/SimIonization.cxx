@@ -16,6 +16,7 @@ namespace larcv {
     , _efield(0.273)
     , _elifetime(10000.)
     , _vdrift(1.114)
+    , _work_function(23.6e-6)
   {}
 
   void SimIonization::configure(const PSet& cfg)
@@ -29,12 +30,14 @@ namespace larcv {
     _threshold = cfg.get<double>("MinThreshold",0.06);// MeV
     _elifetime = cfg.get<double>("ElectronLifetime",_elifetime); //us
     _vdrift    = cfg.get<double>("DriftVelocity",_vdrift); // cm/us
+    _work_function = cfg.get<double>("WorkFunction", _work_function); // MeV/e-
   }
 
   double SimIonization::Recombination(double dedx) const {
     double alpha = _alpha;
     double beta = _beta / (_density * _efield);
-    return log(alpha + beta * dedx) / (beta * dedx);
+    double W = _work_function;
+    return log(alpha + beta * dedx) / (beta * W);
   }
 
   double SimIonization::Lifetime(double x) const {

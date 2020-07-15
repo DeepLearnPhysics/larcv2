@@ -47,7 +47,7 @@ namespace larcv {
     std::vector<std::string> _output_producer_v;
     std::vector<std::string> _cluster3d_producer_v;
     std::vector<size_t> _numvox_v;
-    std::vector<double> _sigma_v;
+    std::vector<double> _sigma2_v;
     std::vector<std::vector<std::vector<double> > > _scale_vvv;
     bool _normalize;
     float _threshold;
