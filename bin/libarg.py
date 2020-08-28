@@ -17,14 +17,16 @@ else:
         dirs.append(d)
     libs=[x for x in commands.getoutput('larcv-config --libs').split() if not x.startswith('-llarcv')]
     libs+= commands.getoutput('root-config --libs').split()
-
+        
 if 'PYTHON_LIB' in os.environ:
     python_linked = sum(['lpython' in val for val in libs]) > 0
     if not python_linked:
         libs+= [" -L{} -lpython{}.{}".format(os.environ["PYTHON_LIB"].strip(), 
                                              sys.version_info.major, 
                                              sys.version_info.minor)]
-
+if 'LARCV_EDEPSIM_LIBS' in os.environ:
+    libs += os.environ['LARCV_EDEPSIM_LIBS'].split()
+        
 objs_list=[]
 dict_list=[]
 for l in dirs:
