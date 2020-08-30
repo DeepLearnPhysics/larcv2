@@ -14,7 +14,7 @@ INCFLAGS  = -I.                       #Include itself
 INCFLAGS += $(shell larcv-config --includes)
 
 ifdef LARCV_EDEPSIM_INCLUDES
-INCFLAGS += -I$(LARCV_EDEPSIM_INCLUDES)
+INCFLAGS += $(LARCV_EDEPSIM_INCLUDES)
 LDFLAGS  += $(LARCV_EDEPSIM_LIBS)
 endif
 

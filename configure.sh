@@ -41,9 +41,10 @@ fi
 # Check edep-sim
 if [ `command -v edep-sim` ]; then
     where="$( dirname "$( dirname `which edep-sim` )" )"
-    export LARCV_EDEPSIM_INCLUDES=$where/include
-    export LARCV_EDEPSIM_LIBDIR=$where/lib
-    export LARCV_EDEPSIM_LIBS="-L${LARCV_EDEPSIM_LIBDIR} -ledepsim -ledepsim_io "
+    LARCV_EDEPSIM_INCLUDES=`geant4-config --prefix`
+    export LARCV_EDEPSIM_INCLUDES="-I${LARCV_EDEPSIM_INCLUDES}/include -I${LARCV_EDEPSIM_INCLUDES}/include/Geant4 -I${where}/include"
+    LARCV_EDEPSIM_LIBS=`geant4-config --libs`
+    export LARCV_EDEPSIM_LIBS="${LARCV_EDEPSIM_LIBS} -L${where}/lib -ledepsim -ledepsim_io "    
 fi
 
 export LARCV_COREDIR=$LARCV_BASEDIR/larcv/core

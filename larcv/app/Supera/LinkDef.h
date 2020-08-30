@@ -11,7 +11,13 @@
 
 //#pragma link C++ function larcv::cluster_to_image2d(const larcv::Pixel2DCluster&, size_t, size_t)+;
 //#pragma link C++ class larcv::ROIPad+;
-#pragma link C++ class larcv::Supera+;
+#pragma link C++ class larcv::SuperaBase+;
+#pragma link C++ class larcv::SuperaBBoxInteraction+;
+#pragma link C++ class larcv::SuperaG4Trajectory+;
+#pragma link C++ class larcv::Vec3f+;
+#pragma link C++ class larcv::Ray+;
+#pragma link C++ class larcv::AABBox+;
+#pragma link C++ class std::vector<std::vector<float> >+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
