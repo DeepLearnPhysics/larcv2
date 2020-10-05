@@ -99,6 +99,9 @@ namespace larcv {
     /// Returns true if after any entry is processed (process_entry/batch_process) but not yet finalized
     inline bool processing() const { return _processing; }
 
+    inline size_t batch_start_entry() const { return _batch_start_entry; }
+    inline size_t batch_num_entry() const { return _batch_num_entry; }
+
   private:
 
     bool _process_entry_();
