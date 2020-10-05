@@ -21,7 +21,10 @@ if len(sys.argv) > 2:
 		if not argv.endswith('.root'): continue
 		print('Adding input:',argv)
 		ch.AddFile(argv)
-print('Processing',ch.GetEntries(),'events')
+event_range = range(proc.batch_start_entry(), proc.batch_start_entry() + proc.batch_num_entry()) \
+	if proc.batch_num_entry() > 0 \
+	else range(ch.GetEntries())
+print('Processing', len(event_range), 'events')
 
 # Initialize and retrieve a list of processes that belongs to SuperaBase inherited module classes
 proc.initialize()
@@ -32,9 +35,10 @@ for name in proc.process_names():
 	if getattr(module,'is')('Supera'):
 		print('Running a Supera module:',name)
 		supera_procs.append(pid)
-# Event loop
-for entry in range(ch.GetEntries()):
 
+# Event loop
+for entry in event_range:
+	print("considering event:", entry)
 	ch.GetEntry(entry)
 
 	ev = ch.Event 
@@ -47,5 +51,4 @@ for entry in range(ch.GetEntries()):
 		module.SetEvent(ev)
 
 	proc.process_entry()
-	break
 proc.finalize()
