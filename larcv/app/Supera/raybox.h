@@ -75,7 +75,7 @@ namespace larcv {
             return 2;
         } 
 
-        bool contain(const Vec3f& pt) {
+        bool contain(const Vec3f& pt) const {
             return (bounds[0].x <= pt.x && pt.x < bounds[1].x &&
                 bounds[0].y <= pt.y && pt.y < bounds[1].y &&
                 bounds[0].z <= pt.z && pt.z < bounds[1].z);
