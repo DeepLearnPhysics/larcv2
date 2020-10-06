@@ -19,7 +19,17 @@
 #include "EDepSim/TG4Event.h"
 #include "larcv/core/DataFormat/EventParticle.h"
 #include "larcv/core/DataFormat/EventVoxel3D.h"
+
+// forward declarations
+class TVector3;
+
 namespace larcv {
+
+  class AABBox;
+
+  template <typename T>
+  class Vec3;
+  typedef Vec3<float> Vec3f;
 
   /**
      \class SuperaG4HitSegment
@@ -47,12 +57,29 @@ namespace larcv {
       /// Apply Landau fluctuations to the set of energies in these voxels
       void FluctuateEnergy(std::vector<Voxel> &voxels);
 
-      larcv::Particle MakeParticle(const TG4Trajectory&);
+      /// Where (if anywhere) does a line segment intersect a given bounding box?
+      /// (If the entire line segment is contained, the entry and exit points
+      ///  will be set to the start and stop points provided.)
+      ///
+      /// \param bbox        Bounding box in question
+      /// \param startPoint  Start point of the line segment in question
+      /// \param stopPoint   Stop point of the line segment in question
+      /// \param entryPoint  Computed entry point of the line segment into the box, if any
+      /// \param exitPoint   Computed exit point of the line segment from the box, if any
+      /// \return            Number of intersections (will be 0, 1, or 2)
+      char Intersections(const larcv::AABBox & bbox,
+                         const TVector3 & startPoint,
+                         const TVector3 & stopPoint,
+                         larcv::Vec3f & entryPoint,
+                         larcv::Vec3f & exitPoint) const;
+
+      larcv::Particle MakeParticle(const TG4Trajectory& traj,
+                                   const larcv::AABBox& bbox);
 
       std::vector<larcv::Voxel>
       MakeVoxels(const ::TG4HitSegment &hitSegment,
                  const larcv::Voxel3DMeta &meta,
-                 const std::vector<larcv::Particle> &particles);
+                 std::vector<larcv::Particle> &particles);
 
     std::string _sparsetensor3d_producer;
     std::string _particle_producer;
