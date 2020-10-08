@@ -25,11 +25,13 @@ class TVector3;
 
 namespace larcv {
 
+  template <typename T>
   class AABBox;
 
   template <typename T>
   class Vec3;
   typedef Vec3<float> Vec3f;
+  typedef Vec3<double> Vec3d;
 
   /**
      \class SuperaG4HitSegment
@@ -67,14 +69,15 @@ namespace larcv {
       /// \param entryPoint  Computed entry point of the line segment into the box, if any
       /// \param exitPoint   Computed exit point of the line segment from the box, if any
       /// \return            Number of intersections (will be 0, 1, or 2)
-      char Intersections(const larcv::AABBox & bbox,
+      template <typename T>
+      char Intersections(const larcv::AABBox<T> & bbox,
                          const TVector3 & startPoint,
                          const TVector3 & stopPoint,
-                         larcv::Vec3f & entryPoint,
-                         larcv::Vec3f & exitPoint) const;
+                         larcv::Vec3<T> & entryPoint,
+                         larcv::Vec3<T> & exitPoint) const;
 
       larcv::Particle MakeParticle(const TG4Trajectory& traj,
-                                   const larcv::AABBox& bbox);
+                                   const larcv::AABBox<double>& bbox);
 
       std::vector<larcv::Voxel>
       MakeVoxels(const ::TG4HitSegment &hitSegment,

@@ -36,7 +36,7 @@ namespace larcv {
     auto ev_particles = (EventParticle*)(mgr.get_data("particle",_particle_producer));
 
     auto meta = ev_hittensor->meta();
-    larcv::AABBox box(meta);
+    larcv::AABBox<double> box(meta);
 
     std::vector<larcv::Particle> particles;
     particles.reserve(evt->Trajectories.size());
@@ -58,19 +58,24 @@ namespace larcv {
     larcv::VoxelSet voxelSet;
     for (auto const & detPair : evt->SegmentDetectors)
     {
-      larcv::VoxelSet voxels;
-      LARCV_INFO() << "Sensitive detector: " << detPair.first << std::endl;
-      for (auto const & hitSeg : detPair.second)
+      LARCV_DEBUG() << "Sensitive detector: " << detPair.first << std::endl;
+      LARCV_DEBUG() << "  There are " << detPair.second.size() << " hits" << std::endl;
+      for (std::size_t hitIdx = 0; hitIdx < detPair.second.size(); hitIdx++)
       {
+        LARCV_DEBUG() << "   hit number: " << hitIdx << std::endl;
+        auto const & hitSeg = detPair.second[hitIdx];
         auto newVoxels = MakeVoxels(hitSeg, ev_hittensor->meta(), particles);
-        LARCV_INFO() << "  Voxel count " << voxels.size() << " value sum " << voxels.sum() << std::endl;
-        for (std::size_t idx = 0; idx < newVoxels.size(); idx++)
-          voxelSet.emplace(std::move(newVoxels[idx]), true);
+        LARCV_DEBUG() << "    made " << newVoxels.size() << " voxels " << std::endl;
+        for (std::size_t voxIdx = 0; voxIdx < newVoxels.size(); voxIdx++)
+          voxelSet.emplace(std::move(newVoxels[voxIdx]), true);
       }
     }
 
+    LARCV_DEBUG() << "Made " << particles.size() << " true particles" << std::endl;
+    LARCV_DEBUG() << "Made " << voxelSet.size() << " voxels, with " << voxelSet.sum() << " total" << std::endl;
     ev_particles->emplace(std::move(particles));
     ev_hittensor->emplace(std::move(voxelSet), ev_hittensor->meta());
+    LARCV_DEBUG() << "Done with event." << std::endl;
 
     return true;
   }
@@ -78,7 +83,7 @@ namespace larcv {
   void SuperaG4HitSegment::finalize()
   {}
 
-  larcv::Particle SuperaG4HitSegment::MakeParticle(const TG4Trajectory& traj, const larcv::AABBox & bbox)
+  larcv::Particle SuperaG4HitSegment::MakeParticle(const TG4Trajectory& traj, const larcv::AABBox<double> & bbox)
   {
     larcv::Particle res;
     res.track_id(traj.GetTrackId());
@@ -111,7 +116,7 @@ namespace larcv {
         LARCV_DEBUG() << "  Considering step (" << trajP1.X() << "," << trajP1.Y() << "," << trajP1.Z() << ")"
                       << " -> " << trajP2.X() << "," << trajP2.Y() << "," << trajP2.Z() << ")" << std::endl;
 
-        larcv::Vec3f p1, p2;
+        larcv::Vec3d p1, p2;
         if (!Intersections(bbox, trajP1.Vect(), trajP2.Vect(),p1, p2))
         {
           LARCV_DEBUG() << "   --> does not intersect bounding box." << std::endl;
@@ -137,7 +142,7 @@ namespace larcv {
     res.energy_init(mom.E());
     res.parent_track_id(traj.GetParentId());
 
-    float distTraveled = 0;
+    double distTraveled = 0;
     for (std::size_t idx = 1; idx < traj.Points.size(); idx++)
       distTraveled += (traj.Points[idx].GetPosition().Vect() - traj.Points[idx-1].GetPosition().Vect()).Mag();
     res.distance_travel(distTraveled);
@@ -157,22 +162,25 @@ namespace larcv {
                                                            std::vector<larcv::Particle> &particles)
   {
     std::vector<larcv::Voxel> voxels;
-    larcv::AABBox box(meta);
+    larcv::AABBox<double> box(meta);
 
-    //std::vector<std::vector<float> > res;
-    //std::vector<float> res_pt(4);
-    const float epsilon = 1.e-4;
-    float dist_travel = 0.;
-    float energy_deposit = 0.;
-    float smallest_side = std::min(meta.size_voxel_x(),std::min(meta.size_voxel_y(),meta.size_voxel_z()));
-     LARCV_INFO() <<"World: " << box.bounds[0] << " => " << box.bounds[1] << std::endl;
+    const double epsilon = 1.e-3;
+    double dist_travel = 0.;
+    double energy_deposit = 0.;
+    double smallest_side = std::min(meta.size_voxel_x(),std::min(meta.size_voxel_y(),meta.size_voxel_z()));
+    LARCV_INFO() <<"World: " << box.bounds[0] << " => " << box.bounds[1] << std::endl;
 
     TVector3 start = hitSegment.GetStart().Vect();
     TVector3 end = hitSegment.GetStop().Vect();
     start *= 0.1;  // convert unit to cm
     end *= 0.1;
 
-    larcv::Vec3f pt0, pt1;
+    LARCV_INFO() << "Voxelizing TG4HitSegment for primary " << hitSegment.GetPrimaryId()
+                 << " from (" << start.x() << "," << start.y() << "," << start.z() << ")"
+                 << " to (" << end.x() << "," << end.y() << "," << end.z() << ")"
+                 << std::endl;
+
+    larcv::Vec3d pt0, pt1;
     char crossings = Intersections(box, start, end, pt0, pt1);
 
     if(crossings == 0) {
@@ -180,25 +188,31 @@ namespace larcv {
       return voxels;
     }
 
-    larcv::Vec3f dir = pt1 - pt0;
-    float length = dir.length();
-    larcv::Ray ray(pt0, dir);
+    LARCV_DEBUG() << "   Intersects with bounding box at"
+                  << " (" << pt0.x << "," << pt0.y << "," << pt0.z << ")"
+                  << " and (" << pt1.x << "," << pt1.y << "," << pt1.z << ")"
+                  << std::endl;
+
+    larcv::Vec3d dir = pt1 - pt0;
+    double length = dir.length();
+    dir.normalize();
+    larcv::Ray<double> ray(pt0, dir);
 
     int trackId = hitSegment.GetPrimaryId();
     auto& particle = *std::find_if(particles.begin(), particles.end(),
                                    [=](const larcv::Particle & p) { return p.track_id() == static_cast<unsigned int>(trackId); });
 
     voxels.reserve(voxels.size() + (size_t)(length / smallest_side));
-    float t0,t1,dist_section;
+    double t0, t1, dist_section;
     dist_section = 0.;
     size_t nx, ny, nz;
     t0=t1=0.;
     //size_t ctr=0;
-    while(1) {
+    while(true) {
       //ctr += 1;
       //if(ctr>=10) break;
       // define the inspection box
-      Vec3f pt = pt0 + dir * (t1 + epsilon);
+      Vec3d pt = pt0 + dir * (t1 + epsilon);
       LARCV_DEBUG() << "    New point: " << pt << std::endl;
       auto vox_id = meta.id((double)(pt.x), (double)(pt.y), (double)(pt.z));
       if(vox_id==larcv::kINVALID_VOXELID) break;
@@ -217,12 +231,12 @@ namespace larcv {
         LARCV_ERROR() << "      No crossing (not expected) ... breaking" << std::endl;
         break;
       }
-      float dx=0;
+      double dx=0;
       if(cross==1) {
-        LARCV_DEBUG() << "      One crossing: " << dir * t1 << std::endl;
+        LARCV_DEBUG() << "      One crossing: " << pt0 + dir * t1 << std::endl;
         dx = std::min(t1,length);
       }else {
-        LARCV_DEBUG() << "      Two crossing" << dir * t0 << " => " << dir * t1 << std::endl;
+        LARCV_DEBUG() << "      Two crossing" << pt0 + dir * t0 << " => " << pt0 + dir * t1 << std::endl;
         if(t1>length) dx = length - t0;
         else dx = t1 - t0;
       }
@@ -233,17 +247,18 @@ namespace larcv {
       res_pt[3] = dx;
       res.push_back(res_pt);
       */
-      float energyInVoxel = dx / length * hitSegment.GetEnergyDeposit();
+      double energyInVoxel = dx / length * hitSegment.GetEnergyDeposit();
       voxels.emplace_back(vox_id, energyInVoxel);
       dist_travel += dx;
       dist_section += dx;
       energy_deposit += energyInVoxel;
       //LARCV_DEBUG() << "      Registering voxel id " << vox_id << " at distance fraction " << t1/length << std::endl;
-      LARCV_DEBUG() << "      Registering voxel id " << vox_id << " t1 " << t1 << " length " << length << std::endl;
+      LARCV_DEBUG() << "      Registering voxel id " << vox_id << " t1 =" << t1 << " (total length = " << length << ")" << std::endl;
       if(t1>length) {
         LARCV_DEBUG() << "      Reached the segment end (t1 = " << t1 << " fractional length " << t1/length << ") ... breaking" << std::endl;
         break;
       }
+
       LARCV_DEBUG() << "      Updated t1 = " << t1 << " (fractional length " << t1/length << ")" << std::endl;
     }
 
@@ -255,15 +270,16 @@ namespace larcv {
     return voxels;
   }
 
-  char SuperaG4HitSegment::Intersections(const AABBox &bbox,
+  template <typename T>
+  char SuperaG4HitSegment::Intersections(const AABBox<T> &bbox,
                                          const TVector3 &startPoint,
                                          const TVector3 &stopPoint,
-                                         Vec3f &entryPoint,
-                                         Vec3f &exitPoint) const
+                                         Vec3<T> &entryPoint,
+                                         Vec3<T> &exitPoint) const
   {
     TVector3 displVec = (stopPoint - startPoint);
     TVector3 dir = displVec.Unit();
-    larcv::Ray ray(startPoint, dir);
+    larcv::Ray<T> ray(startPoint, dir);
 
     bool startContained = bbox.contain(startPoint);
     bool stopContained = bbox.contain(stopPoint);
@@ -275,11 +291,11 @@ namespace larcv {
 
     if(!startContained || !stopContained)
     {
-      float t0, t1;
+      double t0, t1;
       int cross = bbox.intersect(ray, t0, t1);
       if (cross > 0)
       {
-        const float epsilon = 0.0001;
+        const T epsilon = 0.0001;
         if (!startContained)
           entryPoint = startPoint + (t0 + epsilon) * dir;
 
@@ -307,6 +323,13 @@ namespace larcv {
 
     return 2;
   }
+
+  // instantiate the template for the type(s) we care about
+  template char SuperaG4HitSegment::Intersections(const AABBox<double> &bbox,
+                                                  const TVector3 &startPoint,
+                                                  const TVector3 &stopPoint,
+                                                  Vec3d &entryPoint,
+                                                  Vec3d &exitPoint) const;
 
 }
 

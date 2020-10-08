@@ -10,26 +10,28 @@
 
 namespace larcv {
 
+    template <typename T>
     class Ray 
     { 
     public: 
-        Ray(const Vec3f &orig, const Vec3f &dir) : orig(orig), dir(dir) 
+        Ray(const Vec3<T> &orig, const Vec3<T> &dir) : orig(orig), dir(dir)
         { 
             invdir = 1 / dir; 
             sign[0] = (invdir.x < 0); 
             sign[1] = (invdir.y < 0); 
             sign[2] = (invdir.z < 0); 
         } 
-        Vec3f orig, dir; // ray orig and dir 
-        Vec3f invdir; 
+        Vec3<T> orig, dir; // ray orig and dir
+        Vec3<T> invdir;
         int sign[3]; 
     }; 
 
+    template <typename T>
     class AABBox 
     { 
     public: 
-        AABBox(const Vec3f &b0, const Vec3f &b1) { bounds[0] = b0, bounds[1] = b1; } 
-        AABBox(const float x0, const float y0, const float z0, const float x1, const float y1, const float z1)
+        AABBox(const Vec3<T> &b0, const Vec3<T> &b1) { bounds[0] = b0, bounds[1] = b1; }
+        AABBox(const T x0, const T y0, const T z0, const T x1, const T y1, const T z1)
         {
             bounds[0].x=x0; bounds[0].y=y0; bounds[0].z=z0;
             bounds[1].x=x1; bounds[1].y=y1; bounds[1].z=z1;
@@ -39,9 +41,9 @@ namespace larcv {
             bounds[0].x=box.min_x(); bounds[0].y=box.min_y(); bounds[0].z=box.min_z(); 
             bounds[1].x=box.max_x(); bounds[1].y=box.max_y(); bounds[1].z=box.max_z();
         }
-        int intersect(const Ray &r, float& t0, float& t1) const 
+        int intersect(const Ray<T> &r, T& t0, T& t1) const
         { 
-            float tmin, tmax, tymin, tymax, tzmin, tzmax; 
+            T tmin, tmax, tymin, tymax, tzmin, tzmax;
 
             tmin = (bounds[r.sign[0]].x - r.orig.x) * r.invdir.x; 
             tmax = (bounds[1-r.sign[0]].x - r.orig.x) * r.invdir.x; 
@@ -75,13 +77,13 @@ namespace larcv {
             return 2;
         } 
 
-        bool contain(const Vec3f& pt) const {
+        bool contain(const Vec3<T>& pt) const {
             return (bounds[0].x <= pt.x && pt.x < bounds[1].x &&
                 bounds[0].y <= pt.y && pt.y < bounds[1].y &&
                 bounds[0].z <= pt.z && pt.z < bounds[1].z);
         }
 
-        Vec3f bounds[2]; 
+        Vec3<T> bounds[2];
     }; 
 
 }
