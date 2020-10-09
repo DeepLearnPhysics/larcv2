@@ -15,8 +15,9 @@
 #pragma link C++ class larcv::SuperaBBoxInteraction+;
 #pragma link C++ class larcv::SuperaG4Trajectory+;
 #pragma link C++ class larcv::Vec3f+;
-#pragma link C++ class larcv::Ray+;
-#pragma link C++ class larcv::AABBox+;
+#pragma link C++ class larcv::Vec3d+;
+#pragma link C++ class larcv::Ray<double>+;
+#pragma link C++ class larcv::AABBox<double>+;
 #pragma link C++ class std::vector<std::vector<float> >+;
 //ADD_NEW_CLASS ... do not change this line
 #endif

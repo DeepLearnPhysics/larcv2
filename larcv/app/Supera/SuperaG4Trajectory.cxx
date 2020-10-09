@@ -117,51 +117,48 @@ namespace larcv {
     larcv::Particle& part)
   {
     larcv::VoxelSet vs;
-    //std::vector<std::vector<float> > res;
-    //std::vector<float> res_pt(4);
     double mass2 = trj.GetInitialMomentum().M2();
-    const float epsilon = 1.e-4;
-    float dist_travel = 0.;
-    float energy_deposit = 0.;
-    float smallest_side = std::min(meta.size_voxel_x(),std::min(meta.size_voxel_y(),meta.size_voxel_z()));
+    const double epsilon = 1.e-4;
+    double dist_travel = 0.;
+    double energy_deposit = 0.;
+    double smallest_side = std::min(meta.size_voxel_x(),std::min(meta.size_voxel_y(),meta.size_voxel_z()));
     bool first_step_set = false;
     LARCV_INFO() << "Tracking: PDG " << trj.GetPDGCode() << " E = " << trj.GetInitialMomentum().E() << " MeV" << std::endl;
-    larcv::AABBox box(meta);
+    larcv::AABBox<double> box(meta);
     LARCV_INFO() <<"World: " << box.bounds[0] << " => " << box.bounds[1] << std::endl;
 
     for(size_t pidx=0; (pidx+1)<trj.Points.size(); ++pidx) {
       auto const& start = trj.Points[pidx];
       auto const& end = trj.Points[pidx+1];
-      //float dp2 = start.GetMomentum().Mag2() - end.GetMomentum().Mag2();
       auto const& pos_start = start.GetPosition();
       auto const& pos_end   = end.GetPosition();
       double tstart = pos_start.T();
       double tend   = pos_end.T();
 
-      larcv::Vec3f pt0(pos_start);
-      larcv::Vec3f pt1(pos_end);
+      larcv::Vec3d pt0(pos_start);
+      larcv::Vec3d pt1(pos_end);
       // change unit to cm
       pt0 /= 10.;
       pt1 /= 10.;
       LARCV_INFO() << "Segment: idx " << pidx << " ... " << pt0 << " => " << pt1 << std::endl;
 
-      larcv::Vec3f dir = pt1 - pt0;
+      larcv::Vec3d dir = pt1 - pt0;
       auto length = dir.length();
       dir /= length;
-      larcv::Ray ray(pt0,dir);
+      larcv::Ray<double> ray(pt0,dir);
       // 1) check if the start is inside
-      box = larcv::AABBox(meta);
+      box = larcv::AABBox<double>(meta);
       LARCV_INFO() <<"Ray: " << ray.orig << " dir " << ray.dir << std::endl;
       bool skip = false;
       if(!box.contain(pt0)) {
-        float t0,t1;
+        double t0,t1;
         auto cross = box.intersect(ray,t0,t1);
         if(cross==0) skip = true;
         else if(cross==2) {
           pt0 = pt0 + dir * (t0 + epsilon);
           tstart = tstart + t0/length * (tend - tstart);
           length = (pt1 - pt0).length();
-          ray = larcv::Ray(pt0,dir);
+          ray = larcv::Ray<double>(pt0,dir);
         }
       }
 
@@ -175,8 +172,8 @@ namespace larcv {
         first_step_set = true;
       }
       vs.reserve(vs.size() + (size_t)(length/smallest_side));
-      float energy_diff = sqrt(start.GetMomentum().Mag2() + mass2) - sqrt(end.GetMomentum().Mag2() + mass2);
-      float t0,t1,dist_section;
+      double energy_diff = sqrt(start.GetMomentum().Mag2() + mass2) - sqrt(end.GetMomentum().Mag2() + mass2);
+      double t0,t1,dist_section;
       dist_section = 0.;
       size_t nx, ny, nz;
       t0=t1=0.;
@@ -185,7 +182,7 @@ namespace larcv {
         //ctr += 1;
         //if(ctr>=10) break;
         // define the inspection box
-        Vec3f pt = pt0 + dir * (t1 + epsilon);
+        Vec3d pt = pt0 + dir * (t1 + epsilon);
         LARCV_DEBUG() << "    New point: " << pt << std::endl;
         auto vox_id = meta.id((double)(pt.x), (double)(pt.y), (double)(pt.z));
         if(vox_id==larcv::kINVALID_VOXELID) break;
@@ -204,7 +201,7 @@ namespace larcv {
           LARCV_ERROR() << "      No crossing (not expected) ... breaking" << std::endl;
           break;
         }
-        float dx=0;
+        double dx=0;
         if(cross==1) {
           LARCV_DEBUG() << "      One crossing: " << dir * t1 << std::endl;
           dx = std::min(t1,length);

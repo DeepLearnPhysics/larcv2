@@ -65,6 +65,8 @@ template<typename T>
         Vec3(const TLorentzVector& v) : x(v.X()), y(v.Y()), z(v.Z()) {}
         Vec3 operator + (const Vec3 &v) const
         { return Vec3(x + v.x, y + v.y, z + v.z); }
+        Vec3 & operator += (const Vec3 &v)
+        { x += v.x; y += v.y; z += v.z; return *this; }
         Vec3 operator - (const Vec3 &v) const
         { return Vec3(x - v.x, y - v.y, z - v.z); }
         Vec3 operator - () const
@@ -123,6 +125,7 @@ template<typename T>
 // you can declare a vector either that way: Vec3<float> a, or that way: Vec3f a
 //[/comment]
     typedef Vec3<float> Vec3f;
+    typedef Vec3<double> Vec3d;
     typedef Vec3<int> Vec3i;
 
 }
