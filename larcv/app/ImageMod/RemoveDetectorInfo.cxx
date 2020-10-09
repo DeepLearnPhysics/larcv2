@@ -79,8 +79,8 @@ namespace larcv {
                              part.parent_position().z() - origin.z, part.parent_position().t());
 
 	part.last_step(part.last_step().x() - origin.x,
-			     part.last_step().y() - origin.y,
-			     part.last_step().z() - origin.z, part.last_step().t());
+		       part.last_step().y() - origin.y,
+		       part.last_step().z() - origin.z, part.last_step().t());
 
         //
         // Remove last_step and distance_travel as those are detector geometry specific
