@@ -16,7 +16,7 @@
 
 #include <iostream>
 #include "Vertex.h"
-#include "BBox.h"
+#include "Voxel3DMeta.h"
 #include "DataFormatTypes.h"
 namespace larcv {
 
@@ -232,6 +232,9 @@ namespace larcv {
     void emplace_back(larcv::Particle&& part);
 
     void emplace(std::vector<larcv::Particle>&& part_v);
+
+    void merge(const ParticleSet& ps,
+      const double dx, const double dy, const double dz, const double dt);
 
   private:
 

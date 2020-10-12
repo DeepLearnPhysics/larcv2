@@ -147,6 +147,9 @@ namespace larcv {
     /// Emplace a new voxel from id & value
     inline void emplace(VoxelID_t id, float value, const bool add)
     { emplace(Voxel(id,value),add); }
+    /// Merge a set of voxels
+    inline void emplace(const VoxelSet& vs, const bool add)
+    { for(auto const& v : vs.as_vector()) emplace(v.id(),v.value(),add); }
     /// InstanceID_t setter
     inline void id(const InstanceID_t id) { _id = id; }
 

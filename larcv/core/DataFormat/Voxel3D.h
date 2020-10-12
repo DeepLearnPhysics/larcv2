@@ -47,6 +47,29 @@ namespace larcv {
     /// Emplace the whole voxel set w/ meta
     inline void emplace(VoxelSet&& vs, const Voxel3DMeta& meta)
     {*((VoxelSet*)this) = std::move(vs); this->meta(meta);}
+    /// Merge another SparseTensor3D
+    inline void merge(const SparseTensor3D& vs, bool add=true, bool check_meta_strict=true)
+    { 
+      if(!(this->meta().valid()))
+        this->meta(vs.meta());
+      else if(check_meta_strict) {
+        if(vs.meta() != this->meta()) {
+          std::cerr << "Meta mismatched (strict check)!" << std::endl
+                    << this->meta().dump() << std::endl
+                    << vs.meta().dump() << std::endl;
+          throw std::exception();
+        }
+      }
+      else if(this->meta().num_voxel_x() != vs.meta().num_voxel_x() || 
+        this->meta().num_voxel_y() != vs.meta().num_voxel_y() || 
+        this->meta().num_voxel_z() != vs.meta().num_voxel_z() ) {
+          std::cerr << "Meta mismatched (loose check)!" << std::endl
+                    << this->meta().dump() << std::endl
+                    << vs.meta().dump() << std::endl;
+          throw std::exception(); 
+      }
+      for(auto const& v : vs.as_vector()) this->emplace(v.id(),v.value(),add);
+    }
     /// Emplace a new voxel from id & value
     inline void emplace(VoxelID_t id, float value, const bool add)
     { VoxelSet::emplace(id, value, add); }
@@ -98,6 +121,34 @@ namespace larcv {
     /// emplace VoxelSetArray
     inline void emplace(VoxelSetArray&& vsa, const Voxel3DMeta& meta)
     { *((VoxelSetArray*)this) = std::move(vsa); this->meta(meta); }
+    /// Merge another ClusterVoxel3D
+    inline void merge(const ClusterVoxel3D& vsa, bool check_meta_strict=true)
+    { 
+      if(!(this->meta().valid()))
+        this->meta(vsa.meta());
+      else if(check_meta_strict) {
+        if(vsa.meta() != this->meta()) {
+          std::cerr << "Meta mismatched (strict check)!" << std::endl
+                    << this->meta().dump() << std::endl
+                    << vsa.meta().dump() << std::endl;
+          throw std::exception();
+        }
+      }
+      else if(this->meta().num_voxel_x() != vsa.meta().num_voxel_x() || 
+        this->meta().num_voxel_y() != vsa.meta().num_voxel_y() || 
+        this->meta().num_voxel_z() != vsa.meta().num_voxel_z() ) {
+        if(vsa.meta() != this->meta()) {
+          std::cerr << "Meta mismatched (loose check)!" << std::endl
+                    << this->meta().dump() << std::endl
+                    << vsa.meta().dump() << std::endl;
+          throw std::exception(); 
+        }
+      }
+      for(auto vs : vsa.as_vector()) {
+        vs.id(larcv::kINVALID_INSTANCEID);
+        ((VoxelSetArray*)this)->emplace(std::move(vs));
+      } 
+    }
     /// Meta setter
     void meta(const larcv::Voxel3DMeta& meta);
 

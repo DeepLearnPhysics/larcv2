@@ -25,11 +25,11 @@ fi
 # Check python version compatibility:
 export LARCV_PYTHON_CONFIG=python-config
 LARCV_PYVERSION=0
-export LARCV_PYTHON=`which python`
-if [ `command -v python` ]; then
+if [ `command -v python3` ]; then
+    export LARCV_PYTHON=`which python3`
     LARCV_PYVERSION=$($LARCV_PYTHON -c "import sys; print(sys.version_info.major)")
 else
-    export LARCV_PYTHON=`which python3`
+    export LARCV_PYTHON=`which python`
     LARCV_PYVERSION=$($LARCV_PYTHON -c "import sys; print(sys.version_info.major)")
 fi
 if [[ $LARCV_PYVERSION -gt 2 ]]
