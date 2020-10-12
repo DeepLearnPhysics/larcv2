@@ -5,15 +5,15 @@
 #include "Vertex.h"
 #include "larcv/core/Base/larbys.h"
 #include "larcv/core/Base/larcv_logger.h"
-
+#include "larcv/core/Base/LArCVTypes.h"
 namespace larcv {
 
   // Interaction ID default constructor
   Vertex::Vertex()
-    : _x(0)
-    , _y(0)
-    , _z(0)
-    , _t(0)
+    : _x(larcv::kINVALID_DOUBLE)
+    , _y(larcv::kINVALID_DOUBLE)
+    , _z(larcv::kINVALID_DOUBLE)
+    , _t(larcv::kINVALID_DOUBLE)
   {approx();}
 
   Vertex::Vertex(double x, double y, double z, double t)
