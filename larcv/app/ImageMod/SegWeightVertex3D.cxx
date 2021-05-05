@@ -45,15 +45,15 @@ namespace larcv {
                                            const Voxel& vox,
                                            std::vector<VoxelID_t>& result) const
   {
-    result.resize(pow(_distance_neighbors * 2 + 1, 3)-1);
+    result.resize(pow(_distance_neighbors * 2 + 1, 3));
     size_t ctr=0;
     for(int xshift=-_distance_neighbors; xshift<=_distance_neighbors; ++xshift) {
       for(int yshift=-_distance_neighbors; yshift<=_distance_neighbors; ++yshift) {
         for(int zshift=-_distance_neighbors; zshift<=_distance_neighbors; ++zshift) {
-          if(xshift != 0 || yshift !=0 || zshift !=0 ) {
+          //if(xshift != 0 || yshift !=0 || zshift !=0 ) {
             result[ctr] = meta.shift(vox.id(),xshift,yshift,zshift);
             ++ctr;
-          }
+          //}
         }
       }
     }
@@ -104,7 +104,7 @@ namespace larcv {
         for (auto const& neighbor_id : neighbor_voxel_id) {
           if (neighbor_id == kINVALID_VOXELID) continue;
           auto const& orig_vox = ev_tensor3d.find(neighbor_id);
-          if (orig_vox.id() != kINVALID_VOXELID) continue;
+          if (orig_vox.id() == kINVALID_VOXELID) continue;
           result.emplace(neighbor_id, _prob_neighbors, false);
           ++count_neighbors;
         }
