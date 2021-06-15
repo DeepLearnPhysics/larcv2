@@ -76,6 +76,11 @@
 #pragma link C++ class larcv::ParticleSet+;
 #pragma link C++ class larcv::EventParticle+;
 
+#pragma link C++ class larcv::Neutrino+;
+#pragma link C++ class std::vector<larcv::Neutrino>+;
+#pragma link C++ class larcv::NeutrinoSet+;
+#pragma link C++ class larcv::EventNeutrino+;
+
 #pragma link C++ class larcv::Meta+;
 #pragma link C++ class larcv::EventMeta+;
 
