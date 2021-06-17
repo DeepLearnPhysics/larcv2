@@ -97,6 +97,14 @@ namespace larcv {
     inline const std::string& creation_process() const { return _process; }
     inline int num_voxels() const { return _num_voxels; }
 
+		inline std::vector<double> traj_x  () const { return _traj_x; }
+		inline std::vector<double> traj_y  () const { return _traj_y; }
+		inline std::vector<double> traj_z  () const { return _traj_z; }
+		inline std::vector<double> traj_t  () const { return _traj_t; }
+		inline std::vector<double> traj_px () const { return _traj_px; }
+		inline std::vector<double> traj_py () const { return _traj_py; }
+		inline std::vector<double> traj_pz () const { return _traj_pz; }
+		inline std::vector<double> traj_e  () const { return _traj_e; }
 
     //
     // Setters
@@ -129,6 +137,16 @@ namespace larcv {
     inline void energy_deposit  (double e)           { _energy_deposit = e; }
     inline void creation_process (const std::string& proc) { _process = proc; }
     inline void num_voxels(int count) { _num_voxels = count; }
+		inline void add_trajectory_point(double x, double y, double z, double t, double px, double py, double pz, double e) {
+			_traj_x.push_back(x);
+			_traj_y.push_back(y);
+			_traj_z.push_back(z);
+			_traj_t.push_back(t);
+			_traj_px.push_back(px);
+			_traj_py.push_back(py);
+			_traj_pz.push_back(pz);
+			_traj_e.push_back(e);
+		}
     std::string dump() const;
 
   private:
@@ -163,6 +181,14 @@ namespace larcv {
     int _num_voxels; ///< Number of voxels in the particle's 3D cluster.
 
     std::vector<larcv::InstanceID_t> _children_id; ///< "ID" of the children particles in ParticleSet collection
+		std::vector<double> _traj_x;
+		std::vector<double> _traj_y;
+		std::vector<double> _traj_z;
+		std::vector<double> _traj_t;
+		std::vector<double> _traj_px;
+		std::vector<double> _traj_py;
+		std::vector<double> _traj_pz;
+		std::vector<double> _traj_e;
   };
 
   /**
