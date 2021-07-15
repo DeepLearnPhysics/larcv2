@@ -3,14 +3,16 @@
 
 #include "MergeStreams.h"
 #include "larcv/core/Base/LArCVBaseUtilFunc.h"
+#include "larcv/core/DataFormat/EventNeutrino.h"
 #include "larcv/core/DataFormat/EventParticle.h"
 #include "larcv/core/DataFormat/EventVoxel3D.h"
 #include "larcv/core/DataFormat/Voxel3D.h"
 #include "larcv/core/DataFormat/Voxel.h"
+#include "larcv/core/DataFormat/Neutrino.h"
 
 namespace larcv {
 
-  MergeStreams::MergeStreams(std::string name) : larcv_base(name), _current_entry(0) {
+  MergeStreams::MergeStreams(std::string name) : larcv_base(name) {
 
   }
   
@@ -23,22 +25,35 @@ namespace larcv {
     auto main_cfg = CreatePSetFromFile(cfg_file);
     auto const& cfg = main_cfg.get_pset(name());
 
-    _num_input_files = cfg.get<size_t>("NumInputFiles");
+    //_num_input_files = cfg.get<size_t>("NumInputFiles");
     _out_filename = cfg.get<std::string>("OutFilename");
     std::vector<std::string> input_files  = cfg.get<std::vector<std::string> >("InputFiles");
-    _multiplicity = cfg.get<std::vector<int> >("Multiplicity");
-    // TODO Check for length
+    std::vector<int> multiplicity = cfg.get<std::vector<int> >("Multiplicity");
+
+    _cluster3d_aligned = cfg.get<std::vector<std::string> >("Cluster3dAligned");
+    _particle_aligned = cfg.get<std::vector<std::string> >("ParticleAligned");
+
+    _num_input_files = input_files.size();
+    if (_num_input_files != multiplicity.size()) {
+      LARCV_CRITICAL() << "Input files list and multiplicity list must have the same size." << std::endl;
+      throw larbys();
+    }
 
     // Create one IOManager per input file
     for (size_t i = 0; i < _num_input_files; ++i) {
-      IOManager io(IOManager::kREAD, "InputStream" + std::to_string(i));
-      io.add_in_file(input_files[i]);
-      _in_io.push_back(io);
+      for (size_t j = 0; j < multiplicity[i]; ++j) {
+        IOManager io(IOManager::kREAD, "InputStream" + std::to_string(i));
+        io.add_in_file(input_files[i]);
+        _in_io.push_back(io);
+        _current_entry.push_back(0);
+        _multiplicity.push_back(multiplicity[i]);
+        _offset.push_back(j);
+      }
     }    
 
     _out_io = IOManager(IOManager::kWRITE, "OutputStream");
     _out_io.set_out_file(_out_filename);
-    std::cout << "done configure" << std::endl;
+    //std::cout << "done configure" << std::endl;
 
   }
   void MergeStreams::initialize() {
@@ -49,7 +64,7 @@ namespace larcv {
      }*/
     for (auto& io : _in_io) {
       io.initialize();
-      std::cout <<"nentries" <<  io.get_n_entries() << std::endl;
+      //std::cout <<"nentries" <<  io.get_n_entries() << std::endl;
       //for (auto& prod : io.product_list()) 
       //  std::cout << "producer " << prod << std::endl;
     }
@@ -57,16 +72,54 @@ namespace larcv {
   }
 
   bool MergeStreams::process() {
-    /* We may want to pick N1 events from a file and N2 events from
-    another file, so putting all entries in a vector for now. */
-    for (size_t i = 0; i < _num_input_files; ++i) {
-      if (_current_entry < _in_io[i].get_n_entries() )
-        _in_io[i].read_entry(_current_entry, false);
+    /*
+	So we want to pick N1 from file 1 and N2 from file 2.
+	We pick N1 first events of file 1, overlay with N2 
+	first events of file 2. That makes 1 output event.
+	Then we pick the next N1 events of file 1 with the next
+	N2 events of file 2, etc. In other words: sequential
+	batches in each file. 
+
+	TODO : add randomness option?
+	
+	Since we have multiple entries in _in_io for the 
+	same file (depending on configured multiplicity),
+	we need to adapt the entry index that we are reading
+	for each of these instances.
+
+    */
+    for (size_t i = 0; i < _in_io.size(); ++i) {
+      //for (size_t j = 0; j < _multiplicity[i]; ++j) {
+        if (_current_entry[i] + _offset[i] < _in_io[i].get_n_entries() ) {
+          _in_io[i].read_entry(_current_entry[i] + _offset[i], false);
+        }
+      //}
+      _current_entry[i] = _current_entry[i] + _multiplicity[i];
     }
-    ++_current_entry;
+
+    // 2. Process cluster3d
+    std::vector<std::string> producer_list_cluster3d = _in_io[0].producer_list("cluster3d");
+    std::map<std::string, larcv::EventClusterVoxel3D> store_out_event_cluster3d;
+    //std::map<std::string, std::vector<int> > offset_cluster3d;
+    for (auto& producer : producer_list_cluster3d) {
+      std::vector<larcv::EventClusterVoxel3D> event_cluster3d_v;
+      //std::vector<int> offsets;
+      for (auto& io : _in_io) {
+        auto& event_cluster3d = io.get_data<larcv::EventClusterVoxel3D>(producer);
+        event_cluster3d_v.push_back(event_cluster3d);
+        //offsets.push_back(event_cluster3d.as_vector().size());
+      }
+      //offset_cluster3d.push_back(offsets);
+      // TODO make sure particle id and cluster index still match
+      VoxelSetArray vsa_output = merge_event_cluster3d(event_cluster3d_v);
+      auto& out_event_cluster3d = _out_io.get_data<larcv::EventClusterVoxel3D>(producer);
+      out_event_cluster3d.meta(event_cluster3d_v[0].meta());
+      out_event_cluster3d.emplace(std::move(vsa_output), event_cluster3d_v[0].meta());
+      store_out_event_cluster3d.insert(std::pair<std::string, larcv::EventClusterVoxel3D>(producer, out_event_cluster3d));
+    }
 
     // 1. Process particles first
-    // First check that all files have the same producers
+    // TODO First check that all files have the same producers
     std::vector<std::string> producer_list = _in_io[0].producer_list("particle");
     /*for (auto& io : _in_io) {
       if (io.producer_list("particle") !== producer_list) {
@@ -84,20 +137,30 @@ namespace larcv {
       std::vector<larcv::Particle> out_producer = merge_event_particle(event_particle_v);
       auto& out_event_particle = _out_io.get_data<larcv::EventParticle>(producer);
       out_event_particle.emplace(std::move(out_producer));
-    }
 
-    // 2. Process cluster3d
-    std::vector<std::string> producer_list_cluster3d = _in_io[0].producer_list("cluster3d");
-    for (auto& producer : producer_list_cluster3d) {
-      std::vector<larcv::EventClusterVoxel3D> event_cluster3d_v;
-      for (auto& io : _in_io)
-        event_cluster3d_v.push_back(io.get_data<larcv::EventClusterVoxel3D>(producer));
-      // TODO make sure particle id and cluster index still match
-      VoxelSetArray vsa_output = merge_event_cluster3d(event_cluster3d_v);
-      auto& out_event_cluster3d = _out_io.get_data<larcv::EventClusterVoxel3D>(producer);
-      out_event_cluster3d.meta(event_cluster3d_v[0].meta());
-      out_event_cluster3d.emplace(std::move(vsa_output), event_cluster3d_v[0].meta());
-  
+      // Check voxel count for aligned data products
+      auto idx = std::find(_particle_aligned.begin(), _particle_aligned.end(), producer); 
+      if (idx != _particle_aligned.end()) {
+        std::string cluster3d_producer = _cluster3d_aligned[idx - _particle_aligned.begin()];
+        auto cluster3d_idx = std::find(producer_list_cluster3d.begin(), producer_list_cluster3d.end(), cluster3d_producer);
+        if (cluster3d_idx == producer_list_cluster3d.end()) {
+          LARCV_CRITICAL() << "No cluster3d product found with name " << cluster3d_producer << std::endl;
+          throw larbys();
+        }
+        else {
+          // Time to check
+          //auto& out_event_cluster3d = _out_io.get_data<larcv::EventClusterVoxel3D>(producer);
+          // Same length for cluster3d list and particles list
+          assert(store_out_event_cluster3d[cluster3d_producer].as_vector().size() == out_event_particle.as_vector().size());
+          for (size_t pidx = 0; pidx <  out_event_particle.as_vector().size(); ++ pidx) {
+            //std::cout << store_out_event_cluster3d[cluster3d_producer].as_vector().size() << " " << pidx << std::endl;
+            assert(store_out_event_cluster3d[cluster3d_producer].as_vector().size() > pidx);
+            //std::cout << producer << " " << store_out_event_cluster3d[cluster3d_producer].as_vector()[pidx].as_vector().size() << " " << out_event_particle.as_vector()[pidx].num_voxels() << " " << store_out_event_cluster3d[cluster3d_producer].as_vector()[pidx].sum() << " " << out_event_particle.as_vector()[pidx].energy_deposit() << std::endl;
+            // Same voxel count?
+            //assert(store_out_event_cluster3d[cluster3d_producer].as_vector()[pidx].as_vector().size() == out_event_particle.as_vector()[pidx].num_voxels());
+          }
+        }
+      }
     }
 
     // 3. Process sparse3d
@@ -106,12 +169,36 @@ namespace larcv {
       std::vector<larcv::EventSparseTensor3D> event_sparse3d_v;
       for(auto& io : _in_io)
         event_sparse3d_v.push_back(io.get_data<larcv::EventSparseTensor3D>(producer));
-      VoxelSet vs_output = merge_event_sparse3d(event_sparse3d_v);
+      larcv::VoxelSet vs_output = merge_event_sparse3d(event_sparse3d_v);
       auto& out_event_sparse3d = _out_io.get_data<larcv::EventSparseTensor3D>(producer);
-      std::cout << event_sparse3d_v[0].meta().dump() << std::endl;
       out_event_sparse3d.meta(event_sparse3d_v[0].meta());
       out_event_sparse3d.emplace(std::move(vs_output), event_sparse3d_v[0].meta());
-      std::cout << out_event_sparse3d.meta().dump() << std::endl;
+    }
+
+    // 4. Process neutrino
+    std::vector<std::string> producer_list_neutrino = _in_io[0].producer_list("neutrino");
+    for (auto& producer : producer_list_neutrino) {
+      std::vector<larcv::EventNeutrino> event_neutrino_v;
+      std::vector<larcv::EventParticle> event_particle_v;
+
+      // Check that a ParticleSet exists for that producer
+      auto idx = std::find(producer_list.begin(), producer_list.end(), producer);
+      if (idx == producer_list.end()) {
+        LARCV_CRITICAL() << "Found neutrino product without corresponding particle product (named " << producer << ")" << std::endl;
+        throw larbys();
+      }
+
+      for (auto& io : _in_io) {
+        auto& event_neutrino = io.get_data<larcv::EventNeutrino>(producer);
+        event_neutrino_v.push_back(event_neutrino);
+        auto& event_particle = io.get_data<larcv::EventParticle>(producer);
+        event_particle_v.push_back(event_particle);
+      }
+
+      std::vector<larcv::Neutrino> output = merge_event_neutrino(event_neutrino_v, event_particle_v);
+      auto& out_event_neutrino = _out_io.get_data<larcv::EventNeutrino>(producer);
+      //out_event_cluster3d.meta(event_cluster3d_v[0].meta());
+      out_event_neutrino.emplace(std::move(output));
     }
 
     // Set run/subrun/event id in output file
@@ -139,7 +226,6 @@ namespace larcv {
     out_producer.resize(total_num_clusters);
     larcv::InstanceID_t counter = 0;
     for (auto ev_cluster3d : event_cluster3d_v) {
-      std::cout << "cluster3d " << ev_cluster3d.as_vector().size() << std::endl;
       //out_producer.insert(ev_cluster3d.as_vector());
       for (auto const& cluster : ev_cluster3d.as_vector()) {
         auto& out_cluster = out_producer.writeable_voxel_set(counter);
@@ -181,6 +267,26 @@ namespace larcv {
         shift_id += max_id+1;
         shift_group_id += max_group_id+1;
         shift_interaction_id += max_interaction_id+1;
+    }
+    return out_producer;
+  }
+
+  std::vector<larcv::Neutrino> MergeStreams::merge_event_neutrino(std::vector<larcv::EventNeutrino>& event_neutrino_v, std::vector<larcv::EventParticle>& event_particle_v) {
+    assert(event_neutrino_v.size() == event_particle_v.size());
+
+    std::vector<larcv::Neutrino> out_producer;
+    larcv::InstanceID_t shift_id = 0;
+    for (size_t i = 0; i < event_neutrino_v.size(); ++i) {
+      auto neutrino_v = event_neutrino_v[i].as_vector();
+      auto particle_v = event_particle_v[i].as_vector();
+      larcv::InstanceID_t max_id = 0;
+      for (auto particle : particle_v)
+        if (max_id < particle.id()) max_id = particle.id();
+      for (auto neutrino: neutrino_v) {
+        neutrino.id(neutrino.id() + shift_id);
+        out_producer.push_back(neutrino);
+      }
+      shift_id += max_id+1;
     }
     return out_producer;
   }
