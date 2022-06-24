@@ -17,8 +17,8 @@ namespace larcv {
     _hit_key_producer_v.clear();
     _hit_charge_producer_v   = cfg.get<std::vector<std::string> >("HitChargeProducerList", _hit_charge_producer_v );
     _hit_key_producer_v      = cfg.get<std::vector<std::string> >("HitKeyProducerList",    _hit_key_producer_v );
-    auto _reference_producer = cfg.get<std::string>("ReferenceProducer", "" );
-    auto _output_producer    = cfg.get<std::string>("OutputProducer", "" );
+    _reference_producer = cfg.get<std::string>("ReferenceProducer", "" );
+    _output_producer    = cfg.get<std::string>("OutputProducer", "" );
 
     if (_hit_charge_producer_v.size() != 3) {
       throw larbys();
