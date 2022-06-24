@@ -48,6 +48,7 @@
 #pragma link C++ class larcv::SegWeightInstance3D+;
 #pragma link C++ class larcv::SegLabelFromCluster3D+;
 #pragma link C++ class larcv::MaskTensor3D+;
+#pragma link C++ class larcv::RescaleChargeTensor3D+;
 #pragma link C++ class larcv::ThresholdTensor3D+;
 //#pragma link C++ class larcv::ParticleROIFromCluster+;
 #pragma link C++ class larcv::Cluster2DFromCluster3D+;
