@@ -14,6 +14,7 @@
 #ifndef __LARCV_FLASH_H__
 #define __LARCV_FLASH_H__
 
+#include "DataFormatTypes.h"
 #include <vector>
 
 namespace larcv {
@@ -26,14 +27,15 @@ namespace larcv {
     public:
 
         /// Default constructor
-        Flash(double time, double timeWidth, double absTime, unsigned int frame,
-            std::vector<double> PEPerOpDet,
+        Flash(double time=0, double timeWidth=0, double absTime=0, unsigned int frame=0,
+            std::vector<double> PEPerOpDet=std::vector<double>(0),
             bool inBeamFrame=0, int onBeamTime=0, double fastToTotal=1,
             double xCenter=0, double xWidth=0,
             double yCenter=0, double yWidth=0,
             double zCenter=0, double zWidth=0,
             std::vector<double> wireCenters = std::vector<double>(0),
-            std::vector<double> wireWidths = std::vector<double>(0));
+            std::vector<double> wireWidths = std::vector<double>(0),
+            InstanceID_t id = kINVALID_INDEX);
 
         /// Default destructor
         virtual ~Flash() {}
@@ -41,6 +43,7 @@ namespace larcv {
         double TotalPE() const;
 
         /// Getters
+        inline InstanceID_t id         () const { return _id;         }
         inline double time () const { return _time; }
         inline double timeWidth () const { return _timeWidth; }
         inline double absTime () const { return _absTime; }
@@ -58,10 +61,30 @@ namespace larcv {
         inline bool inBeamFrame () const { return _inBeamFrame; }
         inline int onBeamTime () const { return _onBeamTime; }
 
+        /// Setters
+        inline void id (InstanceID_t id  )  { _id = id;         }
+        inline void time (double time) { _time = time; }
+        inline void timeWidth (double timeWidth) { _timeWidth = timeWidth; }
+        inline void absTime (double absTime) { _absTime = absTime; }
+        inline void frame (unsigned int frame) { _frame = frame; }
+        inline void PEPerOpDet(std::vector<double> PEPerOpDet) { _PEPerOpDet = PEPerOpDet; }
+        inline void wireCenters(std::vector<double> wireCenters) { _wireCenters = wireCenters; }
+        inline void wireWidths(std::vector<double> wireWidths) { _wireWidths = wireWidths; }
+        inline void xCenter (double xCenter) { _xCenter = xCenter; }
+        inline void xWidth (double xWidth) { _xWidth = xWidth; }
+        inline void yCenter (double yCenter) { _yCenter = yCenter; }
+        inline void yWidth (double yWidth) { _yWidth = yWidth; }
+        inline void zCenter (double zCenter) { _zCenter = zCenter; }
+        inline void zWidth (double zWidth) { _zWidth = zWidth; }
+        inline void fastToTotal (double fastToTotal) { _fastToTotal = fastToTotal; }
+        inline void inBeamFrame (bool inBeamFrame) { _inBeamFrame = inBeamFrame; }
+        inline void onBeamTime (int onBeamTime) { _onBeamTime = onBeamTime; }
+
     private:
         // See also https://internal.dunescience.org/doxygen/OpFlash_8h_source.html
         // Mirroring it to facilitate Larsoft recob::OpFlash -> larcv -> CAF translation
 
+        InstanceID_t   _id; ///< "ID" of this flash in FlashSet collection
         double _time; ///< Time on @ref DetectorClocksHardwareTrigger "trigger time scale" [us]
         double _timeWidth; ///< Width of the flash in time [us]
         double _absTime; ///< Time by PMT readout clock
@@ -78,6 +101,33 @@ namespace larcv {
         double _fastToTotal; ///< Fast to total light ratio
         bool _inBeamFrame; ///< Is this in the beam frame?
         int _onBeamTime; ///< Is this in time with beam?
+    };
+
+    /**
+       \class FlashSet
+       \brief Flash/Interaction collection
+    */
+    class FlashSet {
+    public:
+      FlashSet() {}
+      virtual ~FlashSet() {}
+
+      void clear() { _part_v.clear(); }
+
+      inline const std::vector<larcv::Flash>& as_vector() const
+      { return _part_v; }
+
+      void set(const std::vector<larcv::Flash>& part_v);
+
+      void append(const larcv::Flash& part);
+
+      void emplace_back(larcv::Flash&& part);
+
+      void emplace(std::vector<larcv::Flash>&& part_v);
+
+    private:
+
+      std::vector<larcv::Flash> _part_v; ///< a collection of flashes (index maintained)
     };
 }
 
