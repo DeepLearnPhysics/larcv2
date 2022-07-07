@@ -91,20 +91,8 @@
 #pragma link C++ function larcv::as_image2d(const ClusterPixel2D&)+;
 #pragma link C++ function larcv::as_sparse_tensor3d(const ClusterVoxel3D&)+;
 
+#pragma link C++ class larcv::Flash;
+
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
