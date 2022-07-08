@@ -112,22 +112,22 @@ namespace larcv {
       FlashSet() {}
       virtual ~FlashSet() {}
 
-      void clear() { _part_v.clear(); }
+      void clear() { _flash_v.clear(); }
 
       inline const std::vector<larcv::Flash>& as_vector() const
-      { return _part_v; }
+      { return _flash_v; }
 
-      void set(const std::vector<larcv::Flash>& part_v);
+      void set(const std::vector<larcv::Flash>& flash_v);
 
-      void append(const larcv::Flash& part);
+      void append(const larcv::Flash& flash);
 
-      void emplace_back(larcv::Flash&& part);
+      void emplace_back(larcv::Flash&& flash);
 
-      void emplace(std::vector<larcv::Flash>&& part_v);
+      void emplace(std::vector<larcv::Flash>&& flash_v);
 
     private:
 
-      std::vector<larcv::Flash> _part_v; ///< a collection of flashes (index maintained)
+      std::vector<larcv::Flash> _flash_v; ///< a collection of flashes (index maintained)
     };
 }
 

@@ -39,34 +39,34 @@ namespace larcv {
         return std::accumulate(_PEPerOpDet.begin(), _PEPerOpDet.end(), 0.0);
     }
 
-    void FlashSet::set(const std::vector<larcv::Flash>& part_v)
+    void FlashSet::set(const std::vector<larcv::Flash>& flash_v)
     {
-      _part_v = part_v;
-      for(size_t i=0; i<_part_v.size(); ++i)
-        if(_part_v.back().id() == kINVALID_INSTANCEID)
-          _part_v[i].id(i);
+      _flash_v = flash_v;
+      for(size_t i=0; i<_flash_v.size(); ++i)
+        if(_flash_v.back().id() == kINVALID_INSTANCEID)
+          _flash_v[i].id(i);
     }
 
-    void FlashSet::append(const larcv::Flash& part)
+    void FlashSet::append(const larcv::Flash& flash)
     {
-      _part_v.push_back(part);
-      if(_part_v.back().id() == kINVALID_INSTANCEID)
-        _part_v.back().id(_part_v.size()-1);
+      _flash_v.push_back(flash);
+      if(_flash_v.back().id() == kINVALID_INSTANCEID)
+        _flash_v.back().id(_flash_v.size()-1);
     }
 
-    void FlashSet::emplace_back(larcv::Flash&& part)
+    void FlashSet::emplace_back(larcv::Flash&& flash)
     {
-      _part_v.emplace_back(std::move(part));
-      if(_part_v.back().id() == kINVALID_INSTANCEID)
-        _part_v.back().id(_part_v.size()-1);
+      _flash_v.emplace_back(std::move(flash));
+      if(_flash_v.back().id() == kINVALID_INSTANCEID)
+        _flash_v.back().id(_flash_v.size()-1);
     }
 
-    void FlashSet::emplace(std::vector<larcv::Flash>&& part_v)
+    void FlashSet::emplace(std::vector<larcv::Flash>&& flash_v)
     {
-      _part_v = std::move(part_v);
-      for(size_t i=0; i<_part_v.size(); ++i) {
-        if(_part_v[i].id() == kINVALID_INSTANCEID)
-          _part_v[i].id(i);
+      _flash_v = std::move(flash_v);
+      for(size_t i=0; i<_flash_v.size(); ++i) {
+        if(_flash_v[i].id() == kINVALID_INSTANCEID)
+          _flash_v[i].id(i);
       }
     }
 }
