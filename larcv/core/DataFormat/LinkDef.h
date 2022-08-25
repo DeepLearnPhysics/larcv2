@@ -96,6 +96,10 @@
 #pragma link C++ class larcv::FlashSet+;
 #pragma link C++ class larcv::EventFlash+;
 
+#pragma link C++ class larcv::CRTHit+;
+#pragma link C++ class std::vector<larcv::CRTHit>+;
+#pragma link C++ class larcv::CRTHitSet+;
+#pragma link C++ class larcv::EventCRTHit+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif

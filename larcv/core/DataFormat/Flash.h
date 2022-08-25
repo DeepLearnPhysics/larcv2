@@ -48,9 +48,9 @@ namespace larcv {
         inline double timeWidth () const { return _timeWidth; }
         inline double absTime () const { return _absTime; }
         inline unsigned int frame () const { return _frame; }
-        inline std::vector<double> PEPerOpDet () const { return _PEPerOpDet; }
-        inline std::vector<double> wireCenters () const { return _wireCenters; }
-        inline std::vector<double> wireWidths () const { return _wireWidths; }
+        inline const std::vector<double>& PEPerOpDet () const { return _PEPerOpDet; }
+        inline const std::vector<double>& wireCenters () const { return _wireCenters; }
+        inline const std::vector<double>& wireWidths () const { return _wireWidths; }
         inline double xCenter () const { return _xCenter; }
         inline double xWidth () const { return _xWidth; }
         inline double yCenter () const { return _yCenter; }
@@ -67,9 +67,9 @@ namespace larcv {
         inline void timeWidth (double timeWidth) { _timeWidth = timeWidth; }
         inline void absTime (double absTime) { _absTime = absTime; }
         inline void frame (unsigned int frame) { _frame = frame; }
-        inline void PEPerOpDet(std::vector<double> PEPerOpDet) { _PEPerOpDet = PEPerOpDet; }
-        inline void wireCenters(std::vector<double> wireCenters) { _wireCenters = wireCenters; }
-        inline void wireWidths(std::vector<double> wireWidths) { _wireWidths = wireWidths; }
+        inline void PEPerOpDet(const std::vector<double>& PEPerOpDet) { _PEPerOpDet = PEPerOpDet; }
+        inline void wireCenters(const std::vector<double>& wireCenters) { _wireCenters = wireCenters; }
+        inline void wireWidths(const std::vector<double>& wireWidths) { _wireWidths = wireWidths; }
         inline void xCenter (double xCenter) { _xCenter = xCenter; }
         inline void xWidth (double xWidth) { _xWidth = xWidth; }
         inline void yCenter (double yCenter) { _yCenter = yCenter; }

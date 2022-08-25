@@ -50,8 +50,8 @@ namespace larcv {
   template EventFlash& IOManager::get_data<larcv::EventFlash>(const ProducerID_t);
 
   /**
-     \class larcv::EventNeutrino
-     \brief A concrete factory class for larcv::EventNeutrino
+     \class larcv::EventFlashFactory
+     \brief A concrete factory class for larcv::EventFlash
   */
   class EventFlashFactory : public DataProductFactoryBase {
   public:
