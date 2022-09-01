@@ -1,0 +1,62 @@
+# This @product_deps@ file defines dependencies for this package.
+
+# The *parent* line must the first non-commented line and defines this product and version
+# The version must be of the form vxx_yy_zz (e.g. v01_02_03)
+parent larcv2 v09_56_00_01
+
+defaultqual e20
+
+# These optional lines define where headers, libraries, and executables go and should
+# be used only if your product does not conform to the defaults.
+# Format: directory_type directory_path directory_name
+#   where directory_type is one of incdir, libdir, or bindir
+#   where directory_path is one of product_dir, fq_dir and -
+# Defaults:
+# incdir  product_dir  include
+# fcldir  product_dir  fcl
+# libdir  fq_dir       lib
+# bindir  fq_dir       bin
+#
+
+#fcldir  product_dir job
+#gdmldir product_dir gdml
+#fwdir   product_dir scripts
+#wpdir   product_dir wire-cell-cfg
+
+# table fragment to set FW_SEARCH_PATH needed
+# to find gdml files:
+#table_fragment_begin
+#    pathPrepend(FW_SEARCH_PATH, ${ICARUSCODE_DIR}/gdml)
+#    pathPrepend(FHICL_FILE_PATH, .:./job)
+#    pathPrepend(PYTHONPATH, ${UPS_PROD_DIR}/python)
+#    pathPrepend(WIRECELL_PATH, ${UPS_PROD_DIR}/wire-cell-cfg)
+#table_fragment_end
+
+# With "product  version" table below, we now define depdendencies
+
+# Add the dependent product and version
+
+product                   version
+root                      v6_22_08d
+
+#cetbuildtools	          v8_18_04	-	only_for_build
+end_product_list
+
+# Restore this temporarily...
+# We now define allowed qualifiers and the corresponding qualifiers for the dependencies.
+# Make a table by adding columns before "notes".
+# e15  - with gcc 6.4.0 and -std=c++1y
+qualifier  root       notes
+e20:debug  e20:debug
+e20:prof   e20:prof
+e19:debug  e19:debug
+e19:prof   e19:prof
+c7:debug   c7:debug
+c7:prof    c7:prof
+end_qualifier_list
+
+# Preserve tabs and formatting in emacs and vi / vim:
+
+### Local Variables:
+### tab-width: 8
+### End:
