@@ -6,6 +6,8 @@ ROOTMAP=$(SHLIB:.so=.rootmap)
 LARCV_BASIC_ROOTLIBS = $(shell root-config --libs) -lPhysics
 LARCV_BASIC_ROOTINC  = $(shell root-config --cflags)
 
+LARCV_BASIC_ROOTINC  = ${LARCV_BASIC_ROOTINC/-std=c++17/-cxxflags=”-std=c++17”}
+
 PACKAGE_BUILDDIR = $(LARCV_BUILDDIR)/$(PACKAGE_NAME)
 PACKAGE_INCDIR   = $(LARCV_INCDIR)/$(HEADERS_DEST)
 $(shell mkdir -p $(LARCV_BUILDDIR))
