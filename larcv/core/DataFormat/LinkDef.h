@@ -91,20 +91,15 @@
 #pragma link C++ function larcv::as_image2d(const ClusterPixel2D&)+;
 #pragma link C++ function larcv::as_sparse_tensor3d(const ClusterVoxel3D&)+;
 
+#pragma link C++ class larcv::Flash+;
+#pragma link C++ class std::vector<larcv::Flash>+;
+#pragma link C++ class larcv::FlashSet+;
+#pragma link C++ class larcv::EventFlash+;
+
+#pragma link C++ class larcv::CRTHit+;
+#pragma link C++ class std::vector<larcv::CRTHit>+;
+#pragma link C++ class larcv::CRTHitSet+;
+#pragma link C++ class larcv::EventCRTHit+;
 //ADD_NEW_CLASS ... do not change this line
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-

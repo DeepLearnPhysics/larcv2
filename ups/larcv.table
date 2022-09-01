@@ -1,7 +1,25 @@
-File=Table 
-Product=larcv
- 
+File=Table
+Product=larcv2
+
 Group:
+
+Flavor     = ANY
+Qualifiers = "e20:prof"
+
+  Action = GetProducts
+    setupRequired( root v6_22_08d -q +e20:+nu:+prof )
+
+Flavor     = ANY
+Qualifiers = "e20:debug"
+
+  Action = GetProducts
+    setupRequired( root v6_22_08d -q +e20:+nu:+debug )
+
+Flavor     = ANY
+Qualifiers = "e20:opt"
+
+  Action = GetProducts
+    setupRequired( root v6_22_08d -q +e20:+nu:+opt )
 
 Flavor     = ANY
 Qualifiers = "e14:prof"
@@ -73,6 +91,6 @@ End:
 #*************************************************
 #
 # ups declare command that works on gpvm:
-# ups declare larcv v06_36_00 -r larcv/v06_36_00 -f Linux64bit+2.6-2.12 -m larcv.table -q e14:prof -U ups/
+# ups declare larcv2 v09_56_00 -r larcv/v09_56_00 -f Linux64bit+3.10-2.17 -m larcv.table -q e20:p392:prof -U ups/
 #
 #
