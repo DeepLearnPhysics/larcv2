@@ -9,7 +9,7 @@ Qualifiers = "e20:p392:prof"
       envSet(LARCV2_FQ_DIR, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_e20_p392_prof)
 
   Action = GetProducts
-    setupRequired( root v6_22_08d -q +e20:+p392:+prof )
+      setupRequired( root v6_22_08d -q +e20:+p392:+prof )
 
 
 Common:
@@ -34,13 +34,13 @@ Common:
     envSet(${UPS_PROD_NAME_UC}_INC,${LARCV2_FQ_DIR}/include)
     envSet(${UPS_PROD_NAME_UC}_LIB,${LARCV2_FQ_DIR}/lib)
 
-    if ( test `uname` = "Darwin" )
+    if ( test Linux = "Darwin" )
       envSet(${UPS_PROD_NAME_UC}_CXX,clang++)
       pathPrepend(DYLD_LIBRARY_PATH, ${LARCV_LIBDIR})
     else()
       envSet(${UPS_PROD_NAME_UC}_CXX,g++)
       pathPrepend(LD_LIBRARY_PATH, ${LARCV_LIBDIR})
-    endif ( test `uname` = "Darwin" )
+    endif ( test Linux = "Darwin" )
 
     # add the bin directory to the path
     pathPrepend(PATH, ${LARCV2_FQ_DIR}/bin )
