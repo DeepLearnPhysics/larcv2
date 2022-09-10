@@ -134,24 +134,54 @@ namespace larcv {
 // Compiler macro for saving us from text typing
 //
 /// Compiler macro for DEBUG message
+#ifndef LARCV_DEBUG
 #define LARCV_DEBUG()    if( logger().debug   () ) logger().send(::larcv::msg::kDEBUG,    __FUNCTION__, __LINE__, __FILE__)
+#endif
 /// Compiler macro for INFO message
+#ifndef LARCV_INFO
 #define LARCV_INFO()     if( logger().info    () ) logger().send(::larcv::msg::kINFO,     __FUNCTION__, __LINE__          )
+#endif
 /// Compiler macro for NORMAL message
+#ifndef LARCV_NORMAL
 #define LARCV_NORMAL()   if( logger().normal  () ) logger().send(::larcv::msg::kNORMAL,   __FUNCTION__                    )
+#endif
 /// Compiler macro for WARNING message
+#ifndef LARCV_WARNING
 #define LARCV_WARNING()  if( logger().warning () ) logger().send(::larcv::msg::kWARNING,  __FUNCTION__                    )
+#endif
 /// Compiler macro for ERROR message
+#ifndef LARCV_ERROR
 #define LARCV_ERROR()    if( logger().error   () ) logger().send(::larcv::msg::kERROR,    __FUNCTION__, __LINE__          )
+#endif
 /// Compiler macro for CRITICAL message
+#ifndef LARCV_CRITICAL
 #define LARCV_CRITICAL()                           logger().send(::larcv::msg::kCRITICAL, __FUNCTION__, __LINE__, __FILE__)
+#endif
 
+#ifndef LARCV_SDEBUG
 #define LARCV_SDEBUG()    if(larcv::logger::get_shared().debug())    larcv::logger::get_shared().send(::larcv::msg::kDEBUG,    __FUNCTION__,__LINE__,__FILE__)
+#endif
+
+#ifndef LARCV_SINFO
 #define LARCV_SINFO()     if(larcv::logger::get_shared().info())     larcv::logger::get_shared().send(::larcv::msg::kINFO,     __FUNCTION__,__LINE__         )
+#endif
+
+#ifndef LARCV_SNORMAL
 #define LARCV_SNORMAL()   if(larcv::logger::get_shared().normal())   larcv::logger::get_shared().send(::larcv::msg::kNORMAL,   __FUNCTION__                  )
+#endif
+
+#ifndef LARCV_SWARNING
 #define LARCV_SWARNING()  if(larcv::logger::get_shared().warning())  larcv::logger::get_shared().send(::larcv::msg::kWARNING,  __FUNCTION__                  )
+#endif
+
+#ifndef LARCV_SERROR
 #define LARCV_SERROR()    if(larcv::logger::get_shared().error())    larcv::logger::get_shared().send(::larcv::msg::kERROR,    __FUNCTION__,__LINE__         )
+#endif
+
+#ifndef LARCV_SCRITICAL
 #define LARCV_SCRITICAL() larcv::logger::get_shared().send(::larcv::msg::kCRITICAL, __FUNCTION__,__LINE__,__FILE__)
   
 /** @} */ // end of doxygen group logger
+#endif
+
 #endif
