@@ -1,0 +1,57 @@
+File=Table
+Product=larcv2
+
+Group:
+
+Flavor     = ANY
+Qualifiers = "e20:p392:prof"
+  Action = DefineFQ
+      envSet(LARCV2_FQ_DIR, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_e20_p392_prof)
+
+  Action = GetProducts
+      setupRequired( root v6_22_08d -q +e20:+p392:+prof )
+
+
+Common:
+  Action = setup
+    prodDir()
+    setupEnv()
+    envSet(${UPS_PROD_NAME_UC}_VERSION, ${UPS_PROD_VERSION})
+
+    # Set up required products, which is root
+    exeActionRequired(GetProducts)
+    exeActionRequired(DefineFQ)
+
+    # FIXME which ones do we really need?
+    envSet(${UPS_PROD_NAME_UC}_BASEDIR,${LARCV2_FQ_DIR})
+    #envSet(${UPS_PROD_NAME_UC}_COREDIR,${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/core)
+    #envSet(${UPS_PROD_NAME_UC}_APPDIR,${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}/app)
+    envSet(${UPS_PROD_NAME_UC}_ROOT6,0)
+    envSet(${UPS_PROD_NAME_UC}_INCDIR,${LARCV2_FQ_DIR}/include)
+    envSet(${UPS_PROD_NAME_UC}_LIBDIR,${LARCV2_FQ_DIR}/lib)
+
+    # most critical
+    envSet(${UPS_PROD_NAME_UC}_INC,${LARCV2_FQ_DIR}/include)
+    envSet(${UPS_PROD_NAME_UC}_LIB,${LARCV2_FQ_DIR}/lib)
+
+    if ( test Linux = "Darwin" )
+      envSet(${UPS_PROD_NAME_UC}_CXX,clang++)
+      pathPrepend(DYLD_LIBRARY_PATH, ${LARCV_LIBDIR})
+    else()
+      envSet(${UPS_PROD_NAME_UC}_CXX,g++)
+      pathPrepend(LD_LIBRARY_PATH, ${LARCV_LIBDIR})
+    endif ( test Linux = "Darwin" )
+
+    # add the bin directory to the path
+    pathPrepend(PATH, ${LARCV2_FQ_DIR}/bin )
+    # add the python area to the pythonpath
+    pathPrepend(PYTHONPATH, ${LARCV2_FQ_DIR}/python )
+
+End:
+# End Group definition
+#*************************************************
+#
+# ups declare command that works on gpvm:
+# ups declare larcv2 v2_1_0 -r larcv2/v2_1_0 -f Linux64bit+3.10-2.17 -m larcv2.table -q e20:p392:prof -U ups/
+#
+#
