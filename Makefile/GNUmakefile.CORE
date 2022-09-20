@@ -37,6 +37,7 @@ $(PACKAGE_BUILDDIR)/%.o: %.cxx %.h
 	@$(CXX) $(CXXFLAGS) $(LARCV_BASIC_ROOTINC) $(INCFLAGS) -DLARCV_NUMPY=$(LARCV_NUMPY) -DLARCV_OPENCV=$(LARCV_OPENCV) -c $< -o $@
 $(DICT).o: $(DICT).cxx
 	@echo '<< compiling' $(PACKAGE_NAME)Dict.cxx '>>'
+	@echo '<< with' $(LARCV_BASIC_ROOTINC) '>>'
 	@$(CXX) $(CXXFLAGS) $(LARCV_BASIC_ROOTINC) $(INCFLAGS) -c $< -o $@
 ifdef LARCV_ROOT6
 
