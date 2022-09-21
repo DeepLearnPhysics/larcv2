@@ -16,6 +16,7 @@ new=-cxxflags='-std=c++17'
 #	LARCV_BASIC_ROOTINC := $(patsubst %-std=c++17,%,$(LARCV_BASIC_ROOTINC))
 #endif
 
+LARCV_BASIC_ROOTINC := $(patsubst %-std=c++17,%,$(LARCV_BASIC_ROOTINC))
 LARCV_BASIC_ROOTINC := $(patsubst %-m64,%,$(LARCV_BASIC_ROOTINC))
 LARCV_BASIC_ROOTINC := $(patsubst %-pthread,%,$(LARCV_BASIC_ROOTINC))
 LARCV_BASIC_ROOTINC := $(patsubst %-stdlib=libc++,%,$(LARCV_BASIC_ROOTINC))
