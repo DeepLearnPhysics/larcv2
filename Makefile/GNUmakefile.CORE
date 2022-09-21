@@ -9,7 +9,14 @@ LARCV_BASIC_ROOTINC  = $(shell root-config --cflags)
 #ifeq (${OSNAME}, Darwin)
 #	LARCV_BASIC_ROOTINC  = ${LARCV_BASIC_ROOTINC/-std=c++17/-cxxflags=”-std=c++17”}
 #endif
-LARCV_BASIC_ROOTINC  = ${LARCV_BASIC_ROOTINC/-std=c++17/-cxxflags=”-std=c++17”}
+
+old=
+new=-cxxflags='-std=c++17'
+LARCV_BASIC_ROOTINC := $(patsubst %-std=c++17,%,$(LARCV_BASIC_ROOTINC))
+LARCV_BASIC_ROOTINC := $(patsubst %-m64,%,$(LARCV_BASIC_ROOTINC))
+LARCV_BASIC_ROOTINC := $(patsubst %-pthread,%,$(LARCV_BASIC_ROOTINC))
+LARCV_BASIC_ROOTINC := $(patsubst %-stdlib=libc++,%,$(LARCV_BASIC_ROOTINC))
+#LARCV_BASIC_ROOTINC  = $(subst $(old),,$(shell root-config --cflags))
 
 PACKAGE_BUILDDIR = $(LARCV_BUILDDIR)/$(PACKAGE_NAME)
 PACKAGE_INCDIR   = $(LARCV_INCDIR)/$(HEADERS_DEST)
@@ -37,13 +44,14 @@ $(PACKAGE_BUILDDIR)/%.o: %.cxx %.h
 	@$(CXX) $(CXXFLAGS) $(LARCV_BASIC_ROOTINC) $(INCFLAGS) -DLARCV_NUMPY=$(LARCV_NUMPY) -DLARCV_OPENCV=$(LARCV_OPENCV) -c $< -o $@
 $(DICT).o: $(DICT).cxx
 	@echo '<< compiling' $(PACKAGE_NAME)Dict.cxx '>>'
-	@echo '<< with' $(LARCV_BASIC_ROOTINC) '>>'
+	#@echo '<< with' $(LARCV_BASIC_ROOTINC) '>>'
 	@$(CXX) $(CXXFLAGS) $(LARCV_BASIC_ROOTINC) $(INCFLAGS) -c $< -o $@
 ifdef LARCV_ROOT6
 
 # root class dictionary
 $(DICT).cxx: $(HEADERS) LinkDef.h
 	@echo '<< generating dict >>'
+	#@echo '<< with'  $(LARCV_BASIC_ROOTINC)  '>>'
 	@rootcling -f $(DICT).cxx -s $(LARCV_LIBDIR)/$(SHLIB) -rml liblarcv.so -rmf $(LARCV_LIBDIR)/$(ROOTMAP) $(CINTFLAGS) -c $(LARCV_BASIC_ROOTINC) $(INCFLAGS) $(HEADERS) LinkDef.h
 
 # install headers
