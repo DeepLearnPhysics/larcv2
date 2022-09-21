@@ -56,7 +56,7 @@ ifdef LARCV_ROOT6
 $(DICT).cxx: $(HEADERS) LinkDef.h
 	@echo '<< generating dict >>'
 	#@echo '<< with'  $(LARCV_BASIC_ROOTINC)  '>>'
-	@rootcling -f $(DICT).cxx -s $(LARCV_LIBDIR)/$(SHLIB) -rml liblarcv.so -rmf $(LARCV_LIBDIR)/$(ROOTMAP) $(CINTFLAGS) -c $(LARCV_BASIC_ROOTINC) $(INCFLAGS) $(HEADERS) LinkDef.h
+	@rootcling -f $(DICT).cxx -s $(LARCV_LIBDIR)/$(SHLIB) -rml liblarcv.so -rmf $(LARCV_LIBDIR)/$(ROOTMAP) $(CINTFLAGS) $(LARCV_BASIC_ROOTINC) $(INCFLAGS) $(HEADERS) LinkDef.h
 
 # install headers
 install_header: $(OBJECTS) $(DICT).o
