@@ -3,14 +3,22 @@ Product=larcv2
 
 Group:
 
+
+Flavor     = ANY
+Qualifiers = "c7:p392:prof"
+  Action = DefineFQ
+      envSet(LARCV2_FQ_DIR, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_c7_p392_prof)
+  Action = GetProducts
+      setupRequired( root v6_22_08d -q +c7:+p392:+prof )
+  
+
+
 Flavor     = ANY
 Qualifiers = "e20:p392:prof"
   Action = DefineFQ
       envSet(LARCV2_FQ_DIR, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_e20_p392_prof)
-
   Action = GetProducts
       setupRequired( root v6_22_08d -q +e20:+p392:+prof )
-
 
 Common:
   Action = setup

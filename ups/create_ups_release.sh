@@ -40,11 +40,13 @@ QUAL_E="${arr[2]}" # for example e20
 QUAL_P="${arr[3]}" # for example p392 (Python version)
 QUAL_Q="${arr[4]}" # for example prof / debug etc
 QUALIFIERS="${QUAL_E}_${QUAL_P}_${QUAL_Q}"
+echo "Found qualifiers: ${QUALIFIERS}"
 
 # We could also get flavor directly from ups...?
 #FLAVOR=$(ups flavor -4)
 
 FLAVOR_FULL="${FLAVOR}_${QUALIFIERS}"
+echo "Found flavor: ${FLAVOR}"
 
 # Step 2 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Make sure we have the right larcv2 version built
@@ -68,7 +70,49 @@ fi
 # itself...
 
 # However we can update the larcv2.table automatically
-cat > $LARCV_BASEDIR/ups/larcv2.table <<- EOM
+if [[ -f $LARCV_BASEDIR/ups/larcv2.table ]]; then # does the file larcv2.table exist?
+  echo "File ups/larcv2.table exists already."
+  # If yes, we just need to update the relevant entry.
+  NEW_GROUP="
+Flavor     = ANY
+Qualifiers = \"${QUAL_E}:${QUAL_P}:${QUAL_Q}\"
+  Action = DefineFQ
+      envSet(LARCV2_FQ_DIR, \${UPS_PROD_DIR}/\${UPS_PROD_FLAVOR}_${QUAL_E}_${QUAL_P}_${QUAL_Q})
+  Action = GetProducts
+      setupRequired( root $ROOT_VERSION -q +${QUAL_E}:+${QUAL_P}:+${QUAL_Q} )
+  "
+  NEW_GROUP=${NEW_GROUP//$'\n'/\\$'\n'}
+  NEW_GROUP=${NEW_GROUP//$'/'/\\$'/'}
+  NEW_GROUP=${NEW_GROUP//$'+'/\\$'+'}
+  # first find if there is already an entry for current flavor and delete it
+  PATTERN="Qualifiers = \"${QUAL_E}:${QUAL_P}:${QUAL_Q}\""
+
+  if grep -q $PATTERN $LARCV_BASEDIR/ups/larcv2.table; then
+    echo "Replacing existing flavor group."
+    # Breakdown for my own sanity.
+    # /$FLAVOR_PATTERN/    first find $FLAVOR_PATTERN
+    #   N                  append next line
+    #   /$PATTERN/         find $PATTERN
+    #   :a                 start loop (label a)
+    #   N                  and accumulate lines
+    #   /^$/M !ba          until the pattern /^$/ (new line) is found, in a multiline setting (option M in GNU sed)
+    #                      !ba means for each line that does NOT fit the pattern /^$/ we go back (b for branch) to label a.
+    #   d                  delete pattern space (i.e. whole paragraph we just found)
+    # After this, we find the start of the list of flavors "Group:"
+    # and write down $NEW_GROUP.
+    FLAVOR_PATTERN="Flavor     = ANY"
+    sed -e '/'"${FLAVOR_PATTERN}"'/{ N; /'"${PATTERN}"'/{:a; N; /^$/M !ba; d; }; }' -e '/Group:/a \\n'"${NEW_GROUP}"'' $LARCV_BASEDIR/ups/larcv2.table > $LARCV_BASEDIR/ups/larcv2.temp
+    # Breakdown for my own sanity.
+    mv $LARCV_BASEDIR/ups/larcv2.temp $LARCV_BASEDIR/ups/larcv2.table
+  else
+    echo "Adding new flavor group."
+    # Find "Group:" line and insert the new group right after this
+    sed "s/Group:/&\n${NEW_GROUP}/" $LARCV_BASEDIR/ups/larcv2.table > $LARCV_BASEDIR/ups/larcv2.temp
+    mv $LARCV_BASEDIR/ups/larcv2.temp $LARCV_BASEDIR/ups/larcv2.table
+  fi
+else
+  echo "Creating file ups/larcv2.table"
+  cat > $LARCV_BASEDIR/ups/larcv2.table <<- EOM
 File=Table
 Product=larcv2
 
@@ -127,7 +171,8 @@ End:
 #
 #
 EOM
-echo "Updated ups/larcv2.table.\n"
+fi
+echo "Updated ups/larcv2.table."
 
 # Step 4 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # format product folder correctly and copy bin / include / lib
@@ -136,12 +181,20 @@ if [[ ! -d larcv2 ]]; then
   mkdir larcv2
 fi
 cd larcv2
-mkdir $TAG
-mkdir "$TAG".version
+
+# Create folders v2_X_x and v2_X_x.version
+if [[ ! -d $TAG ]]; then
+  mkdir $TAG
+fi
+if [[ ! -d "$TAG".version ]]; then
+  mkdir "$TAG".version
+fi
 
 # Format $TAG folder
 scp -r "$LARCV_BASEDIR"/ups "$TAG"/
-mkdir "$TAG"/"$FLAVOR_FULL"
+if [[ ! -d "$TAG"/"$FLAVOR_FULL" ]]; then
+  mkdir "$TAG"/"$FLAVOR_FULL"
+fi
 scp -r $LARCV_BUILDDIR/bin "$TAG"/"$FLAVOR_FULL"/
 scp -r $LARCV_BUILDDIR/include "$TAG"/"$FLAVOR_FULL"/
 scp -r $LARCV_BUILDDIR/lib "$TAG"/"$FLAVOR_FULL"/
