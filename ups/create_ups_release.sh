@@ -151,10 +151,10 @@ Common:
 
     if ( test `uname` = "Darwin" )
       envSet(\${UPS_PROD_NAME_UC}_CXX,clang++)
-      pathPrepend(DYLD_LIBRARY_PATH, \${LARCV_LIBDIR})
+      pathPrepend(DYLD_LIBRARY_PATH, \${LARCV2_LIBDIR})
     else()
       envSet(\${UPS_PROD_NAME_UC}_CXX,g++)
-      pathPrepend(LD_LIBRARY_PATH, \${LARCV_LIBDIR})
+      pathPrepend(LD_LIBRARY_PATH, \${LARCV2_LIBDIR})
     endif ( test `uname` = "Darwin" )
 
     # add the bin directory to the path

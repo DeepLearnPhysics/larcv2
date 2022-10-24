@@ -5,12 +5,21 @@ Group:
 
 
 Flavor     = ANY
+Qualifiers = "e20:p392:debug"
+  Action = DefineFQ
+      envSet(LARCV2_FQ_DIR, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_e20_p392_debug)
+  Action = GetProducts
+      setupRequired( root v6_22_08d -q +e20:+p392:+debug )
+
+
+
+Flavor     = ANY
 Qualifiers = "c7:p392:prof"
   Action = DefineFQ
       envSet(LARCV2_FQ_DIR, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_c7_p392_prof)
   Action = GetProducts
       setupRequired( root v6_22_08d -q +c7:+p392:+prof )
-  
+
 
 
 Flavor     = ANY
@@ -44,10 +53,10 @@ Common:
 
     if ( test Linux = "Darwin" )
       envSet(${UPS_PROD_NAME_UC}_CXX,clang++)
-      pathPrepend(DYLD_LIBRARY_PATH, ${LARCV_LIBDIR})
+      pathPrepend(DYLD_LIBRARY_PATH, ${LARCV2_LIBDIR})
     else()
       envSet(${UPS_PROD_NAME_UC}_CXX,g++)
-      pathPrepend(LD_LIBRARY_PATH, ${LARCV_LIBDIR})
+      pathPrepend(LD_LIBRARY_PATH, ${LARCV2_LIBDIR})
     endif ( test Linux = "Darwin" )
 
     # add the bin directory to the path
