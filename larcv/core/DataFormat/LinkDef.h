@@ -90,6 +90,10 @@
 #pragma link C++ function larcv::as_sparse_tensor2d(const ClusterPixel2D&)+;
 #pragma link C++ function larcv::as_image2d(const ClusterPixel2D&)+;
 #pragma link C++ function larcv::as_sparse_tensor3d(const ClusterVoxel3D&)+;
+#pragma link C++ function larcv::as_event_sparse3d(const larcv::Voxel3DMeta&, const std::vector<larcv::VoxelID_t>&, const std::vector<float>&)+;
+#pragma link C++ function larcv::as_event_cluster3d(const larcv::Voxel3DMeta&, const std::vector<std::vector<larcv::VoxelID_t> >&, const std::vector<std::vector<float> >&)+;
+#pragma link C++ function larcv::as_event_sparse3d(larcv::EventSparseTensor3D&, const larcv::Voxel3DMeta&, const std::vector<larcv::VoxelID_t>&, const std::vector<float>&)+;
+#pragma link C++ function larcv::as_event_cluster3d(larcv::EventClusterVoxel3D&, const larcv::Voxel3DMeta&, const std::vector<std::vector<larcv::VoxelID_t> >&, const std::vector<std::vector<float> >&)+;
 
 #pragma link C++ class larcv::Flash+;
 #pragma link C++ class std::vector<larcv::Flash>+;

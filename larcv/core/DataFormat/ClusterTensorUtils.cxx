@@ -48,6 +48,72 @@ namespace larcv {
     return SparseTensor3D(std::move(vs),std::move(Voxel3DMeta(clusters.meta())));
   }
 
+  larcv::EventSparseTensor3D as_event_sparse3d(const Voxel3DMeta& meta,
+    const std::vector<larcv::VoxelID_t>& id_v,
+    const std::vector<float>& val_v)
+  {
+    EventSparseTensor3D result;
+    larcv::VoxelSet data(id_v,val_v);
+    result.emplace(std::move(data),meta);
+    return result;
+  }
+
+  larcv::EventClusterVoxel3D as_event_cluster3d(const Voxel3DMeta& meta,
+    const std::vector<std::vector<larcv::VoxelID_t> >& id_vv,
+    const std::vector<std::vector<float> >& val_vv)
+  {
+    if(id_vv.size() != val_vv.size())
+      throw larbys("ID and VALUE array size mismatch. Can't construct VoxelSet!");
+
+    std::vector<larcv::VoxelSet> vs_v;
+    vs_v.reserve(id_vv.size());
+    for(size_t i=0; i<id_vv.size(); ++i)
+    {
+      larcv::VoxelSet vs(id_vv[i],val_vv[i]);
+      vs_v.emplace_back(std::move(vs));
+    }
+
+    VoxelSetArray vsa;
+    vsa.emplace(std::move(vs_v));
+
+    EventClusterVoxel3D result;
+    result.emplace(std::move(vsa),meta);
+
+    return result;
+  }
+
+  void as_event_sparse3d(EventSparseTensor3D& data,
+    const Voxel3DMeta& meta,
+    const std::vector<larcv::VoxelID_t>& id_v,
+    const std::vector<float>& val_v)
+  {
+    larcv::VoxelSet vs(id_v,val_v);
+    data.emplace(std::move(vs),meta);
+  }
+
+  /// Algorithm to create EventClusterVoxel3D from meta, voxel id array, and value array
+  void as_event_cluster3d(EventClusterVoxel3D& data,
+    const Voxel3DMeta& meta,
+    const std::vector<std::vector<larcv::VoxelID_t> >& id_vv,
+    const std::vector<std::vector<float> >& val_vv)
+  {
+    if(id_vv.size() != val_vv.size())
+      throw larbys("ID and VALUE array size mismatch. Can't construct VoxelSet!");
+
+    std::vector<larcv::VoxelSet> vs_v;
+    vs_v.reserve(id_vv.size());
+    for(size_t i=0; i<id_vv.size(); ++i)
+    {
+      larcv::VoxelSet vs(id_vv[i],val_vv[i]);
+      vs_v.emplace_back(std::move(vs));
+    }
+
+    VoxelSetArray vsa;
+    vsa.emplace(std::move(vs_v));
+
+    data.emplace(std::move(vsa),meta);
+  }
+
   FlatTensorContents as_flat_arrays(const VoxelSet& tensor, const ImageMeta& meta)
   {
     FlatTensorContents res;

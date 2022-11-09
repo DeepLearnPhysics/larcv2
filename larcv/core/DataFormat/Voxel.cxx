@@ -4,11 +4,41 @@
 #include "Voxel.h"
 #include <iostream>
 #include <cmath>
+#include "larcv/core/Base/larbys.h"
 
 namespace larcv {
 
   Voxel::Voxel(VoxelID_t id, float value)
   { _id = id; _value = value; }
+
+  VoxelSet::VoxelSet(const std::vector<larcv::VoxelID_t>& id_v,
+    const std::vector<float>& val_v)
+  {
+    if(id_v.size() != val_v.size())
+      throw larbys("ID and VALUE array size mismatch. Can't construct VoxelSet!");
+
+    if(id_v.empty())
+      return;
+
+    _voxel_v.reserve(id_v.size());
+    Voxel vox(id_v[0],val_v[0]);
+    _voxel_v.push_back(vox);
+
+    for(size_t i=1; i<val_v.size(); ++i) {
+
+      vox.set(id_v[i],val_v[i]);
+
+      if(vox.id() == larcv::kINVALID_VOXELID)
+        throw larbys("Invalid voxel ID included. Can't construct VoxelSet!");
+
+      if(vox.id() <= id_v[i-1])
+        throw larbys("Found a larger voxel id BEFORE a smaller voxel ID!");
+      
+      _voxel_v.push_back(vox);
+    }
+
+    return;
+  }
 
   float VoxelSet::max() const
   {
