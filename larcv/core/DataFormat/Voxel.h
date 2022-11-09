@@ -94,6 +94,9 @@ namespace larcv {
   public:
     /// Default ctor
   VoxelSet() : _id(larcv::kINVALID_INSTANCEID) {}
+    /// Alternative ctor with an ordered voxel ID and value arrays
+  VoxelSet(const std::vector<larcv::VoxelID_t>& id_v,
+    const std::vector<float>& val_v);
     /// Default dtor
     virtual ~VoxelSet() {}
 
