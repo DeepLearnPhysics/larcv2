@@ -254,8 +254,12 @@ PyObject * fragment(PyObject * pyarray, PyObject * samples_idx, double threshold
     return segments;
 }
 
-
 void fill_3d_pcloud(const SparseTensor3D& data, PyObject* pyarray, PyObject* select) {
+  fill_3d_pcloud((larcv::VoxelSet)data, data.meta(), pyarray, select );
+}
+
+
+void fill_3d_pcloud(const VoxelSet& data, const Voxel3DMeta& meta, PyObject* pyarray, PyObject* select) {
   SetPyUtil();
 
   float **carray;
@@ -303,7 +307,7 @@ void fill_3d_pcloud(const SparseTensor3D& data, PyObject* pyarray, PyObject* sel
       index = select_ptr[i];
 
     auto const& vox = vs[index];
-    auto pt = data.meta().position(vox.id());
+    auto pt = meta.position(vox.id());
     //if(dims[1] == 1 && !(isnan(vox.value())))
     if(dims[1] == 1)
       carray[i][0] = vox.value();
@@ -324,6 +328,10 @@ void fill_3d_pcloud(const SparseTensor3D& data, PyObject* pyarray, PyObject* sel
 }
 
 void fill_3d_voxels(const SparseTensor3D& data, PyObject* pyarray, PyObject* select) {
+  fill_3d_voxels(data,data.meta(),pyarray,select);
+}
+
+void fill_3d_voxels(const VoxelSet& data, const Voxel3DMeta& meta, PyObject* pyarray, PyObject* select) {
   SetPyUtil();
 
   int **carray;
@@ -371,7 +379,7 @@ void fill_3d_voxels(const SparseTensor3D& data, PyObject* pyarray, PyObject* sel
       index = select_ptr[i];
 
     auto const& vox = vs[index];
-    data.meta().id_to_xyz_index(vox.id(),ix,iy,iz);
+    meta.id_to_xyz_index(vox.id(),ix,iy,iz);
     carray[i][0] = ix;
     carray[i][1] = iy;
     carray[i][2] = iz;
