@@ -222,6 +222,8 @@ namespace larcv {
 
     void clear() { _part_v.clear(); }
 
+    size_t size() { return _part_v.size(); }
+
     inline const std::vector<larcv::Particle>& as_vector() const
     { return _part_v; }
 

@@ -24,7 +24,7 @@ all: pre_build main_build pkg_build
 
 pre_build:
 
-main_build: .depend pre_build $(DICT).o $(OBJECTS) $(LARCV_LIBDIR)/$(ROOTMAP) install_header
+main_build: .depend pre_build $(DICT).o $(OBJECTS) $(LARCV_LIBDIR)/$(ROOTMAP) install_header install_pcm
 
 # default rule for making .o files from .cxx files
 $(PACKAGE_BUILDDIR)/%.o: %.cxx %.h
@@ -38,7 +38,7 @@ ifdef LARCV_ROOT6
 # root class dictionary
 $(DICT).cxx: $(HEADERS) LinkDef.h
 	@echo '<< generating dict >>'
-	@rootcling -f $(DICT).cxx -s $(LARCV_LIBDIR)/$(SHLIB) -rml liblarcv.so -rmf $(LARCV_LIBDIR)/$(ROOTMAP) $(CINTFLAGS) -c $(LARCV_BASIC_ROOTINC) $(INCFLAGS) $(HEADERS) LinkDef.h
+	@rootcling -f $(DICT).cxx -c $(INCFLAGS) $(HEADERS) LinkDef.h
 
 # install headers
 install_header: $(OBJECTS) $(DICT).o
@@ -46,6 +46,12 @@ ifdef HEADERS_DEST
 	@echo '<< installing headers >>'
 	@$(foreach f, $(HEADERS),$(shell cp $(f) $(PACKAGE_INCDIR)/))
 endif
+
+# install pcm
+install_pcm: $(DICT).cxx
+	@echo '<< installing pcm >>'
+	@cp $(DICT)_rdict.pcm $(LARCV_LIBDIR)
+
 
 $(LARCV_LIBDIR)/$(ROOTMAP):
 	
