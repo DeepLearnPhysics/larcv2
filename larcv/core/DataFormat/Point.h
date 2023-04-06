@@ -29,6 +29,7 @@ namespace larcv {
 
     Point2D(const Point2D& pt) : x(pt.x), y(pt.y) {};
 
+    Point2D& operator=(const Point2D&) = default;
     double x, y;
     
     inline bool operator== (const Point2D& rhs) const
@@ -73,6 +74,8 @@ namespace larcv {
     ~Point3D() {}
 
     Point3D(const Point3D& pt) : x(pt.x), y(pt.y), z(pt.z) {}
+
+    Point3D& operator=(const Point3D&) = default;
 
     double x, y, z;
     

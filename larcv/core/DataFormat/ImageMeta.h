@@ -74,6 +74,7 @@ namespace larcv {
       : BBox2D(box), _unit(unit)
     { update(y_row_count, x_column_count); }
 
+    ImageMeta& operator=(const ImageMeta&) = default;
     /// Default destructor
     ~ImageMeta() {}
 

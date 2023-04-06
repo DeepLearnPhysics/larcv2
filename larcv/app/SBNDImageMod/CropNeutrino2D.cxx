@@ -226,10 +226,10 @@ bool CropNeutrino2D::process(IOManager& mgr) {
           // This is looping over rows and columns of the new meta.
           // Need to match this row and column to the old meta
           int old_row = i_row + min_rows.at(projection_id);
-          if (old_row < 0 || old_row >= old_image.meta().rows()) continue;
+          if (old_row < 0 || old_row >= (int)old_image.meta().rows()) continue;
           for (int i_col = 0; i_col < _output_rows; i_col++) {
             int old_col = i_col + min_cols.at(projection_id);
-            if (old_col < 0 || old_col >= old_image.meta().cols()) continue;
+            if (old_col < 0 || old_col >= (int)old_image.meta().cols()) continue;
 
             // Ok, this is a valid row/col pair in each meta.
             // Copy the value from old to new.
@@ -289,8 +289,8 @@ bool CropNeutrino2D::process(IOManager& mgr) {
 
 
             // If this row or column is outside the boundaries, skip it:
-            if (new_row < 0 || new_row >= new_metas.at(projection_id).rows()) continue;
-            if (new_col < 0 || new_col >= new_metas.at(projection_id).cols()) continue;
+            if (new_row < 0 || new_row >= (int)new_metas.at(projection_id).rows()) continue;
+            if (new_col < 0 || new_col >= (int)new_metas.at(projection_id).cols()) continue;
 
             // Get the index of the voxel in the new meta:
             size_t new_index = new_metas.at(projection_id).index(new_row, new_col);

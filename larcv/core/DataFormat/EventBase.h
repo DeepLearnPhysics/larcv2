@@ -41,7 +41,9 @@ namespace larcv {
 				    , _subrun(rhs._subrun)
 				    , _event(rhs._event)
     {}
-				      
+
+    EventBase& operator=(const EventBase&) = default;
+
     /// Default destructor
     virtual ~EventBase(){}
     /// Set all run/subrun/event to kINVALID_SIZE

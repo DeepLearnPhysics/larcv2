@@ -35,7 +35,9 @@ namespace larcv {
     
     /// Default copy constructor
     larcv_base(const larcv_base &original) : _logger(original._logger) {}
-    
+
+    larcv_base& operator=(const larcv_base&) = default;
+
     /// Default destructor
     virtual ~larcv_base(){};
     
