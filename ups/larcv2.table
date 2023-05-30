@@ -3,21 +3,14 @@ Product=larcv2
 
 Group:
 
-Flavor     = ANY
-Qualifiers = "e20:p3913:prof"
-  Action = DefineFQ
-      envSet(LARCV2_FQ_DIR, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_e20_p3913_prof)
-  Action = GetProducts
-      setupRequired( root v6_26_06a -q +e20:+p3913:+prof )
-  
 
 Flavor     = ANY
-Qualifiers = "e20:p3913:debug"
+Qualifiers = "c7:p3913:debug"
   Action = DefineFQ
-      envSet(LARCV2_FQ_DIR, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_e20_p3913_debug)
+      envSet(LARCV2_FQ_DIR, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_c7_p3913_debug)
   Action = GetProducts
-      setupRequired( root v6_26_06a -q +e20:+p3913:+debug )
-  
+      setupRequired( root v6_26_06a -q +c7:+p3913:+debug )
+
 
 Flavor     = ANY
 Qualifiers = "c7:p3913:prof"
@@ -28,11 +21,19 @@ Qualifiers = "c7:p3913:prof"
 
 
 Flavor     = ANY
-Qualifiers = "c7:p3913:debug"
+Qualifiers = "e20:p3913:debug"
   Action = DefineFQ
-      envSet(LARCV2_FQ_DIR, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_c7_p3913_debug)
+      envSet(LARCV2_FQ_DIR, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_e20_p3913_debug)
   Action = GetProducts
-      setupRequired( root v6_26_06a -q +c7:+p3913:+debug )
+      setupRequired( root v6_26_06a -q +e20:+p3913:+debug )
+
+
+Flavor     = ANY
+Qualifiers = "e20:p3913:prof"
+  Action = DefineFQ
+      envSet(LARCV2_FQ_DIR, ${UPS_PROD_DIR}/${UPS_PROD_FLAVOR}_e20_p3913_prof)
+  Action = GetProducts
+      setupRequired( root v6_26_06a -q +e20:+p3913:+prof )
 
 
 Flavor     = ANY
