@@ -33,6 +33,8 @@
 namespace larcv {
 
   /// Used as an invalid value identifier for long long
+  /// Used as an invalid value identifier for unsigned long long
+  const unsigned long      kINVALID_ULONG     = std::numeric_limits< unsigned long >::max();
   const long long          kINVALID_LONGLONG  = std::numeric_limits< long long          >::max();
   /// Used as an invalid value identifier for unsigned long long
   const unsigned long long kINVALID_ULONGLONG = std::numeric_limits< unsigned long long >::max();
