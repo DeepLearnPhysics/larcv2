@@ -21,7 +21,9 @@ namespace larcv {
   /// "ID" for a set of elements
   typedef unsigned long InstanceID_t;
   /// Invalid rep for InstanceID_t
-  static const unsigned long kINVALID_INSTANCEID = kINVALID_ULONG;
+  // yes, SIGNED long.  this is because numpy's int64 (which this will get converted to when used with mlreco3d)
+  // isn't big enough for the unsigned long long value, but it *is* big enough for this one
+  static const unsigned long kINVALID_INSTANCEID = kINVALID_LONGLONG;
   /// Invalid projection id
   static const ProjectionID_t kINVALID_PROJECTIONID = kINVALID_USHORT;
 
