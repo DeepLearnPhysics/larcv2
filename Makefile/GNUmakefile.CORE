@@ -65,7 +65,7 @@ $(DICT).cxx: $(HEADERS) LinkDef.h
 # if ROOTMAP defined, define rule for making it
 $(LARCV_LIBDIR)/$(ROOTMAP): $(OBJECTS) $(DICT).o
 	@echo "<< generating rootmap >>"
-	@rlibmap -f  -o $(LARCV_LIBDIR)/$(ROOTMAP) -l $(LARCV_LIBDIR)/liblarcv.so -c LinkDef.h
+	@rlibmap -f -shared  -o $(LARCV_LIBDIR)/$(ROOTMAP) -l $(LARCV_LIBDIR)/liblarcv.so -c LinkDef.h
 
 # install headers
 install_header: .depend #$(OBJECTS) $(DICT).o
