@@ -4,6 +4,7 @@ if sys.version_info.major == 3:
     import subprocess
     dirs=[]
     for d in os.listdir(os.environ['LARCV_BUILDDIR']):
+        if d==".DS_Store": continue
         if not len([x for x in os.listdir('%s/%s' % (os.environ['LARCV_BUILDDIR'],d)) if x.endswith('.o')]): continue
         dirs.append(d)
     libs=[x for x in subprocess.getoutput('larcv-config --libs').split() if not x.startswith('-llarcv')]
