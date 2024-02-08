@@ -42,6 +42,9 @@ namespace larcv {
       , _px               (0.)
       , _py               (0.)
       , _pz               (0.)
+      , _px_final         (kINVALID_DOUBLE)
+      , _py_final         (kINVALID_DOUBLE)
+      , _pz_final         (kINVALID_DOUBLE)
       , _dist_travel      (-1)
       , _energy_init      (0.)
       , _energy_deposit   (0.)
@@ -76,7 +79,11 @@ namespace larcv {
     inline double       px         () const { return _px;         }
     inline double       py         () const { return _py;         }
     inline double       pz         () const { return _pz;         }
+    inline double       px_final   () const { return _px_final;   }
+    inline double       py_final   () const { return _py_final;   }
+    inline double       pz_final   () const { return _pz_final;   }
     inline double       p          () const { return sqrt(pow(_px,2)+pow(_py,2)+pow(_pz,2)); }
+    inline double       p_final    () const { return sqrt(pow(_px_final,2)+pow(_py_final,2)+pow(_pz_final,2)); }
     inline const larcv::Vertex& position() const { return _vtx;   }
     inline double       x          () const { return _vtx.x();    }
     inline double       y          () const { return _vtx.y();    }
@@ -135,6 +142,7 @@ namespace larcv {
     inline void gen_id          (unsigned int id )   { _genid = id;       }
     inline void pdg_code        (int code)           { _pdg = code;         }
     inline void momentum        (double px, double py, double pz) { _px = px; _py = py; _pz = pz; }
+    inline void final_momentum  (double px_final, double py_final, double pz_final) { _px_final = px_final; _py_final = py_final; _pz_final = pz_final; }
     inline void position        (const larcv::Vertex& vtx) { _vtx = vtx;    }
     inline void position        (double x, double y, double z, double t) { _vtx = Vertex(x,y,z,t); }
     inline void end_position    (const larcv::Vertex& vtx) { _end_pt = vtx; }
@@ -187,6 +195,7 @@ namespace larcv {
     unsigned int _genid;       ///< Original generator ID, if different from Geant4 one (e.g.: GENIE particle ID)
     int          _pdg;         ///< PDG code
     double       _px,_py,_pz;  ///< (x,y,z) component of particle's initial momentum
+    double       _px_final,_py_final,_pz_final;  ///< (x,y,z) component of particle's final momentum
     Vertex       _vtx;         ///< (x,y,z,t) of particle's vertex information
     Vertex       _end_pt;      ///< (x,y,z,t) at which particle disappeared from G4WorldVolume
     Vertex       _first_step;  ///< (x,y,z,t) of the first energy deposition point in the detector
