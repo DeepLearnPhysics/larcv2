@@ -26,7 +26,8 @@ namespace larcv {
 
     ss << buf.str() << "Vertex   (x, y, z, t) = (" << x() << "," << y() << "," << z() << "," << t() << ")" << std::endl
        << buf.str() << "Momentum (px, py, pz) = (" << px() << "," << py() << "," << pz() << ")" << std::endl
-       << buf.str() << "Inittial Energy  = " << energy_init() << std::endl
+       << buf.str() << "Final Momentum (px_final, py_final, pz_final) = (" << px_final() << "," << py_final() << "," << pz_final() << ")" << std::endl
+       << buf.str() << "Initial Energy  = " << energy_init() << std::endl
        << buf.str() << "Deposit  Energy  = " << energy_deposit() << std::endl
        << buf.str() << "Creation Process = " << creation_process() << std::endl
        << buf.str() << "Instance ID = " << id() << std::endl
