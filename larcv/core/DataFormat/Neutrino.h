@@ -30,7 +30,9 @@ namespace larcv {
 
     /// Default constructor
     Neutrino()
-      : _id         (kINVALID_INDEX)
+      : _id               (kINVALID_INDEX) 
+      , _event_id         (kINVALID_INDEX) 
+      , _vertex_id         (kINVALID_INDEX)  
       , _mcst_index (kINVALID_INDEX)
       , _mct_index  (kINVALID_INDEX)
 			, _nu_trackid       (kINVALID_UINT)
@@ -45,12 +47,18 @@ namespace larcv {
 			, _x                (0.)
 			, _y                (0.)
 			, _qsqr             (0.)
+			, _q0               (0.)
+			, _q3               (0.)
 			//, _pt               (0.)
 			, _theta            (0.)
       , _pdg              (0)
+      , _pdg_lep          (0)
       , _px               (0.)
       , _py               (0.)
       , _pz               (0.)
+      , _px_lep           (0.)
+      , _py_lep           (0.)
+      , _pz_lep           (0.)
       , _dist_travel      (-1)
       , _energy_init      (0.)
       , _energy_deposit   (0.)
@@ -61,7 +69,10 @@ namespace larcv {
     /// Default destructor
     ~Neutrino(){}
     /// particle's ID getter
-    inline InstanceID_t id         () const { return _id;         }
+    inline InstanceID_t id               () const { return _id;         } 
+    inline InstanceID_t event_id         () const { return _event_id;         } 
+    inline InstanceID_t vertex_id        () const { return _vertex_id;         }
+    
     // origin/generator info getter
     inline MCSTIndex_t  mcst_index () const { return _mcst_index; }
     inline MCTIndex_t   mct_index  () const { return _mct_index;  }
@@ -72,6 +83,8 @@ namespace larcv {
 		inline int    nucleon          () const { return _nucleon; }
 		inline int    quark            () const { return _quark; }
 		inline double momentum_transfer () const { return _qsqr; }
+		inline double momentum_transfer_mag () const { return _q3; }
+		inline double energy_transfer () const { return _q0; }
 		inline double bjorken_x         () const { return _x; }
 		inline double hadronic_invariant_mass () const { return _w; }
 		inline double inelasticity     () const { return _y; }
@@ -81,11 +94,16 @@ namespace larcv {
     inline unsigned int nu_track_id   () const { return _nu_trackid;    }
     inline unsigned int lepton_track_id   () const { return _lepton_trackid;    }
     inline int          pdg_code   () const { return _pdg;        }
+    inline int          pdg_code_lep   () const { return _pdg_lep;        }  
     inline double       px         () const { return _px;         }
     inline double       py         () const { return _py;         }
     inline double       pz         () const { return _pz;         }
+    inline double       px_lep     () const { return _px_lep;     }
+    inline double       py_lep     () const { return _py_lep;     }
+    inline double       pz_elp     () const { return _pz_lep;     }
     //inline double       pt         () const { return _pt;         }
     inline double       p          () const { return sqrt(pow(_px,2)+pow(_py,2)+pow(_pz,2)); }
+    inline double       p_lep          () const { return sqrt(pow(_px_lep,2)+pow(_py_lep,2)+pow(_pz_lep,2)); }
     inline const larcv::Vertex& position() const { return _vtx;   }
     inline double       x          () const { return _vtx.x();    }
     inline double       y          () const { return _vtx.y();    }
@@ -110,7 +128,9 @@ namespace larcv {
     // Setters
     //
     // generator/origin info setter
-    inline void id              (InstanceID_t id  )  { _id = id;         }
+    inline void id        (InstanceID_t id  )  { _id = id;         }
+    inline void event_id        (InstanceID_t event_id  )  { _event_id = event_id;         }
+    inline void vertex_id       (InstanceID_t vertex_id )  { _vertex_id = vertex_id;       }
     inline void mcst_index      (MCSTIndex_t id )    { _mcst_index = id;    }
     inline void mct_index       (MCTIndex_t id )     { _mct_index = id;     }
     inline void current_type (short curr) {_current_type = curr; }
@@ -120,6 +140,8 @@ namespace larcv {
 		inline void nucleon      (int nucleon)     { _nucleon = nucleon; }
 		inline void quark        (int quark)       { _quark = quark; }
 		inline void momentum_transfer (double q2)  { _qsqr = q2; }
+		inline void momentum_transfer_mag (double q3)  { _q3 = q3; }
+		inline void energy_transfer (double q0)  { _q0 = q0; }
 		inline void bjorken_x    (double x)        { _x = x; }
 		inline void hadronic_invariant_mass (double w) { _w = w; }
 		inline void inelasticity (double y)        { _y = y; }
@@ -129,7 +151,9 @@ namespace larcv {
     inline void nu_track_id        (unsigned int id )   { _nu_trackid = id;       }
     inline void lepton_track_id        (unsigned int id )   { _nu_trackid = id;       }
     inline void pdg_code        (int code)           { _pdg = code;         }
+    inline void pdg_code_lep    (int code)           { _pdg_lep = code;         }
     inline void momentum        (double px, double py, double pz) { _px = px; _py = py; _pz = pz; }
+    inline void momentum_lep    (double px_lep, double py_lep, double pz_lep) { _px_lep = px_lep; _py_lep = py_lep; _pz_lep = pz_lep; }
     inline void position        (const larcv::Vertex& vtx) { _vtx = vtx;    }
     inline void position        (double x, double y, double z, double t) { _vtx = Vertex(x,y,z,t); }
     inline void distance_travel ( double dist ) { _dist_travel = dist; }
@@ -150,8 +174,9 @@ namespace larcv {
     std::string dump() const;
 
   private:
-
-    InstanceID_t   _id; ///< "ID" of this particle in ParticleSet collection
+    InstanceID_t   _id; ///< "ID" of interaction, unique inside the file
+    InstanceID_t   _event_id; ///< "ID" of the spill the neutrino interaction corresponds to
+    InstanceID_t   _vertex_id; ///< "ID" of the neutrino interaction from GENIE
     /// index number in the origin MCShower/MCTrack container array (kINVALID_USHORT if neither)
     MCSTIndex_t  _mcst_index;
     ///< index number in the origin MCTruth container array (kINVALID_USHORT if MCShower/MCTrack)
@@ -167,12 +192,16 @@ namespace larcv {
 		double _w;
 		double _x;         ///< if neutrino, Bjorken variable x
 		double _y;
-		double _qsqr; ///< if neutrino, momentum transfer Q^2
+		double _qsqr; ///< if neutrino, momentum transfer Q^2 [MeV]
+		double _q3; ///< Maginitude of momentum transfer [MeV]
+		double _q0; ///< Energy transfer [MeV]
 		double _theta;
 		//double _pt;
 
     int          _pdg;         ///< PDG code
+    int          _pdg_lep;         ///< PDG code of the outgoing lepton
     double       _px,_py,_pz;  ///< (x,y,z) component of particle's initial momentum
+    double       _px_lep,_py_lep,_pz_lep;  ///< (x,y,z) component of outgoing lepton momentum
     Vertex       _vtx;         ///< (x,y,z,t) of particle's vertex information
     double       _dist_travel; ///< filled only if MCTrack origin: distance measured along the trajectory
     double       _energy_init; ///< initial energy of the particle
