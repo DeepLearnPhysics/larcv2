@@ -56,9 +56,7 @@ namespace larcv {
       , _px               (0.)
       , _py               (0.)
       , _pz               (0.)
-      , _px_lep           (0.)
-      , _py_lep           (0.)
-      , _pz_lep           (0.)
+      , _p_lep            (0.)
       , _dist_travel      (-1)
       , _energy_init      (0.)
       , _energy_deposit   (0.)
@@ -98,12 +96,9 @@ namespace larcv {
     inline double       px         () const { return _px;         }
     inline double       py         () const { return _py;         }
     inline double       pz         () const { return _pz;         }
-    inline double       px_lep     () const { return _px_lep;     }
-    inline double       py_lep     () const { return _py_lep;     }
-    inline double       pz_elp     () const { return _pz_lep;     }
+    inline double       momentum_lep     () const { return _p_lep;     }
     //inline double       pt         () const { return _pt;         }
     inline double       p          () const { return sqrt(pow(_px,2)+pow(_py,2)+pow(_pz,2)); }
-    inline double       p_lep          () const { return sqrt(pow(_px_lep,2)+pow(_py_lep,2)+pow(_pz_lep,2)); }
     inline const larcv::Vertex& position() const { return _vtx;   }
     inline double       x          () const { return _vtx.x();    }
     inline double       y          () const { return _vtx.y();    }
@@ -153,7 +148,7 @@ namespace larcv {
     inline void pdg_code        (int code)           { _pdg = code;         }
     inline void pdg_code_lep    (int code)           { _pdg_lep = code;         }
     inline void momentum        (double px, double py, double pz) { _px = px; _py = py; _pz = pz; }
-    inline void momentum_lep    (double px_lep, double py_lep, double pz_lep) { _px_lep = px_lep; _py_lep = py_lep; _pz_lep = pz_lep; }
+    inline void momentum_lep    (double p_lep) {_p_lep = p_lep; }
     inline void position        (const larcv::Vertex& vtx) { _vtx = vtx;    }
     inline void position        (double x, double y, double z, double t) { _vtx = Vertex(x,y,z,t); }
     inline void distance_travel ( double dist ) { _dist_travel = dist; }
@@ -201,7 +196,7 @@ namespace larcv {
     int          _pdg;         ///< PDG code
     int          _pdg_lep;         ///< PDG code of the outgoing lepton
     double       _px,_py,_pz;  ///< (x,y,z) component of particle's initial momentum
-    double       _px_lep,_py_lep,_pz_lep;  ///< (x,y,z) component of outgoing lepton momentum
+    double       _p_lep;  // outgoing lepton momentum
     Vertex       _vtx;         ///< (x,y,z,t) of particle's vertex information
     double       _dist_travel; ///< filled only if MCTrack origin: distance measured along the trajectory
     double       _energy_init; ///< initial energy of the particle
