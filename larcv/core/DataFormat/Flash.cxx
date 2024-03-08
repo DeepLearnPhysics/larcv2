@@ -22,17 +22,17 @@ namespace larcv {
         , _absTime  (absTime)
         , _frame    (frame)
         , _PEPerOpDet (PEPerOpDet)
-        , _inBeamFrame (inBeamFrame)
-        , _onBeamTime  (onBeamTime)
-        , _fastToTotal (fastToTotal)
+        , _wireCenters (wireCenters)
+        , _wireWidths  (wireWidths)
         , _xCenter     (xCenter)
         , _xWidth      (xWidth)
         , _yCenter     (yCenter)
         , _yWidth      (yWidth)
         , _zCenter     (zCenter)
         , _zWidth      (zWidth)
-        , _wireCenters (wireCenters)
-        , _wireWidths  (wireWidths)
+        , _fastToTotal (fastToTotal)
+        , _inBeamFrame (inBeamFrame)
+        , _onBeamTime  (onBeamTime)
     {}
 
     double Flash::TotalPE() const {

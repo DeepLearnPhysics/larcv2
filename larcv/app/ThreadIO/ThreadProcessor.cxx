@@ -91,7 +91,7 @@ namespace larcv {
     if (_manager_thread.joinable()) _manager_thread.join();
   }
 
-  void ThreadProcessor::manager_batch_process(size_t batch_size)
+  void ThreadProcessor::manager_batch_process(size_t /*batch_size*/)
   {
     _run_manager_thread = true;
     auto t_start = std::chrono::high_resolution_clock::now();
@@ -99,7 +99,7 @@ namespace larcv {
     while (_run_manager_thread) {
       LARCV_INFO() << "Calling batch_process" << std::endl;
       t_start = std::chrono::high_resolution_clock::now();
-      auto state   = batch_process(batch_size);
+      //auto state   = batch_process(batch_size);
       t_end   = std::chrono::high_resolution_clock::now();
       LARCV_INFO() << "Returned from batch_process: "
                    << (long long)(std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_start).count())

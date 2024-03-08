@@ -46,6 +46,7 @@ namespace larcv {
         LARCV_CRITICAL() << "Wrong point type (Point3D) in Vertex::as_point2d" << std::endl;
         throw larbys();
     }
+    return Point2D(_x, _y); // quiet compiler warning
   }
 
   const larcv::Point3D Vertex::as_point3d() const

@@ -56,7 +56,7 @@ void BatchFillerSparseTensor2D::_batch_end_() {
 void BatchFillerSparseTensor2D::finalize() { _entry_data.clear(); }
 
 void BatchFillerSparseTensor2D::assert_dimension(
-    const EventSparseTensor2D& voxel_data) const {
+    const EventSparseTensor2D& /*voxel_data*/) const {
   // auto const& voxel_meta = voxel_data.as_vector().front().meta();
   // if (_rows != voxel_meta.rows()) {
   //   LARCV_CRITICAL() << "# of Y-voxels (" << _rows << ") changed ... now "
@@ -177,7 +177,7 @@ bool BatchFillerSparseTensor2D::process(IOManager& mgr) {
       if (flip_y) row = meta.rows() - (row + 1);
 
 
-      size_t index = count*(_max_voxels*point_dim) + i*point_dim;
+      //size_t index = count*(_max_voxels*point_dim) + i*point_dim;
       _entry_data.at(count*(_max_voxels*point_dim) + i*point_dim) = row;
       _entry_data.at(count*(_max_voxels*point_dim) + i*point_dim + 1) = col;
       if (_include_values){
