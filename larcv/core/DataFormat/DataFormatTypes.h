@@ -19,9 +19,11 @@ namespace larcv {
   /// "ID" of MCTruth in terms of its index number in the collection std::vector
   typedef unsigned short MCTIndex_t;
   /// "ID" for a set of elements
-  typedef unsigned short InstanceID_t;
+  typedef unsigned long InstanceID_t;
   /// Invalid rep for InstanceID_t
-  static const unsigned short kINVALID_INSTANCEID = kINVALID_USHORT;
+  // yes, SIGNED long.  this is because numpy's int64 (which this will get converted to when used with mlreco3d)
+  // isn't big enough for the unsigned long long value, but it *is* big enough for this one
+  static const unsigned long kINVALID_INSTANCEID = kINVALID_LONGLONG;
   /// Invalid projection id
   static const ProjectionID_t kINVALID_PROJECTIONID = kINVALID_USHORT;
 

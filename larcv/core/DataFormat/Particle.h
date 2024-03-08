@@ -37,10 +37,14 @@ namespace larcv {
       , _current_type     (-1)
       , _interaction_type (-1)
       , _trackid          (kINVALID_UINT)
+      , _genid            (kINVALID_UINT)
       , _pdg              (0)
       , _px               (0.)
       , _py               (0.)
       , _pz               (0.)
+      , _end_px         (kINVALID_DOUBLE)
+      , _end_py         (kINVALID_DOUBLE)
+      , _end_pz         (kINVALID_DOUBLE)
       , _dist_travel      (-1)
       , _energy_init      (0.)
       , _energy_deposit   (0.)
@@ -70,11 +74,16 @@ namespace larcv {
     inline short nu_interaction_type () const { return _interaction_type; }
     // particle's info getter
     inline unsigned int track_id   () const { return _trackid;    }
+    inline unsigned int gen_id     () const { return _genid;      }
     inline int          pdg_code   () const { return _pdg;        }
     inline double       px         () const { return _px;         }
     inline double       py         () const { return _py;         }
     inline double       pz         () const { return _pz;         }
+    inline double       end_px   () const { return _end_px;   }
+    inline double       end_py   () const { return _end_py;   }
+    inline double       end_pz   () const { return _end_pz;   }
     inline double       p          () const { return sqrt(pow(_px,2)+pow(_py,2)+pow(_pz,2)); }
+    inline double       end_p    () const { return sqrt(pow(_end_px,2)+pow(_end_py,2)+pow(_end_pz,2)); }
     inline const larcv::Vertex& position() const { return _vtx;   }
     inline double       x          () const { return _vtx.x();    }
     inline double       y          () const { return _vtx.y();    }
@@ -130,8 +139,10 @@ namespace larcv {
     inline void nu_interaction_type (short itype) {_interaction_type = itype; }
     // particle's info setter
     inline void track_id        (unsigned int id )   { _trackid = id;       }
+    inline void gen_id          (unsigned int id )   { _genid = id;       }
     inline void pdg_code        (int code)           { _pdg = code;         }
     inline void momentum        (double px, double py, double pz) { _px = px; _py = py; _pz = pz; }
+    inline void end_momentum  (double end_px, double end_py, double end_pz) { _end_px = end_px; _end_py = end_py; _end_pz = end_pz; }
     inline void position        (const larcv::Vertex& vtx) { _vtx = vtx;    }
     inline void position        (double x, double y, double z, double t) { _vtx = Vertex(x,y,z,t); }
     inline void end_position    (const larcv::Vertex& vtx) { _end_pt = vtx; }
@@ -181,8 +192,10 @@ namespace larcv {
     short _interaction_type;   ///< if neutrino, shows interaction GENIE code. else kINVALID_USHORT
 
     unsigned int _trackid;     ///< Geant4 track id
+    unsigned int _genid;       ///< Original generator ID, if different from Geant4 one (e.g.: GENIE particle ID)
     int          _pdg;         ///< PDG code
     double       _px,_py,_pz;  ///< (x,y,z) component of particle's initial momentum
+    double       _end_px,_end_py,_end_pz;  ///< (x,y,z) component of particle's final momentum
     Vertex       _vtx;         ///< (x,y,z,t) of particle's vertex information
     Vertex       _end_pt;      ///< (x,y,z,t) at which particle disappeared from G4WorldVolume
     Vertex       _first_step;  ///< (x,y,z,t) of the first energy deposition point in the detector
