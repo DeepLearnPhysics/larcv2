@@ -31,11 +31,10 @@ namespace larcv {
     /// Default constructor
     Neutrino()
       : _id               (kINVALID_INDEX) 
-      , _event_id         (kINVALID_INDEX) 
-      , _vertex_id         (kINVALID_INDEX)  
+      , _genid            (kINVALID_INDEX)  
       , _mcst_index (kINVALID_INDEX)
       , _mct_index  (kINVALID_INDEX)
-			, _nu_trackid       (kINVALID_UINT)
+			, _trackid       (kINVALID_UINT)
 			, _lepton_trackid   (kINVALID_UINT)
 			, _current_type     (-1)
 			, _interaction_mode (-1)
@@ -52,11 +51,11 @@ namespace larcv {
 			//, _pt               (0.)
 			, _theta            (0.)
       , _pdg              (0)
-      , _pdg_lep          (0)
+      , _lepton_pdg       (0)
       , _px               (0.)
       , _py               (0.)
       , _pz               (0.)
-      , _p_lep            (0.)
+      , _lepton_p         (0.)
       , _dist_travel      (-1)
       , _energy_init      (0.)
       , _energy_deposit   (0.)
@@ -68,8 +67,7 @@ namespace larcv {
     ~Neutrino(){}
     /// particle's ID getter
     inline InstanceID_t id               () const { return _id;         } 
-    inline InstanceID_t event_id         () const { return _event_id;         } 
-    inline InstanceID_t vertex_id        () const { return _vertex_id;         }
+    inline InstanceID_t genid        () const { return _genid;         }
     
     // origin/generator info getter
     inline MCSTIndex_t  mcst_index () const { return _mcst_index; }
@@ -89,14 +87,14 @@ namespace larcv {
 		inline double theta            () const { return _theta; }
 
     // particle's info getter
-    inline unsigned int nu_track_id   () const { return _nu_trackid;    }
+    inline unsigned int track_id   () const { return _trackid;    }
     inline unsigned int lepton_track_id   () const { return _lepton_trackid;    }
     inline int          pdg_code   () const { return _pdg;        }
-    inline int          pdg_code_lep   () const { return _pdg_lep;        }  
+    inline int          lepton_pdg_code   () const { return _lepton_pdg;        }  
     inline double       px         () const { return _px;         }
     inline double       py         () const { return _py;         }
     inline double       pz         () const { return _pz;         }
-    inline double       momentum_lep     () const { return _p_lep;     }
+    inline double       lepton_p   () const { return _lepton_p;     }
     //inline double       pt         () const { return _pt;         }
     inline double       p          () const { return sqrt(pow(_px,2)+pow(_py,2)+pow(_pz,2)); }
     inline const larcv::Vertex& position() const { return _vtx;   }
@@ -124,8 +122,7 @@ namespace larcv {
     //
     // generator/origin info setter
     inline void id        (InstanceID_t id  )  { _id = id;         }
-    inline void event_id        (InstanceID_t event_id  )  { _event_id = event_id;         }
-    inline void vertex_id       (InstanceID_t vertex_id )  { _vertex_id = vertex_id;       }
+    inline void genid     (InstanceID_t genid )  { _genid = genid;       }
     inline void mcst_index      (MCSTIndex_t id )    { _mcst_index = id;    }
     inline void mct_index       (MCTIndex_t id )     { _mct_index = id;     }
     inline void current_type (short curr) {_current_type = curr; }
@@ -143,15 +140,15 @@ namespace larcv {
 		inline void theta (double theta)           { _theta = theta; }
 
 		// particle's info setter
-    inline void nu_track_id        (unsigned int id )   { _nu_trackid = id;       }
-    inline void lepton_track_id        (unsigned int id )   { _nu_trackid = id;       }
+    inline void track_id        (unsigned int id )   { _trackid = id;       }
+    inline void lepton_track_id (unsigned int id )   { _lepton_trackid = id;       }
     inline void pdg_code        (int code)           { _pdg = code;         }
-    inline void pdg_code_lep    (int code)           { _pdg_lep = code;         }
+    inline void lepton_pdg_code (int code)           { _lepton_pdg = code;         }
     inline void momentum        (double px, double py, double pz) { _px = px; _py = py; _pz = pz; }
-    inline void momentum_lep    (double p_lep) {_p_lep = p_lep; }
+    inline void lepton_p        (double lepton_p) {_lepton_p = lepton_p; }
     inline void position        (const larcv::Vertex& vtx) { _vtx = vtx;    }
     inline void position        (double x, double y, double z, double t) { _vtx = Vertex(x,y,z,t); }
-    inline void distance_travel ( double dist ) { _dist_travel = dist; }
+    inline void distance_travel (double dist ) { _dist_travel = dist; }
     inline void energy_init     (double e)           { _energy_init = e;    }
     inline void energy_deposit  (double e)           { _energy_deposit = e; }
     inline void creation_process (const std::string& proc) { _process = proc; }
@@ -170,13 +167,12 @@ namespace larcv {
 
   private:
     InstanceID_t   _id; ///< "ID" of interaction, unique inside the file
-    InstanceID_t   _event_id; ///< "ID" of the spill the neutrino interaction corresponds to
-    InstanceID_t   _vertex_id; ///< "ID" of the neutrino interaction from GENIE
+    InstanceID_t   _genid; ///Original generator ID, if different from Geant4 one (e.g.: GENIE particle ID)
     /// index number in the origin MCShower/MCTrack container array (kINVALID_USHORT if neither)
     MCSTIndex_t  _mcst_index;
     ///< index number in the origin MCTruth container array (kINVALID_USHORT if MCShower/MCTrack)
     MCTIndex_t   _mct_index;
-    unsigned int _nu_trackid;     ///< Geant4 track id
+    unsigned int _trackid;     ///< Geant4 track id
 		unsigned int _lepton_trackid;
     short _current_type;       ///< if neutrino, shows interaction GENIE current type. else kINVALID_USHORT
 		short _interaction_mode;   ///< if neutrino, shows interaction GENIE mode (QE / 1-pi / DIS / ...)
@@ -194,9 +190,9 @@ namespace larcv {
 		//double _pt;
 
     int          _pdg;         ///< PDG code
-    int          _pdg_lep;         ///< PDG code of the outgoing lepton
+    int          _lepton_pdg;         ///< PDG code of the outgoing lepton
     double       _px,_py,_pz;  ///< (x,y,z) component of particle's initial momentum
-    double       _p_lep;  // outgoing lepton momentum
+    double       _lepton_p;  // outgoing lepton momentum
     Vertex       _vtx;         ///< (x,y,z,t) of particle's vertex information
     double       _dist_travel; ///< filled only if MCTrack origin: distance measured along the trajectory
     double       _energy_init; ///< initial energy of the particle
