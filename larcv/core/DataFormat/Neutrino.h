@@ -67,7 +67,7 @@ namespace larcv {
     ~Neutrino(){}
     /// particle's ID getter
     inline InstanceID_t id               () const { return _id;         } 
-    inline InstanceID_t genid        () const { return _genid;         }
+    inline InstanceID_t gen_id        () const { return _genid;         }
     
     // origin/generator info getter
     inline MCSTIndex_t  mcst_index () const { return _mcst_index; }
@@ -122,7 +122,7 @@ namespace larcv {
     //
     // generator/origin info setter
     inline void id        (InstanceID_t id  )  { _id = id;         }
-    inline void genid     (InstanceID_t genid )  { _genid = genid;       }
+    inline void gen_id     (InstanceID_t genid )  { _genid = genid;       }
     inline void mcst_index      (MCSTIndex_t id )    { _mcst_index = id;    }
     inline void mct_index       (MCTIndex_t id )     { _mct_index = id;     }
     inline void current_type (short curr) {_current_type = curr; }
