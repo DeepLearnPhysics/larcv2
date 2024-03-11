@@ -87,7 +87,7 @@ namespace larcv {
 		inline double theta            () const { return _theta; }
 
     // particle's info getter
-    inline unsigned int track_id   () const { return _trackid;    }
+    inline unsigned int nu_track_id   () const { return _trackid;    }
     inline unsigned int lepton_track_id   () const { return _lepton_trackid;    }
     inline int          pdg_code   () const { return _pdg;        }
     inline int          lepton_pdg_code   () const { return _lepton_pdg;        }  
@@ -140,7 +140,7 @@ namespace larcv {
 		inline void theta (double theta)           { _theta = theta; }
 
 		// particle's info setter
-    inline void track_id        (unsigned int id )   { _trackid = id;       }
+    inline void nu_track_id        (unsigned int id )   { _trackid = id;       }
     inline void lepton_track_id (unsigned int id )   { _lepton_trackid = id;       }
     inline void pdg_code        (int code)           { _pdg = code;         }
     inline void lepton_pdg_code (int code)           { _lepton_pdg = code;         }
