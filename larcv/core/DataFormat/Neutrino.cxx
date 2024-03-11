@@ -13,7 +13,7 @@ namespace larcv {
   {
     std::stringstream ss;
     std::stringstream buf;
-    ss  << "      \033[95m" << "Neutrino " << " (PdgCode,TrackID) = (" << pdg_code() << "," << nu_track_id() << ")\033[00m " << std::endl;
+    ss  << "      \033[95m" << "Neutrino " << " (PdgCode,TrackID) = (" << pdg_code() << "," << track_id() << ")\033[00m " << std::endl;
     buf << "      ";
 
     ss << buf.str() << "Vertex   (x, y, z, t) = (" << x() << "," << y() << "," << z() << "," << t() << ")" << std::endl
