@@ -167,7 +167,7 @@ namespace larcv {
 
   private:
     InstanceID_t   _id; ///< "ID" of interaction, unique inside the file
-    InstanceID_t   _interaction_id; ///Original generator ID, if different from Geant4 one (e.g.: GENIE particle ID)
+    InstanceID_t   _interaction_id; ///Original generator ID
     /// index number in the origin MCShower/MCTrack container array (kINVALID_USHORT if neither)
     MCSTIndex_t  _mcst_index;
     ///< index number in the origin MCTruth container array (kINVALID_USHORT if MCShower/MCTrack)
