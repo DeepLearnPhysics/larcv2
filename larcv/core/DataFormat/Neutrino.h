@@ -31,7 +31,7 @@ namespace larcv {
     /// Default constructor
     Neutrino()
       : _id               (kINVALID_INDEX) 
-      , _genid            (kINVALID_INDEX)  
+      , _interaction_id            (kINVALID_INDEX)  
       , _mcst_index (kINVALID_INDEX)
       , _mct_index  (kINVALID_INDEX)
 			, _trackid       (kINVALID_UINT)
@@ -67,7 +67,7 @@ namespace larcv {
     ~Neutrino(){}
     /// particle's ID getter
     inline InstanceID_t id               () const { return _id;         } 
-    inline InstanceID_t gen_id        () const { return _genid;         }
+    inline InstanceID_t interaction_id        () const { return _interaction_id;         }
     
     // origin/generator info getter
     inline MCSTIndex_t  mcst_index () const { return _mcst_index; }
@@ -122,7 +122,7 @@ namespace larcv {
     //
     // generator/origin info setter
     inline void id        (InstanceID_t id  )  { _id = id;         }
-    inline void gen_id     (InstanceID_t genid )  { _genid = genid;       }
+    inline void interaction_id     (InstanceID_t interaction_id )  { _interaction_id = interaction_id;       }
     inline void mcst_index      (MCSTIndex_t id )    { _mcst_index = id;    }
     inline void mct_index       (MCTIndex_t id )     { _mct_index = id;     }
     inline void current_type (short curr) {_current_type = curr; }
@@ -167,7 +167,7 @@ namespace larcv {
 
   private:
     InstanceID_t   _id; ///< "ID" of interaction, unique inside the file
-    InstanceID_t   _genid; ///Original generator ID, if different from Geant4 one (e.g.: GENIE particle ID)
+    InstanceID_t   _interaction_id; ///Original generator ID, if different from Geant4 one (e.g.: GENIE particle ID)
     /// index number in the origin MCShower/MCTrack container array (kINVALID_USHORT if neither)
     MCSTIndex_t  _mcst_index;
     ///< index number in the origin MCTruth container array (kINVALID_USHORT if MCShower/MCTrack)
