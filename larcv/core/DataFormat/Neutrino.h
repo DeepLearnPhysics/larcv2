@@ -184,8 +184,8 @@ namespace larcv {
 		double _x;         ///< if neutrino, Bjorken variable x
 		double _y;
 		double _qsqr; ///< if neutrino, momentum transfer Q^2 [MeV]
-		double _q3; ///< Maginitude of momentum transfer [MeV]
 		double _q0; ///< Energy transfer [MeV]
+		double _q3; ///< Maginitude of momentum transfer [MeV]
 		double _theta;
 		//double _pt;
 
