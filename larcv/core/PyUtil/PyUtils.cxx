@@ -843,8 +843,8 @@ VoxelSet as_tensor2d(PyObject* pyarray, const ImageMeta& meta, float min_thresho
     LARCV_CRITICAL() << "Cannot convert to 2D C-array (return code " << ret << ")" << std::endl;
     throw larbys();
   }
-  if (dims[1] != 2) {
-    LARCV_CRITICAL() << "The 2nd dimenstion must be length 2! (length " << dims[1] << ")" << std::endl;
+  if (dims[1] != 3) {
+    LARCV_CRITICAL() << "The 2nd dimenstion must be length 3! (length " << dims[1] << ")" << std::endl;
     throw larbys();
   }
   VoxelSet res;
