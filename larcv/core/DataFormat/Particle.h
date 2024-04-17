@@ -37,7 +37,8 @@ namespace larcv {
       , _current_type     (-1)
       , _interaction_type (-1)
       , _trackid          (kINVALID_UINT)
-      , _genid            (kINVALID_UINT)
+      , _genid            (kINVALID_UINT) 
+      , _primary          (false)
       , _pdg              (0)
       , _px               (0.)
       , _py               (0.)
@@ -75,6 +76,7 @@ namespace larcv {
     // particle's info getter
     inline unsigned int track_id   () const { return _trackid;    }
     inline unsigned int gen_id     () const { return _genid;      }
+    inline bool primary () const { return _primary;    }
     inline int          pdg_code   () const { return _pdg;        }
     inline double       px         () const { return _px;         }
     inline double       py         () const { return _py;         }
@@ -139,7 +141,8 @@ namespace larcv {
     inline void nu_interaction_type (short itype) {_interaction_type = itype; }
     // particle's info setter
     inline void track_id        (unsigned int id )   { _trackid = id;       }
-    inline void gen_id          (unsigned int id )   { _genid = id;       }
+    inline void gen_id          (unsigned int id )   { _genid = id;         }  
+    inline void primary         (bool primary )      { _primary = primary;  }
     inline void pdg_code        (int code)           { _pdg = code;         }
     inline void momentum        (double px, double py, double pz) { _px = px; _py = py; _pz = pz; }
     inline void end_momentum  (double end_px, double end_py, double end_pz) { _end_px = end_px; _end_py = end_py; _end_pz = end_pz; }
@@ -193,6 +196,7 @@ namespace larcv {
 
     unsigned int _trackid;     ///< Geant4 track id
     unsigned int _genid;       ///< Original generator ID, if different from Geant4 one (e.g.: GENIE particle ID)
+    bool _primary;             ///< To propagate primary/sec nature of the trajectory
     int          _pdg;         ///< PDG code
     double       _px,_py,_pz;  ///< (x,y,z) component of particle's initial momentum
     double       _end_px,_end_py,_end_pz;  ///< (x,y,z) component of particle's final momentum
