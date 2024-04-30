@@ -369,70 +369,6 @@ namespace larcv {
     LARCV_DEBUG() << "Current input tree index: " << _in_tree_index << std::endl;
     return true;
   }
-    
-    
-   bool IOManager::save_entry(const std::string& type, const std::string& producer)
-   {
-    LARCV_DEBUG() << "start" << std::endl;
-
-    if (!_prepared) {
-        LARCV_CRITICAL() << "Cannot be called before initialize()!" << std::endl;
-        throw larbys();
-    }
-
-    if (_io_mode == kREAD) {
-        LARCV_ERROR() << "Cannot save in READ mode..." << std::endl;
-        return false;
-    }
-
-    TTree* current_tree = nullptr;
-    EventBase* current_product = nullptr;
-    
-    auto prod_name = ProducerName_t(type, producer);
-    std::string tree_name = prod_name.first + "_" + prod_name.second + "_tree";
-    // Find the tree by name
-    for (size_t i = 0; i < _out_tree_v.size(); ++i) {
-        if (!_out_tree_v[i]) break;
-        if (std::string(_out_tree_v[i]->GetName()) == tree_name) {
-            current_tree = _out_tree_v[i];
-            current_product = _product_ptr_v[i];
-            break;
-        }
-    }
-
-    if (!current_tree) {
-        LARCV_ERROR() << "Tree with name \"" << tree_name << "\" not found!" << std::endl;
-        return false;
-    }
-
-    LARCV_INFO() << "Saving new entry in current tree " << current_tree->GetName() << std::endl;
-
-    set_id();
-
-    // Update event ID if not set externally
-    if (!_set_event_id.valid()) {
-        current_product->_run = _event_id.run();
-        current_product->_subrun = _event_id.subrun();
-        current_product->_event = _event_id.event();
-    }
-
-    // Fill the current tree
-    current_tree->Fill();
-
-    // Clear the product data
-    current_product->clear();
-
-    // Clear event ID
-    _event_id.clear();
-    _set_event_id.clear();
-
-    _out_tree_entries += 1;
-    _out_tree_index += 1;
-
-    return true;
-  }
-  
-  
 
   bool IOManager::save_entry()
   {
@@ -505,6 +441,7 @@ namespace larcv {
         p->clear();
       }
     }
+
     clear_entry();
 
     _out_tree_entries += 1;
@@ -512,7 +449,7 @@ namespace larcv {
 
     return true;
   }
-  
+
   void IOManager::clear_entry()
   {
     for (auto& p : _product_ptr_v) {
@@ -616,7 +553,7 @@ namespace larcv {
     __ioman_mtx.unlock();
     return _product_ptr_v[id];
   }
-    
+
   void IOManager::set_id(const size_t run, const size_t subrun, const size_t event) {
 
     if (_io_mode == kREAD) {
@@ -637,7 +574,7 @@ namespace larcv {
     _set_event_id = tmp;
 
   }
- 
+
   void IOManager::set_id() {
     LARCV_DEBUG() << "start" << std::endl;
 
@@ -668,7 +605,7 @@ namespace larcv {
 
     }
   }
-    
+
   void IOManager::finalize()
   {
     LARCV_DEBUG() << "start" << std::endl;
@@ -693,7 +630,7 @@ namespace larcv {
           LARCV_NORMAL() << "Writing " << t->GetName() << " with " << t->GetEntries() << " entries" << std::endl;
           t->Write();
         }
-      }  
+      }
       LARCV_NORMAL() << "Closing output file" << std::endl;
       _out_file->Close();
       _out_file = nullptr;

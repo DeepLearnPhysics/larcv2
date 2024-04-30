@@ -58,7 +58,6 @@ namespace larcv {
     bool initialize();
     bool read_entry(const size_t index, bool force_reload = false);
     bool save_entry();
-    bool save_entry(const std::string& type, const std::string& producer);
     void finalize();
     void clear_entry();
     void set_id(const size_t run, const size_t subrun, const size_t event);
