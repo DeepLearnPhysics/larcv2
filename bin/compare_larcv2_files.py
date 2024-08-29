@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from larcv import larcv
 from ROOT import TChain
 import numpy as np
