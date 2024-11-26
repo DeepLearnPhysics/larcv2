@@ -25,7 +25,12 @@ ENV LARCV_PYTHON_CONFIG=python3.6-config
 ENV PATH=${LARCV_BASEDIR}/bin:${LARCV_BINDIR}:${PATH}
 ENV LD_LIBRARY_PATH=${LARCV_LIBDIR}:${LD_LIBRARY_PATH}:
 ENV PYTHONPATH=${LARCV_BASEDIR}/python:${PYTHONPATH}
-
+RUN apt-get update && apt-get install -y \
+	python3-pip
+RUN python3 -m pip install jupyter
+RUN python3 -m pip install matplotlib
+RUN python3 -m pip install pandas
+RUN python3 -m pip install scipy
 # larcv
 RUN mkdir -p /app && \
     cd /app && \
