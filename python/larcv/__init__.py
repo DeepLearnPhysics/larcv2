@@ -1,4 +1,8 @@
 import ROOT,os
+
+# Import version
+from .version import __version__
+
 if not 'LARCV_BASEDIR' in os.environ:
     print('$LARCV_BASEDIR shell env. var. not found (run configure.sh)')
     raise ImportError

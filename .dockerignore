@@ -1,0 +1,47 @@
+# Build artifacts
+build/
+*.o
+*.so
+*.pyc
+*.pyo
+__pycache__/
+*.egg-info/
+dist/
+
+# Git
+.git/
+.gitignore
+.gitmodules
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Documentation
+doc/
+*.md
+!README.md
+
+# CI/CD
+.github/
+.travis.yml
+
+# Test files
+test/
+tests/
+*.test
+
+# Old Dockerfile
+.Dockerfile
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Logs
+*.log

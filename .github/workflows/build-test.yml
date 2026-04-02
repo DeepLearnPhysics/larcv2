@@ -1,0 +1,55 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  pull_request:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          load: true
+          tags: larcv2:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test LArCV import
+        run: |
+          docker run --rm larcv2:test python -c "import larcv; print('LArCV version:', larcv.__version__)"
+
+      - name: Test basic functionality
+        run: |
+          docker run --rm larcv2:test python -c "
+          import larcv
+          print('Testing LArCV basic functions...')
+          print('LArCV loaded successfully!')
+          print('Version:', larcv.__version__)
+          "
+
+      - name: Run ROOT tests
+        run: |
+          docker run --rm larcv2:test python -c "
+          import ROOT
+          from ROOT import larcv
+          print('ROOT and LArCV loaded successfully!')
+          print('ROOT version:', ROOT.gROOT.GetVersion())
+          "
