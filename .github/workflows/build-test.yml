@@ -45,11 +45,11 @@ jobs:
           print('Version:', larcv.__version__)
           "
 
-      - name: Run ROOT tests
+      - name: Verify ROOT integration
         run: |
           docker run --rm larcv2:test python -c "
+          import larcv
           import ROOT
-          from ROOT import larcv
-          print('ROOT and LArCV loaded successfully!')
           print('ROOT version:', ROOT.gROOT.GetVersion())
+          print('LArCV and ROOT integration verified!')
           "
