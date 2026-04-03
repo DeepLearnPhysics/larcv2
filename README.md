@@ -81,7 +81,7 @@ docker pull ghcr.io/deeplearnphysics/larcv2:ubuntu22.04
 
 **Ubuntu Versions:**
 - **Ubuntu 24.04**: Default, latest ROOT version (6.34.00)
-- **Ubuntu 22.04**: For compatibility with MinkowskiEngine and older systems (ROOT 6.32.06)
+- **Ubuntu 22.04**: For compatibility with MinkowskiEngine and older systems (ROOT 6.32.02)
 
 ### Running the Container
 
@@ -122,7 +122,7 @@ To build the Docker image locally:
 docker build -t larcv2:local .
 
 # Build for Ubuntu 22.04
-docker build --build-arg UBUNTU_VERSION=22.04 --build-arg ROOT_VERSION=6.32.06 -t larcv2:ubuntu22.04 .
+docker build --build-arg UBUNTU_VERSION=22.04 --build-arg ROOT_VERSION=6.32.02 -t larcv2:ubuntu22.04 .
 ```
 
 ### Available Tags

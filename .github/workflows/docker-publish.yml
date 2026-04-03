@@ -32,7 +32,7 @@ jobs:
             suffix: "ubuntu24.04"
             is-default: true
           - ubuntu-version: "22.04"
-            root-version: "6.32.06"
+            root-version: "6.32.02"
             suffix: "ubuntu22.04"
             is-default: false
 
