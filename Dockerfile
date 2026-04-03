@@ -1,7 +1,10 @@
 # Use ROOT6 official image as base
 # Available versions: https://hub.docker.com/r/rootproject/root/tags
 # Note: ROOT images are linux/amd64 only. On ARM (Apple Silicon), Docker will use emulation.
-FROM rootproject/root:6.34.00-ubuntu24.04
+# Build args allow building for different Ubuntu versions
+ARG UBUNTU_VERSION=24.04
+ARG ROOT_VERSION=6.34.00
+FROM rootproject/root:${ROOT_VERSION}-ubuntu${UBUNTU_VERSION}
 
 LABEL maintainer="drielsma@stanford.edu"
 LABEL org.opencontainers.image.source="https://github.com/DeepLearnPhysics/larcv2"

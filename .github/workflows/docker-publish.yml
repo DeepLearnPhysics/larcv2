@@ -23,6 +23,18 @@ jobs:
     permissions:
       contents: read
       packages: write
+    
+    strategy:
+      matrix:
+        include:
+          - ubuntu-version: "24.04"
+            root-version: "6.34.00"
+            suffix: "ubuntu24.04"
+            is-default: true
+          - ubuntu-version: "22.04"
+            root-version: "6.32.06"
+            suffix: "ubuntu22.04"
+            is-default: false
 
     steps:
       - name: Checkout repository
@@ -44,24 +56,30 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            # For PRs, tag with pr-number
-            type=ref,event=pr
-            # For branch pushes, tag with branch name
-            type=ref,event=branch
-            # For version tags: v2.3.4 -> 2.3.4, 2.3, latest
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+            # For PRs, tag with pr-number and ubuntu version
+            type=ref,event=pr,suffix=-${{ matrix.suffix }}
+            # For branch pushes, tag with branch name and ubuntu version
+            type=ref,event=branch,suffix=-${{ matrix.suffix }}
+            # For version tags: v2.3.4 -> 2.3.4-ubuntu24.04, etc.
+            type=semver,pattern={{version}},suffix=-${{ matrix.suffix }}
+            type=semver,pattern={{major}}.{{minor}},suffix=-${{ matrix.suffix }}
+            # Ubuntu version tag (always created)
+            type=raw,value=${{ matrix.suffix }}
+            # Latest tag only for default Ubuntu version (24.04) on version tags
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') && matrix.is-default == true }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
+          build-args: |
+            UBUNTU_VERSION=${{ matrix.ubuntu-version }}
+            ROOT_VERSION=${{ matrix.root-version }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.suffix }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.suffix }}
 
   cleanup-old-images:
     runs-on: ubuntu-latest

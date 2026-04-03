@@ -66,15 +66,22 @@ Checkout the [Wiki](https://github.com/DeepLearnPhysics/larcv2/wiki) for notes o
 Pre-built Docker images are available from GitHub Container Registry:
 
 ```bash
-# Pull the latest stable release
+# Pull the latest stable release (Ubuntu 24.04)
 docker pull ghcr.io/deeplearnphysics/larcv2:latest
 
 # Pull a specific version
-docker pull ghcr.io/deeplearnphysics/larcv2:2.3.0
+docker pull ghcr.io/deeplearnphysics/larcv2:2.3.0-ubuntu24.04
 
 # Pull the latest development version
-docker pull ghcr.io/deeplearnphysics/larcv2:develop
+docker pull ghcr.io/deeplearnphysics/larcv2:develop-ubuntu24.04
+
+# Pull Ubuntu 22.04 version (for MinkowskiEngine compatibility)
+docker pull ghcr.io/deeplearnphysics/larcv2:ubuntu22.04
 ```
+
+**Ubuntu Versions:**
+- **Ubuntu 24.04**: Default, latest ROOT version (6.34.00)
+- **Ubuntu 22.04**: For compatibility with MinkowskiEngine and older systems (ROOT 6.32.06)
 
 ### Running the Container
 
@@ -99,6 +106,9 @@ docker run --rm -v $(pwd):/data ghcr.io/deeplearnphysics/larcv2:latest python /d
 # Use specific version
 ./docker-run.sh --version 2.3.0 bash
 
+# Use Ubuntu 22.04 version
+./docker-run.sh --ubuntu-version 22.04 bash
+
 # See all options
 ./docker-run.sh --help
 ```
@@ -108,15 +118,20 @@ docker run --rm -v $(pwd):/data ghcr.io/deeplearnphysics/larcv2:latest python /d
 To build the Docker image locally:
 
 ```bash
+# Build for Ubuntu 24.04 (default)
 docker build -t larcv2:local .
+
+# Build for Ubuntu 22.04
+docker build --build-arg UBUNTU_VERSION=22.04 --build-arg ROOT_VERSION=6.32.06 -t larcv2:ubuntu22.04 .
 ```
 
 ### Available Tags
 
-Images are automatically built and published when version tags are pushed:
-- Pushing `v2.3.0` creates tags: `2.3.0`, `2.3`, `latest`
-- Pushing to `develop` branch creates tag: `develop`
-- Pushing to `main` branch creates tag: `main`
+Images are automatically built and published for both Ubuntu 22.04 and 24.04 when version tags are pushed:
+- Pushing `v2.3.0` creates tags: `2.3.0-ubuntu24.04`, `2.3.0-ubuntu22.04`, `2.3-ubuntu24.04`, `2.3-ubuntu22.04`, `latest` (24.04)
+- Pushing to `develop` creates: `develop-ubuntu24.04`, `develop-ubuntu22.04`
+- Pushing to `main` creates: `main-ubuntu24.04`, `main-ubuntu22.04`
+- Always available: `ubuntu24.04`, `ubuntu22.04`
 
 ## Releases
 

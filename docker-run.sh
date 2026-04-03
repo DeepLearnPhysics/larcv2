@@ -14,6 +14,7 @@ set -e
 IMAGE="ghcr.io/deeplearnphysics/larcv2:latest"
 MOUNT_DIR=""
 INTERACTIVE="-it"
+UBUNTU_VERSION=""
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -30,6 +31,10 @@ while [[ $# -gt 0 ]]; do
             IMAGE="ghcr.io/deeplearnphysics/larcv2:$2"
             shift 2
             ;;
+        --ubuntu-version)
+            UBUNTU_VERSION="$2"
+            shift 2
+            ;;
         --no-interactive)
             INTERACTIVE=""
             shift
@@ -42,6 +47,7 @@ while [[ $# -gt 0 ]]; do
             echo "Options:"
             echo "  --image IMAGE        Use specific image (default: ghcr.io/deeplearnphysics/larcv2:latest)"
             echo "  --version VERSION    Use specific version tag (e.g., 2.3.4)"
+            echo "  --ubuntu-version VER Use specific Ubuntu version (22.04 or 24.04)"
             echo "  --mount DIR          Mount local directory to /data in container"
             echo "  --no-interactive     Run in non-interactive mode"
             echo "  -h, --help           Show this help message"
@@ -51,6 +57,7 @@ while [[ $# -gt 0 ]]; do
             echo "  $0 python script.py                   # Run Python script"
             echo "  $0 --mount /data python process.py    # Run with mounted data directory"
             echo "  $0 --version 2.3.4 bash               # Use specific version"
+            echo "  $0 --ubuntu-version 22.04 bash        # Use Ubuntu 22.04 image"
             exit 0
             ;;
         *)
@@ -59,6 +66,19 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# Apply Ubuntu version to image tag if specified
+if [ -n "$UBUNTU_VERSION" ]; then
+    # Extract base image and tag
+    if [[ "$IMAGE" =~ ^(.+):(.+)$ ]]; then
+        BASE="${BASH_REMATCH[1]}"
+        TAG="${BASH_REMATCH[2]}"
+        IMAGE="${BASE}:${TAG}-ubuntu${UBUNTU_VERSION}"
+    else
+        # No tag specified, use ubuntu version as tag
+        IMAGE="${IMAGE}:ubuntu${UBUNTU_VERSION}"
+    fi
+fi
 
 # Build docker run command
 DOCKER_CMD="docker run --rm ${INTERACTIVE}"
