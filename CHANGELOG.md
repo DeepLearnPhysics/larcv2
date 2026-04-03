@@ -5,7 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.3.4] - 2026-04-03
+
+### Added
+- Multi-platform Docker support for both Ubuntu 22.04 and 24.04
+- Ubuntu 22.04 images for MinkowskiEngine compatibility (ROOT 6.32.02)
+- `--ubuntu-version` flag to docker-run.sh helper script
+- Matrix build strategy in GitHub Actions for parallel image builds
+
+### Changed
+- Dockerfile now uses build arguments for Ubuntu and ROOT version selection
+- Docker images published with Ubuntu version suffixes (e.g., `-ubuntu22.04`, `-ubuntu24.04`)
+- Updated documentation to explain Ubuntu version differences and usage
 
 ## [2.3.3] - 2026-04-02
 
@@ -25,9 +36,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Deprecated Travis CI integration
 - Old Singularity Hub references
-
-## [2.3.2] - Previous release
-
-[Unreleased]: https://github.com/DeepLearnPhysics/larcv2/compare/v2.3.3...HEAD
-[2.3.3]: https://github.com/DeepLearnPhysics/larcv2/releases/tag/v2.3.3
-[2.3.2]: https://github.com/DeepLearnPhysics/larcv2/releases/tag/v2.3.2
