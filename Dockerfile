@@ -17,7 +17,8 @@ WORKDIR /app/larcv2
 # Set environment variables to prevent Python from writing bytecode and buffering
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    DEBIAN_FRONTEND=noninteractive
+    DEBIAN_FRONTEND=noninteractive \
+    PIP_BREAK_SYSTEM_PACKAGES=1
 
 # Install system dependencies
 RUN apt-get update && \
@@ -27,13 +28,18 @@ RUN apt-get update && \
     git \
     python3-pip \
     python3-dev \
-    python3-numpy \
     libopencv-dev \
-    python3-opencv \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up Python symlinks (ROOT6 image might have different python setup)
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+
+# Remove system numpy if present (may come from base ROOT image)
+RUN apt-get remove -y python3-numpy || true
+
+# Install numpy 2.2.6 and opencv-python via pip to ensure compatibility
+# This avoids conflicts with system packages that depend on numpy 1.x
+RUN pip3 install --no-cache-dir numpy==2.2.6 opencv-python
 
 # Copy the entire project
 COPY . .
