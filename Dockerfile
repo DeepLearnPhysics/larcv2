@@ -26,8 +26,11 @@ RUN apt-get update && \
     build-essential \
     cmake \
     git \
+    gfortran \
+    pkg-config \
     python3-pip \
     python3-dev \
+    libopenblas-dev \
     libopencv-dev \
     && rm -rf /var/lib/apt/lists/*
 
@@ -37,9 +40,13 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 # Remove system numpy if present (may come from base ROOT image)
 RUN apt-get remove -y python3-numpy || true
 
-# Install numpy 2.2.6 and opencv-python via pip to ensure compatibility
-# This avoids conflicts with system packages that depend on numpy 1.x
-RUN pip3 install --no-cache-dir numpy==2.2.6 opencv-python
+# Build numpy 2.2.6 from source against the system OpenBLAS to avoid
+# loading a wheel-bundled BLAS alongside downstream OpenBLAS consumers.
+RUN pip3 install --no-cache-dir --no-binary=numpy \
+    -Csetup-args=-Dblas=openblas \
+    -Csetup-args=-Dlapack=openblas \
+    numpy==2.2.6 && \
+    pip3 install --no-cache-dir opencv-python
 
 # Copy the entire project
 COPY . .
