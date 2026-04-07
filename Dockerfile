@@ -40,11 +40,15 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 # Remove system numpy if present (may come from base ROOT image)
 RUN apt-get remove -y python3-numpy || true
 
+# Upgrade Python packaging tools first; the numpy source build relies on
+# modern pip config-settings support for the Meson backend.
+RUN python3 -m pip install --no-cache-dir --ignore-installed pip setuptools wheel
+
 # Build numpy 2.2.6 from source against the system OpenBLAS to avoid
 # loading a wheel-bundled BLAS alongside downstream OpenBLAS consumers.
 RUN pip3 install --no-cache-dir --no-binary=numpy \
-    -Csetup-args=-Dblas=openblas \
-    -Csetup-args=-Dlapack=openblas \
+    --config-settings=setup-args=-Dblas=openblas \
+    --config-settings=setup-args=-Dlapack=openblas \
     numpy==2.2.6 && \
     pip3 install --no-cache-dir opencv-python
 
