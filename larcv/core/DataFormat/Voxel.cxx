@@ -13,6 +13,7 @@ namespace larcv {
 
   VoxelSet::VoxelSet(const std::vector<larcv::VoxelID_t>& id_v,
     const std::vector<float>& val_v)
+    : _id(larcv::kINVALID_INSTANCEID)
   {
     if(id_v.size() != val_v.size())
       throw larbys("ID and VALUE array size mismatch. Can't construct VoxelSet!");

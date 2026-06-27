@@ -7,6 +7,87 @@ namespace larcv {
 
   static CombineTensor3DProcessFactory __global_CombineTensor3DProcessFactory__;
 
+  namespace {
+
+    void merge_sorted_voxels(const std::vector<larcv::Voxel>& input,
+                             std::vector<larcv::VoxelID_t>& output_id_v,
+                             std::vector<float>& output_value_v,
+                             CombineTensor3D::PoolType_t pool_type)
+    {
+      if (input.empty()) return;
+
+      if (output_id_v.empty()) {
+        output_id_v.reserve(input.size());
+        output_value_v.reserve(input.size());
+        for (auto const& vox : input) {
+          output_id_v.push_back(vox.id());
+          output_value_v.push_back(vox.value());
+        }
+        return;
+      }
+
+      std::vector<larcv::VoxelID_t> merged_id_v;
+      std::vector<float> merged_value_v;
+      merged_id_v.reserve(output_id_v.size() + input.size());
+      merged_value_v.reserve(output_value_v.size() + input.size());
+
+      size_t output_index = 0;
+      size_t input_index = 0;
+      while (output_index < output_id_v.size() && input_index < input.size()) {
+        auto const output_id = output_id_v[output_index];
+        auto const& input_vox = input[input_index];
+
+        if (output_id < input_vox.id()) {
+          merged_id_v.push_back(output_id);
+          merged_value_v.push_back(output_value_v[output_index]);
+          ++output_index;
+          continue;
+        }
+
+        if (input_vox.id() < output_id) {
+          merged_id_v.push_back(input_vox.id());
+          merged_value_v.push_back(input_vox.value());
+          ++input_index;
+          continue;
+        }
+
+        float value = output_value_v[output_index];
+        switch (pool_type) {
+        case CombineTensor3D::kSumPool:
+          value += input_vox.value();
+          break;
+        case CombineTensor3D::kMaxPool:
+          if (input_vox.value() > value) value = input_vox.value();
+          break;
+        case CombineTensor3D::kMinPool:
+          if (input_vox.value() < value) value = input_vox.value();
+          break;
+        }
+        merged_id_v.push_back(output_id);
+        merged_value_v.push_back(value);
+        ++output_index;
+        ++input_index;
+      }
+
+      while (output_index < output_id_v.size()) {
+        merged_id_v.push_back(output_id_v[output_index]);
+        merged_value_v.push_back(output_value_v[output_index]);
+        ++output_index;
+      }
+
+      while (input_index < input.size()) {
+        auto const& input_vox = input[input_index];
+        merged_id_v.push_back(input_vox.id());
+        merged_value_v.push_back(input_vox.value());
+        ++input_index;
+      }
+
+      output_id_v = std::move(merged_id_v);
+      output_value_v = std::move(merged_value_v);
+    }
+
+  }
+
   CombineTensor3D::CombineTensor3D(const std::string name)
     : ProcessBase(name)
   {}
@@ -31,6 +112,8 @@ namespace larcv {
     //larcv::VoxelSet vs;
     larcv::SparseTensor3D vs;
     Voxel3DMeta meta;
+    std::vector<larcv::VoxelID_t> merged_id_v;
+    std::vector<float> merged_value_v;
 
     for(auto const& producer : _tensor3d_producer_v) {
       auto const& ev_tensor3d = mgr.get_data<larcv::EventSparseTensor3D>(producer);
@@ -41,6 +124,10 @@ namespace larcv {
       if(meta != ev_tensor3d.meta()) {
         LARCV_CRITICAL() << "Producer " << producer << " has incompatible Voxel3DMeta" << std::endl;
         throw larbys();
+      }
+      if (_fuzzy_distance <= 0.) {
+        merge_sorted_voxels(ev_tensor3d.as_vector(), merged_id_v, merged_value_v, _pool_type);
+        continue;
       }
       switch(_pool_type) {
       case kSumPool:
@@ -62,6 +149,11 @@ namespace larcv {
         }
         break;
       }
+    }
+
+    if (_fuzzy_distance <= 0.) {
+      larcv::VoxelSet merged_voxels(merged_id_v, merged_value_v);
+      vs.emplace(std::move(merged_voxels), meta);
     }
 
     auto& out_tensor3d = mgr.get_data<larcv::EventSparseTensor3D>(_output_producer);
