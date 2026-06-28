@@ -18,6 +18,8 @@
 #include <vector>
 #include <map>
 #include <cstdint>
+#include <string>
+#include <utility>
 
 namespace larcv {
     /**
@@ -29,7 +31,22 @@ namespace larcv {
 
 		public:
 			/// Default constructor
-			CRTHit() : _id(kINVALID_INDEX) {};
+			CRTHit()
+				: _id(kINVALID_INDEX)
+				, _peshit(0)
+				, _ts0_s(0)
+				, _ts0_s_corr(0)
+				, _ts0_ns(0)
+				, _ts0_ns_corr(0)
+				, _ts1_ns(0)
+				, _plane(0)
+				, _x_pos(0)
+				, _x_err(0)
+				, _y_pos(0)
+				, _y_err(0)
+				, _z_pos(0)
+				, _z_err(0)
+			{};
 
 			/// Default destructor
 			virtual ~CRTHit() {}
