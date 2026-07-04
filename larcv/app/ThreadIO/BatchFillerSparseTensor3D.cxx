@@ -59,7 +59,7 @@ void BatchFillerSparseTensor3D::_batch_end_() {
 void BatchFillerSparseTensor3D::finalize() { _entry_data.clear(); }
 
 void BatchFillerSparseTensor3D::assert_dimension(
-    const EventSparseTensor3D& voxel_data) const {
+    const EventSparseTensor3D& /*voxel_data*/) const {
   // auto const& voxel_meta = voxel_data.as_vector().front().meta();
   // if (_rows != voxel_meta.rows()) {
   //   LARCV_CRITICAL() << "# of Y-voxels (" << _rows << ") changed ... now "
@@ -119,7 +119,7 @@ bool BatchFillerSparseTensor3D::process(IOManager& mgr) {
   }
   // one time operation: get image dimension
   if (batch_data().dim().empty()) {
-    auto const& voxel_meta = voxel_data.meta();
+    //auto const& voxel_meta = voxel_data.meta();
     std::vector<int> dim;
     dim.resize(3);
     dim.at(0) = batch_size();
@@ -141,7 +141,7 @@ bool BatchFillerSparseTensor3D::process(IOManager& mgr) {
   auto & meta = voxel_data.meta();
 
   // Check that this projection ID is in the lists of channels:
-  bool found = false;
+  //bool found = false;
   size_t i = 0;
   
   // Get the random x/y/z flipping

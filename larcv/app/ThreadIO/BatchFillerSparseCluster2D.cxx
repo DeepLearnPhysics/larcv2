@@ -56,7 +56,7 @@ void BatchFillerSparseCluster2D::_batch_end_() {
 void BatchFillerSparseCluster2D::finalize() { _entry_data.clear(); }
 
 void BatchFillerSparseCluster2D::assert_dimension(
-    const EventClusterPixel2D& cluster_data) const {
+    const EventClusterPixel2D& /*cluster_data*/) const {
   // auto const& voxel_meta = cluster_data.as_vector().front().meta();
   // if (_rows != voxel_meta.rows()) {
   //   LARCV_CRITICAL() << "# of Y-voxels (" << _rows << ") changed ... now "

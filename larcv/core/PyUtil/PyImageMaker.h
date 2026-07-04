@@ -66,7 +66,9 @@ namespace larcv {
   class PyImageMakerProcessFactory : public ProcessFactoryBase {
   public:
     /// ctor
-    PyImageMakerProcessFactory() { ProcessFactory::get().add_factory("PyImageMaker",this); }
+    PyImageMakerProcessFactory() {
+      (void)_import_array(); // quiet warning ...numpy/core/include/numpy/__multiarray_api.h ... defined but not used
+      ProcessFactory::get().add_factory("PyImageMaker",this); }
     /// dtor
     ~PyImageMakerProcessFactory() {}
     /// creation method

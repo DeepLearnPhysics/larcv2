@@ -8,14 +8,14 @@ namespace larcv {
 
 std::vector< std::vector<int> > sample(double ** carray, int * csamples, int npts, int num_samples, double threshold) {
     std::vector< std::vector<int> > all_fragments;
-    for (size_t i = 0; i < num_samples; ++i)
+    for (int i = 0; i < num_samples; ++i)
     {
         double x = carray[csamples[i]][0];
         double y = carray[csamples[i]][1];
         double z = carray[csamples[i]][2];
         std::vector<int> fragment_idx;
         // Find all points in this fragment around the sample point
-        for (size_t j = 0; j < npts; ++j) {
+        for (int j = 0; j < npts; ++j) {
             double distance = std::sqrt(std::pow(carray[j][0]-x, 2) + std::pow(carray[j][1]-y, 2) + std::pow(carray[j][2]-z, 2));
             if (distance <= threshold) {
                 fragment_idx.push_back(j);
@@ -30,7 +30,7 @@ std::vector< std::vector<int> > sample(double ** carray, int * csamples, int npt
 
 void compute_pca(double ** coords, int nfrag, double * output) {
     double mean[3];
-    for (size_t k = 0; k < nfrag; ++k) {
+    for (int k = 0; k < nfrag; ++k) {
         mean[0] += coords[k][0];
         mean[1] += coords[k][1];
         mean[2] += coords[k][2];
@@ -45,7 +45,7 @@ void compute_pca(double ** coords, int nfrag, double * output) {
     for (size_t i1 = 0; i1 < 3; ++i1) {
         for (size_t i2 = 0; i2 < 3; ++i2) {
             M[i1][i2] = 0.;
-            for (size_t k = 0; k < nfrag; ++k) {
+            for (int k = 0; k < nfrag; ++k) {
                 M[i1][i2] = M[i1][i2] + (coords[k][i1]-mean[i1]) * (coords[k][i2]-mean[i2]);
             }
         }
@@ -111,10 +111,9 @@ void PCA_3D::_fit(double **coords, size_t n, bool store_spread)
     
   // fill eigenvectors with descending eigenvalues
   _components.reserve(3);
-  double eig_val[3];
+
   for (size_t i = 0; i < 3; ++i){
     size_t ii = idx[i];
-    eig_val[i] = ev[ii];
     std::vector<double> vec(3);
     for (size_t j = 0; j < 3; ++j)
       vec[j] = vh[j][ii]; // transpose of vh sorted by eigenvalue

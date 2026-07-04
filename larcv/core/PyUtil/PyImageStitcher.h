@@ -71,7 +71,10 @@ namespace larcv {
   class PyImageStitcherProcessFactory : public ProcessFactoryBase {
   public:
     /// ctor
-    PyImageStitcherProcessFactory() { ProcessFactory::get().add_factory("PyImageStitcher",this); }
+    PyImageStitcherProcessFactory() {
+      (void)_import_array(); // quiet warning ...numpy/core/include/numpy/__multiarray_api.h ... defined but not used
+      ProcessFactory::get().add_factory("PyImageStitcher",this);
+    }
     /// dtor
     ~PyImageStitcherProcessFactory() {}
     /// creation method

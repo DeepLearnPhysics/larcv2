@@ -2,6 +2,7 @@
 #define __LARCV_CVUTIL_CXX__
 
 #include "CVUtil.h"
+#include "opencv2/imgcodecs/legacy/constants_c.h" // CV_LOAD_IMAGE_COLOR
 
 namespace larcv {
 

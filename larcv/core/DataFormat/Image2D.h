@@ -38,6 +38,8 @@ namespace larcv {
     /// copy ctor
     Image2D(const Image2D&);
     
+    Image2D& operator=(const Image2D&) = default;
+
 #ifndef __CINT__
     /// attribute move ctor
     Image2D(ImageMeta&&, std::vector<float>&&);

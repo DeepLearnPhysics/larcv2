@@ -204,7 +204,7 @@ PyObject * fragment(PyObject * pyarray, PyObject * samples_idx, double threshold
   			       "ERROR: cannot convert samples to 1D C-array");
       throw larbys();
     }
-    int num_samples = dim_samples[0];
+    size_t num_samples = dim_samples[0];
 
     std::vector< std::vector<int> > all_fragments = sample(carray, csamples, npts, num_samples, threshold);
     assert(all_fragments.size() == num_samples);
@@ -224,7 +224,7 @@ PyObject * fragment(PyObject * pyarray, PyObject * samples_idx, double threshold
         int nfrag = fragment_idx.size();
         //std::cout << i << " " << nfrag << std::endl;
         double coords[nfrag][3];
-        for (size_t k = 0; k < nfrag; ++k) {
+        for (int k = 0; k < nfrag; ++k) {
             auto j = fragment_idx[k];
             coords[k][0] = carray[j][0];
             coords[k][1] = carray[j][1];
@@ -293,7 +293,7 @@ void fill_3d_pcloud(const VoxelSet& data, const Voxel3DMeta& meta, PyObject* pya
     select_ptr = (int*)(PyArray_GetPtr(select_pyptr,loc));
   }
 
-  if(npts > data.size() || (dims[1] != 1 && dims[1] != 3 && dims[1] != 4) || dims[0] != data.size()) {
+  if(npts > data.size() || (dims[1] != 1 && dims[1] != 3 && dims[1] != 4) || (size_t)dims[0] != data.size()) {
     logger::get("PyUtil").send(larcv::msg::kCRITICAL,__FUNCTION__,__LINE__,
 			       "ERROR: dimension mismatch");
     throw larbys();
@@ -365,7 +365,7 @@ void fill_3d_voxels(const VoxelSet& data, const Voxel3DMeta& meta, PyObject* pya
     select_ptr = (int*)(PyArray_GetPtr(select_pyptr,loc));
   }
 
-  if(npts > data.size() || dims[1] != 3 || dims[0] != npts) {
+  if(npts > data.size() || dims[1] != 3 || (size_t)dims[0] != npts) {
     logger::get("PyUtil").send(larcv::msg::kCRITICAL,__FUNCTION__,__LINE__,
 			       "ERROR: dimension mismatch");
     throw larbys();
@@ -622,7 +622,7 @@ void as_flat_arrays(const VoxelSet& tensor, const Voxel3DMeta& meta,
   };
 }
 
-void as_flat_arrays(const VoxelSet& tensor, const Voxel3DMeta& meta,
+void as_flat_arrays(const VoxelSet& tensor, const Voxel3DMeta& /*meta*/,
                     PyObject* index, PyObject* value)
 {
   SetPyUtil();

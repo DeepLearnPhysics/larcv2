@@ -67,7 +67,10 @@ namespace larcv {
   class PyCluster3DMakerProcessFactory : public ProcessFactoryBase {
   public:
     /// ctor
-    PyCluster3DMakerProcessFactory() { ProcessFactory::get().add_factory("PyCluster3DMaker",this); }
+    PyCluster3DMakerProcessFactory() {
+      (void)_import_array(); // quiet warning ...numpy/core/include/numpy/__multiarray_api.h ... defined but not used
+      ProcessFactory::get().add_factory("PyCluster3DMaker",this);
+      }
     /// dtor
     ~PyCluster3DMakerProcessFactory() {}
     /// creation method

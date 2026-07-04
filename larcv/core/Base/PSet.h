@@ -32,6 +32,8 @@ namespace larcv {
     PSet(const std::string name="",
 	 const std::string data="");
 
+    PSet& operator=(const PSet&) = default;
+
     /// Default destructor
     virtual ~PSet(){};
 

@@ -41,7 +41,7 @@ namespace larcv {
 
     // Create one IOManager per input file
     for (size_t i = 0; i < _num_input_files; ++i) {
-      for (size_t j = 0; j < multiplicity[i]; ++j) {
+      for (int j = 0; j < multiplicity[i]; ++j) {
         IOManager io(IOManager::kREAD, "InputStream" + std::to_string(i));
         io.add_in_file(input_files[i]);
         _in_io.push_back(io);

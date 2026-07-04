@@ -22,7 +22,7 @@ namespace larcv {
         _meta = meta;
     }
 
-    const Voxel& SparseTensor2D::close(VoxelID_t id, double distance, const larcv::ImageMeta& meta) const
+    const Voxel SparseTensor2D::close(VoxelID_t id, double distance, const larcv::ImageMeta& meta) const
 	{
 		const std::vector<larcv::Voxel>& voxel_v = this->as_vector();
 		if(voxel_v.empty())
