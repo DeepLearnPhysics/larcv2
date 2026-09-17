@@ -35,8 +35,9 @@ test/
 tests/
 *.test
 
-# Old Dockerfile
+# Docker recipes are not LArCV build inputs
 .Dockerfile
+docker/Dockerfile*
 
 # Virtual environments
 venv/

@@ -14,6 +14,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: full
+            file: docker/Dockerfile.full
+          - name: runtime
+            file: docker/Dockerfile.runtime
     
     steps:
       - name: Checkout repository
@@ -26,19 +33,20 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ${{ matrix.file }}
           push: false
           load: true
-          tags: larcv2:test
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          tags: larcv2:test-${{ matrix.name }}
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
 
       - name: Test LArCV import
         run: |
-          docker run --rm larcv2:test python -c "import larcv; print('LArCV version:', larcv.__version__)"
+          docker run --rm larcv2:test-${{ matrix.name }} python3 -c "import larcv; print('LArCV version:', larcv.__version__)"
 
       - name: Test basic functionality
         run: |
-          docker run --rm larcv2:test python -c "
+          docker run --rm larcv2:test-${{ matrix.name }} python3 -c "
           import larcv
           print('Testing LArCV basic functions...')
           print('LArCV loaded successfully!')
@@ -47,9 +55,16 @@ jobs:
 
       - name: Verify ROOT integration
         run: |
-          docker run --rm larcv2:test python -c "
+          docker run --rm larcv2:test-${{ matrix.name }} python3 -c "
           import larcv
           import ROOT
           print('ROOT version:', ROOT.gROOT.GetVersion())
           print('LArCV and ROOT integration verified!')
           "
+
+      - name: Verify runtime data classes
+        if: matrix.name == 'runtime'
+        run: |
+          docker run --rm \
+            -v "$PWD/docker/runtime-smoke.py:/tmp/runtime-smoke.py:ro" \
+            larcv2:test-runtime python3 /tmp/runtime-smoke.py

@@ -115,23 +115,51 @@ docker run --rm -v $(pwd):/data ghcr.io/deeplearnphysics/larcv2:latest python /d
 
 ### Building Locally
 
-To build the Docker image locally:
+Two Dockerfiles are maintained side by side:
+
+- `docker/Dockerfile.full` builds the existing development image with the
+  optional LArCV applications and OpenCV support.
+- `docker/Dockerfile.runtime` builds a runtime image containing only the ROOT
+  components needed for LArCV I/O, the LArCV core, Python, and NumPy. It does
+  not contain OpenCV, HDF5, Torch, CMake, or Git.
+
+To build the images locally:
 
 ```bash
-# Build for Ubuntu 24.04 (default)
-docker build -t larcv2:local .
+# Lean ROOT + LArCV runtime for Ubuntu 24.04
+docker build -f docker/Dockerfile.runtime -t larcv2:runtime .
 
-# Build for Ubuntu 22.04
-docker build --build-arg UBUNTU_VERSION=22.04 --build-arg ROOT_VERSION=6.32.02 -t larcv2:ubuntu22.04 .
+# Full development image for Ubuntu 24.04
+docker build -f docker/Dockerfile.full -t larcv2:local .
+
+# Full development image for Ubuntu 22.04
+docker build -f docker/Dockerfile.full --build-arg UBUNTU_VERSION=22.04 --build-arg ROOT_VERSION=6.32.02 -t larcv2:ubuntu22.04 .
 ```
+
+The runtime retains NumPy because LArCV's `PyUtil` bridge is required by
+consumers such as SPINE. ROOT's C++ compiler driver and standard-library
+headers are also runtime requirements of its Cling interpreter.
 
 ### Available Tags
 
-Images are automatically built and published for both Ubuntu 22.04 and 24.04 when version tags are pushed:
-- Pushing `v2.3.0` creates tags: `2.3.0-ubuntu24.04`, `2.3.0-ubuntu22.04`, `2.3-ubuntu24.04`, `2.3-ubuntu22.04`, `latest` (24.04)
-- Pushing to `develop` creates: `develop-ubuntu24.04`, `develop-ubuntu22.04`
-- Pushing to `main` creates: `main-ubuntu24.04`, `main-ubuntu22.04`
-- Always available: `ubuntu24.04`, `ubuntu22.04`
+The full image is published for Ubuntu 22.04 and 24.04. The lean runtime is
+currently published for the tested Ubuntu 24.04 / ROOT 6.34 combination:
+
+- Pushing `v2.4.2` creates full-image tags such as `2.4.2-ubuntu24.04`,
+  `2.4.2-ubuntu22.04`, and `latest`.
+- The same release creates `2.4.2-runtime-ubuntu24.04` and the moving
+  `runtime` tag. The runtime image never replaces `latest`.
+- Pushing to `develop` creates `develop-ubuntu24.04`,
+  `develop-ubuntu22.04`, and `develop-runtime-ubuntu24.04`.
+- Moving platform tags are `ubuntu24.04`, `ubuntu22.04`, and
+  `runtime-ubuntu24.04`.
+
+For example:
+
+```bash
+docker pull ghcr.io/deeplearnphysics/larcv2:runtime
+docker pull ghcr.io/deeplearnphysics/larcv2:2.4.2-runtime-ubuntu24.04
+```
 
 ## Releases
 
@@ -140,4 +168,5 @@ To create a new release:
 1. Update the version in `python/larcv/version.py`
 2. Commit the change: `git commit -am "Bump version to X.Y.Z"`
 3. Create and push a tag: `git tag vX.Y.Z && git push origin vX.Y.Z`
-4. GitHub Actions will automatically build and publish the Docker image to `ghcr.io/deeplearnphysics/larcv2:X.Y.Z`
+4. GitHub Actions will publish the full and runtime image flavors. `latest`
+   remains the full Ubuntu 24.04 image and `runtime` identifies the lean image.
