@@ -1,0 +1,162 @@
+# syntax=docker/dockerfile:1
+
+# Build LArCV against the exact ROOT installation copied into the runtime.
+# The official ROOT image contains the compiler and Python headers already, so
+# the LArCV build does not need another apt layer. OpenCV is deliberately left
+# disabled. NumPy is present in the builder because it is needed to compile the
+# optional PyUtil bridge used by SPINE.
+ARG UBUNTU_VERSION=24.04
+ARG ROOT_VERSION=6.34.00
+FROM rootproject/root:${ROOT_VERSION}-ubuntu${UBUNTU_VERSION} AS builder
+
+USER root
+WORKDIR /src/larcv2
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LARCV_BASEDIR=/src/larcv2 \
+    LARCV_BUILDDIR=/src/larcv2/build \
+    LARCV_COREDIR=/src/larcv2/larcv/core \
+    LARCV_APPDIR=/src/larcv2/larcv/app \
+    LARCV_LIBDIR=/src/larcv2/build/lib \
+    LARCV_INCDIR=/src/larcv2/build/include \
+    LARCV_BINDIR=/src/larcv2/build/bin \
+    LARCV_ROOT6=1 \
+    LARCV_NUMPY=1 \
+    LARCV_OPENCV=0 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+COPY . .
+
+# configure.sh discovers NumPy from the ROOT image and leaves OpenCV disabled
+# because no OpenCV include/library paths are supplied.
+RUN bash -c "source configure.sh -q && \
+    make APP_SUBDIRS= -j$(nproc) && \
+    python3 -c 'from larcv import larcv; assert larcv.Vertex'"
+
+# Keep the ROOT interpreter, Python bindings, I/O/tree libraries, dictionaries,
+# and headers needed by Cling. Drop analysis, GUI, web, database, and notebook
+# components from the feature-rich upstream binary distribution.
+RUN mkdir -p /opt/root-runtime/lib && \
+    cp -a /opt/root/LICENSE /opt/root/bin /opt/root/etc /opt/root/include \
+        /opt/root-runtime/ && \
+    cp -a /opt/root/lib/ROOT /opt/root/lib/cppyy \
+        /opt/root/lib/cppyy_backend /opt/root-runtime/lib/ && \
+    cp -a \
+        /opt/root/lib/libCling.so \
+        /opt/root/lib/libCore.so \
+        /opt/root/lib/libImt.so \
+        /opt/root/lib/libHist.so \
+        /opt/root/lib/libMathCore.so \
+        /opt/root/lib/libMatrix.so \
+        /opt/root/lib/libMultiProc.so \
+        /opt/root/lib/libNet.so \
+        /opt/root/lib/libRIO.so \
+        /opt/root/lib/libROOTPythonizations.so \
+        /opt/root/lib/libRint.so \
+        /opt/root/lib/libThread.so \
+        /opt/root/lib/libTree.so \
+        /opt/root/lib/libcppyy.so \
+        /opt/root/lib/libcppyy_backend.so \
+        /opt/root/lib/Cling_Runtime.pcm \
+        /opt/root/lib/Cling_Runtime_Extra.pcm \
+        /opt/root/lib/Core.pcm \
+        /opt/root/lib/Hist.pcm \
+        /opt/root/lib/Imt.pcm \
+        /opt/root/lib/MathCore.pcm \
+        /opt/root/lib/Matrix.pcm \
+        /opt/root/lib/MultiProc.pcm \
+        /opt/root/lib/Net.pcm \
+        /opt/root/lib/RIO.pcm \
+        /opt/root/lib/ROOT_Config.pcm \
+        /opt/root/lib/ROOT_Foundation_C.pcm \
+        /opt/root/lib/ROOT_Foundation_Stage1_NoRTTI.pcm \
+        /opt/root/lib/ROOT_Rtypes.pcm \
+        /opt/root/lib/Rint.pcm \
+        /opt/root/lib/Thread.pcm \
+        /opt/root/lib/Tree.pcm \
+        /opt/root/lib/_Builtin_intrinsics.pcm \
+        /opt/root/lib/_Builtin_stddef.pcm \
+        /opt/root/lib/libc.pcm \
+        /opt/root/lib/std.pcm \
+        /opt/root-runtime/lib/
+
+
+# Prune the large ROOT distribution and build tree without contacting a package
+# mirror. Copying this stage into scratch means deleted files do not remain in
+# lower image layers. ROOT/Cling's system toolchain is retained: it is runtime
+# state, since LArCV dictionaries can cause Cling to parse C++ headers lazily.
+FROM builder AS pruner
+
+COPY docker/runtime-entrypoint.sh /usr/local/bin/larcv-entrypoint
+
+RUN rm -rf /opt/root && \
+    mv /opt/root-runtime /opt/root && \
+    rm -rf /src/larcv2 && \
+    apt-mark auto '.*' >/dev/null && \
+    apt-mark manual \
+        ca-certificates \
+        g++ \
+        python3 \
+        python3-dev \
+        python3-numpy \
+        liblz4-1 \
+        liblzma5 \
+        libpcre2-8-0 \
+        libssl3t64 \
+        libtbb12 \
+        libtinfo6 \
+        libxxhash0 \
+        libzstd1 \
+        zlib1g >/dev/null && \
+    apt-get purge -y --auto-remove && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/* /tmp/* /var/tmp/* && \
+    chmod +x /usr/local/bin/larcv-entrypoint
+
+
+FROM scratch AS runtime
+
+COPY --from=pruner / /
+
+LABEL maintainer="drielsma@stanford.edu" \
+    org.opencontainers.image.source="https://github.com/DeepLearnPhysics/larcv2" \
+    org.opencontainers.image.description="Minimal ROOT and LArCV2 runtime" \
+    org.opencontainers.image.licenses="MIT"
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    CLING_STANDARD_PCH=none \
+    ROOTSYS=/opt/root \
+    LARCV_BASEDIR=/opt/larcv \
+    LARCV_BUILDDIR=/opt/larcv \
+    LARCV_COREDIR=/src/larcv2/larcv/core \
+    LARCV_LIBDIR=/opt/larcv/lib \
+    LARCV_INCDIR=/opt/larcv/include \
+    LARCV_BINDIR=/opt/larcv/bin \
+    LARCV_ROOT6=1 \
+    LARCV_NUMPY=1 \
+    LARCV_OPENCV=0 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PATH=/opt/larcv/bin:/opt/root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+    LD_LIBRARY_PATH=/opt/larcv/lib:/opt/root/lib \
+    PYTHONPATH=/opt/larcv/python:/opt/root/lib
+
+COPY --from=builder /src/larcv2/build/lib /opt/larcv/lib
+COPY --from=builder /src/larcv2/build/include /opt/larcv/include
+COPY --from=builder /src/larcv2/build/bin /opt/larcv/bin
+COPY --from=builder /src/larcv2/python /opt/larcv/python
+COPY --from=builder /src/larcv2/larcv/core /src/larcv2/larcv/core
+
+RUN mkdir -p /src/larcv2/build && \
+    ln -s /opt/larcv/include /src/larcv2/build/include && \
+    ln -s /opt/larcv/lib /src/larcv2/build/lib && \
+    python3 -c "import ROOT; from larcv import larcv; assert larcv.Voxel3DMeta(); print(ROOT.gROOT.GetVersion())"
+
+RUN --mount=type=bind,source=docker/runtime-smoke.py,target=/tmp/runtime-smoke.py \
+    python3 /tmp/runtime-smoke.py
+
+WORKDIR /work
+ENTRYPOINT ["/usr/local/bin/larcv-entrypoint"]
+CMD ["python3"]

@@ -27,14 +27,30 @@ jobs:
     strategy:
       matrix:
         include:
-          - ubuntu-version: "24.04"
+          - name: full-ubuntu24.04
+            file: docker/Dockerfile.full
+            ubuntu-version: "24.04"
             root-version: "6.34.00"
-            suffix: "ubuntu24.04"
+            tag-suffix: "ubuntu24.04"
+            channel-tag: "ubuntu24.04"
             is-default: true
-          - ubuntu-version: "22.04"
+            is-runtime: false
+          - name: full-ubuntu22.04
+            file: docker/Dockerfile.full
+            ubuntu-version: "22.04"
             root-version: "6.32.02"
-            suffix: "ubuntu22.04"
+            tag-suffix: "ubuntu22.04"
+            channel-tag: "ubuntu22.04"
             is-default: false
+            is-runtime: false
+          - name: runtime-ubuntu24.04
+            file: docker/Dockerfile.runtime
+            ubuntu-version: "24.04"
+            root-version: "6.34.00"
+            tag-suffix: "runtime-ubuntu24.04"
+            channel-tag: "runtime-ubuntu24.04"
+            is-default: false
+            is-runtime: true
 
     steps:
       - name: Checkout repository
@@ -44,6 +60,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to the Container registry
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -56,22 +73,25 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            # For PRs, tag with pr-number and ubuntu version
-            type=ref,event=pr,suffix=-${{ matrix.suffix }}
-            # For branch pushes, tag with branch name and ubuntu version
-            type=ref,event=branch,suffix=-${{ matrix.suffix }}
-            # For version tags: v2.3.4 -> 2.3.4-ubuntu24.04, etc.
-            type=semver,pattern={{version}},suffix=-${{ matrix.suffix }}
-            type=semver,pattern={{major}}.{{minor}},suffix=-${{ matrix.suffix }}
-            # Ubuntu version tag (always created)
-            type=raw,value=${{ matrix.suffix }}
+            # Full: pr-123-ubuntu24.04. Runtime: pr-123-runtime-ubuntu24.04.
+            type=ref,event=pr,suffix=-${{ matrix.tag-suffix }}
+            # Full: develop-ubuntu24.04. Runtime: develop-runtime-ubuntu24.04.
+            type=ref,event=branch,suffix=-${{ matrix.tag-suffix }}
+            # Full: 2.4.2-ubuntu24.04. Runtime: 2.4.2-runtime-ubuntu24.04.
+            type=semver,pattern={{version}},suffix=-${{ matrix.tag-suffix }}
+            type=semver,pattern={{major}}.{{minor}},suffix=-${{ matrix.tag-suffix }}
+            # Moving OS/flavor channel tags on branch and release pushes.
+            type=raw,value=${{ matrix.channel-tag }},enable=${{ github.event_name != 'pull_request' }}
             # Latest tag only for default Ubuntu version (24.04) on version tags
             type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') && matrix.is-default == true }}
+            # Runtime remains opt-in; it never replaces latest.
+            type=raw,value=runtime,enable=${{ startsWith(github.ref, 'refs/tags/v') && matrix.is-runtime == true }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ${{ matrix.file }}
           platforms: linux/amd64
           build-args: |
             UBUNTU_VERSION=${{ matrix.ubuntu-version }}
@@ -79,8 +99,8 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ matrix.suffix }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.suffix }}
+          cache-from: type=gha,scope=${{ matrix.tag-suffix }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.tag-suffix }}
           provenance: false
 
   cleanup-old-images:

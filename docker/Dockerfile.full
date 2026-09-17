@@ -77,8 +77,8 @@ RUN python -c "import larcv; print('LArCV imported successfully')" || \
     (echo "Failed to import larcv" && exit 1)
 
 # Set up entrypoint to ensure environment is loaded
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+COPY docker/entrypoint.sh /usr/local/bin/larcv-entrypoint
+RUN chmod +x /usr/local/bin/larcv-entrypoint
 
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/larcv-entrypoint"]
 CMD ["/bin/bash"]
